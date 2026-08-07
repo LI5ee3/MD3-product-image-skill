@@ -1,45 +1,117 @@
-# Replace Variant Prompt
+# LOCKED MASTER VARIANT REPLACEMENT
 
-Use for **MODE B — REPLACE_VARIANT**. Fill every placeholder, attach the locked
-master image first and the new product PNG second, then send to GPT-image.
+请基于提供的母版主图生成当前颜色版本。
 
-```text
-You are replacing the product in a locked master image. Do not redesign.
+这是一次：
 
-Image A (first attached image) is the approved master.
-Image B (second attached image) is the product PNG for SKU
-"{{SKU_NAME}}" (color: {{SKU_COLOR}}).
+“锁定母版后的产品替换”
 
-Product name: "{{PRODUCT_NAME}}".
-Version text: "{{VERSION_TEXT}}".
+不是：
 
-Preserve exactly:
-- Logo size and position.
-- Product name size, position, and Bold 700 styling.
-- Version text size, position, and Medium 500 styling.
-- Spacing and alignment between product name and version text.
-- Background geometric shape types, sizes, and positions.
-- Product showcase area position and size.
-- Overall MD3 direction and composition.
+“重新设计一张相似海报”。
 
-Replace:
-- Image B must occupy the same showcase area as the master product, at the
-  same visual size, center position, and placement logic.
+## References
 
-Allow subtle changes only:
-- Background main color tuned to {{SKU_COLOR}}.
-- Background geometry colors.
-- Shadow strength.
-- Text lightness or darkness only when needed for contrast.
+Image A：
 
-Forbidden:
-- Changing any layout, size, position, shape, or typography relationship.
-- Adding text, selling points, promo labels, badges, prices, or icons.
-- Redesigning the composition or the MD3 style.
+已经确认并锁定的母版主图。
 
-Goal: the result must look like the same master with only the product PNG and
-theme colors swapped.
+Image B：
 
-Output: one 1200 x 1600 px image.
-```
+当前颜色版本的产品 PNG。
 
+其他图片（如果存在）：
+
+仅用于帮助识别产品真实外观，不得作为新的构图参考。
+
+## 核心要求
+
+Image A 是唯一的版式来源。
+
+严格保留 Image A 中：
+
+- 品牌 Logo
+- Logo 大小
+- Logo 位置
+- 产品名称
+- 产品名称大小
+- 产品名称位置
+- 版本文字
+- 版本大小
+- 版本位置
+- 标题与版本之间的排版关系
+- 产品展示区域
+- 产品视觉中心
+- 产品视觉尺寸
+- 背景几何元素形状
+- 背景几何元素大小
+- 背景几何元素位置
+- 整体构图
+- 基本光源方向
+
+## Product Replacement
+
+将 Image A 中的产品替换为 Image B 的产品。
+
+保持：
+
+- 相同视觉尺寸
+- 相同视觉中心
+- 相同摆放逻辑
+- 相同观看角度逻辑
+
+不要让新 SKU：
+
+- 突然变大
+- 突然变小
+- 上下移动
+- 左右移动
+- 改变构图平衡
+
+## Allowed Changes
+
+仅允许根据当前产品颜色调整：
+
+- 背景主色
+- MD3 背景几何元素颜色
+- 阴影强度
+- 必要的轮廓分离光
+- 文字明暗，仅限确保可读性
+
+## Forbidden Changes
+
+不得改变：
+
+- Logo 尺寸
+- Logo 位置
+- 标题尺寸
+- 标题位置
+- 版本尺寸
+- 版本位置
+- 标题/版本间距
+- 背景几何形状
+- 背景几何尺寸
+- 背景几何位置
+- 产品展示区域位置
+- 产品视觉尺寸逻辑
+- 整体版式
+
+不要添加任何额外文字。
+
+不要增加卖点。
+
+不要增加促销标签。
+
+不要重新设计海报。
+
+不要改变 MD3 设计方向。
+
+## Target
+
+最终图像应该像：
+
+“在同一个 PSD / Figma 母版里，只替换了产品 PNG 和主题色。”
+
+而不是：
+
+“GPT-image 又重新设计了一张看起来差不多的海报。”
