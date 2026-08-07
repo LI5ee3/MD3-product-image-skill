@@ -45,15 +45,17 @@ Background decoration must never damage text readability.
 
 ## Five Master Options
 
-Every new product requires exactly five candidate master compositions before selection:
+A new product requires exactly five candidate master compositions before
+master selection.
 
-1. Balanced Classic
-2. Product Dominant
-3. Tonal Surface
-4. Dynamic Arc
-5. Minimal Premium
+They must differ meaningfully in composition, not merely in color.
 
-They must differ in composition, not merely color.
+Do not use predefined fixed composition categories.
+
+The five options should be designed responsively around the actual product,
+while exploring differences in product placement, scale, information-zone
+placement, negative space, MD3 geometry, tonal surfaces, depth, lighting, and
+overall visual balance.
 
 ## Same Product SKU Rule
 
