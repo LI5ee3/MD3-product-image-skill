@@ -2,9 +2,10 @@
 name: md3-product-main-image
 description: >
   Create Google Material Design 3 inspired e-commerce product main images
-  with GPT-image. Supports creating one independent master image for a product,
-  replacing same-product color SKU variants while locking the approved master,
-  and generating complete multi-color SKU sets using a master-first workflow.
+  with GPT-image. Supports generating five master design candidates for a new
+  product, selecting one approved master, replacing same-product color SKU
+  variants while locking that master, and building complete multi-color SKU
+  sets from the same original selected master.
 ---
 
 # MD3 Product Main Image
@@ -14,110 +15,308 @@ description: >
 Create premium 1200 × 1600 px e-commerce product main images for marketplaces
 such as Ozon using GPT-image.
 
-Each product gets its own independently designed master image.
+Each product receives its own independently designed master layout.
 
 Different products do NOT need to share the same layout.
 
-The only global requirement across products is the Google Material Design 3
-visual direction and the generation rules defined in this Skill.
+The only global consistency requirement across different products is:
+
+- Google Material Design 3 inspired visual language
+- strong marketplace readability
+- protected uploaded assets
+- clean product-first composition
 
 For the SAME product with different colors:
 
-- Create one master first.
-- Lock the master.
-- Generate all remaining color SKUs by editing/replacing the product inside
-  that master.
+1. Generate five master design candidates.
+2. Wait for the user to select one.
+3. Lock the selected candidate as the approved master.
+4. Generate all remaining color SKUs from that ORIGINAL selected master.
 
 Never independently redesign every color SKU.
 
 ---
 
-# Supported Modes
+# Workflow States
 
-The Skill supports exactly three workflow modes:
+The workflow contains four states:
 
-1. CREATE_MASTER
-2. REPLACE_VARIANT
-3. BUILD_SKU_SET
+1. CREATE_MASTER_OPTIONS
+2. SELECT_MASTER
+3. REPLACE_VARIANT
+4. BUILD_SKU_SET
 
-Determine the correct mode before generating images.
-
----
-
-# MODE 1 — CREATE_MASTER
-
-Use when:
-
-- the product does not yet have an approved master;
-- the user asks to create a product main image or master;
-- the user specifies one color as the master;
-- the user uploads a logo and product PNG for a new product.
-
-Read:
-
-`prompts/create-master.md`
-
-Generate ONE master image.
-
-Do not automatically generate other SKU colors unless the user explicitly
-requests batch generation.
+Determine the correct state before generating images.
 
 ---
 
-# MODE 2 — REPLACE_VARIANT
+# STATE 1 — CREATE_MASTER_OPTIONS
 
 Use when:
 
-- an approved master already exists;
-- the user supplies another color PNG of the same product;
-- the user asks to replace the product color;
-- the user says the master is confirmed, approved, locked, finalized, or
-  equivalent.
+- this is a new product;
+- there is no approved master;
+- the user asks to create a product main image;
+- the user asks to create a master;
+- the user starts a new SKU set;
+- the user asks to generate design options.
 
-Read:
+Generate exactly FIVE master design candidates.
 
-`prompts/replace-variant.md`
+All five candidates must use the SAME:
 
-CRITICAL:
+- uploaded brand logo;
+- uploaded master product PNG;
+- exact product name;
+- exact version text;
+- output size;
+- MD3 design direction.
 
-Once the user confirms a master, NEVER return to CREATE_MASTER for other
-colors of that same product unless the user explicitly asks to redesign the
-master.
+The five candidates must explore meaningfully different compositions.
 
-Treat the task as editing the master, NOT creating a new poster.
+Do NOT create five nearly identical images with only different background colors.
+
+The candidates should differ in areas such as:
+
+- product placement;
+- product scale;
+- information-zone placement;
+- negative-space distribution;
+- MD3 geometry;
+- arc position;
+- tonal surface structure;
+- depth;
+- lighting balance;
+- overall composition.
+
+After generating the five candidates:
+
+STOP.
+
+Do not generate other color SKUs.
+
+Wait for explicit user selection.
 
 ---
 
-# MODE 3 — BUILD_SKU_SET
+# Five Master Candidate Directions
+
+The following are recommended design directions.
+
+They are not rigid templates.
+
+Adapt them to the actual product shape.
+
+## Option 1 — Balanced Classic
+
+- clear information zone;
+- large product with balanced placement;
+- restrained MD3 geometry;
+- stable commercial composition.
+
+## Option 2 — Product Dominant
+
+- significantly larger product;
+- reduced decorative geometry;
+- strong marketplace-thumbnail readability;
+- information zone carries less visual weight.
+
+## Option 3 — Tonal Surface
+
+- large rounded MD3 tonal surface;
+- more visual layering;
+- product interacts visually with the tonal field;
+- controlled depth.
+
+## Option 4 — Dynamic Arc
+
+- stronger directional curve or arc;
+- increased motion in the composition;
+- strict text-protection zone;
+- product remains dominant.
+
+## Option 5 — Minimal Premium
+
+- maximum negative space;
+- minimal geometry;
+- restrained tonal hierarchy;
+- subtle studio lighting;
+- premium high-end appearance.
+
+The five designs must be genuinely different in layout and composition.
+
+Changing only color does NOT count as a different design.
+
+---
+
+# STATE 2 — SELECT_MASTER
+
+After five candidates exist, wait for the user to choose one.
+
+Recognize selection language such as:
+
+- 方案1
+- 方案2
+- 方案3
+- 方案4
+- 方案5
+- 第一个
+- 第二张
+- 第3个
+- 选4
+- 用第五个
+- 3号作为母版
+- 第三张作为母版
+- 就用这张
+- 这张确认
+- 这张作为母版
+
+If selection is unambiguous:
+
+MASTER_SELECTED = selected option
+
+MASTER_APPROVED = true
+
+The selected ORIGINAL image becomes the only master reference for later SKU
+generation.
+
+Do not merge several candidate designs.
+
+Do not borrow elements from rejected options unless the user explicitly asks.
+
+---
+
+# Redesign Request
+
+If the user says:
+
+- 重新生成5个方案
+- 这5个都不合适
+- 再给我5个
+- 重新设计母版
+- 换一批方案
+- 再做五个不同方案
+
+return to:
+
+CREATE_MASTER_OPTIONS
+
+Generate a new set of five candidates.
+
+Do not continue SKU production until the user selects a new master.
+
+---
+
+# STATE 3 — REPLACE_VARIANT
+
+Use only after:
+
+MASTER_APPROVED = true
+
+The task is a locked-master product replacement.
+
+Image A:
+
+the ORIGINAL selected approved master.
+
+Image B:
+
+the new same-product color SKU PNG.
+
+Do NOT create a new poster.
+
+Do NOT reinterpret the composition.
+
+Strictly preserve:
+
+- brand logo visual size;
+- brand logo location;
+- product-name typography;
+- product-name size;
+- product-name position;
+- version typography;
+- version size;
+- version position;
+- title/version spacing;
+- text alignment;
+- product display area;
+- product visual size;
+- product visual center;
+- background geometry shape;
+- background geometry size;
+- background geometry position;
+- overall composition;
+- main lighting direction.
+
+Allowed changes:
+
+- replacement product PNG;
+- background main color;
+- MD3 geometry color;
+- shadow strength;
+- subtle separation lighting;
+- text light/dark value only where required for contrast.
+
+The result should look like:
+
+the same design file with a different product SKU inserted.
+
+It should NOT look like:
+
+a newly redesigned but similar poster.
+
+---
+
+# STATE 4 — BUILD_SKU_SET
 
 Use when:
 
-- the user uploads several colors of the same product;
-- the user asks to generate all color variants;
-- the user asks for a complete SKU image set.
-
-Read:
-
-`prompts/build-sku-set.md`
+- the user uploads multiple color variants of the same product;
+- the user asks for all SKUs;
+- the user asks for a complete color set;
+- the user asks for batch generation.
 
 The workflow MUST be:
 
-MASTER SKU
-→ CREATE MASTER
-→ lock master
-→ Variant 2 replacement
-→ Variant 3 replacement
-→ Variant N replacement
+1. Identify the master SKU color.
+2. Run CREATE_MASTER_OPTIONS for that SKU.
+3. Generate exactly five master candidates.
+4. STOP.
+5. Wait for user selection.
+6. Run SELECT_MASTER.
+7. Lock the selected option.
+8. Generate every remaining SKU using REPLACE_VARIANT.
 
-Never independently generate multiple posters in parallel.
+Do not generate the full SKU set before master selection.
 
-There must be ONE layout origin for the entire set.
+---
+
+# Critical Batch Rule
+
+Every SKU must be derived from the SAME ORIGINAL selected master.
+
+Correct:
+
+MASTER + SKU 2
+MASTER + SKU 3
+MASTER + SKU 4
+MASTER + SKU 5
+
+Incorrect:
+
+MASTER → SKU 2 → SKU 3 → SKU 4
+
+Never use a previously generated variant as the source for the next variant.
+
+Always return to the ORIGINAL MASTER.
+
+This reduces cumulative layout drift.
 
 ---
 
 # Required Inputs
 
-## CREATE_MASTER
+## CREATE_MASTER_OPTIONS
 
 Required:
 
@@ -126,13 +325,19 @@ Required:
 - product name;
 - version text.
 
-If multiple product colors are already uploaded, identify which color should
-serve as master.
+Optional:
 
-If the user explicitly chooses one, use it.
+- user-selected master color;
+- additional same-product PNGs for product recognition only.
 
-If no master color is specified but multiple colors exist, prefer the variant
-with the clearest silhouette and strongest neutral visual balance.
+If multiple colors are uploaded and the user explicitly identifies the master
+color, use that color.
+
+If the user has not specified a master color, prefer the variant with:
+
+- clear silhouette;
+- strong edge separation;
+- neutral visual balance.
 
 Do not ask unnecessary questions when the correct choice is obvious.
 
@@ -142,10 +347,10 @@ Do not ask unnecessary questions when the correct choice is obvious.
 
 Required:
 
-- approved master image;
-- new same-product color PNG.
+- approved selected master image;
+- new same-product product PNG.
 
-Do not regenerate a replacement if there is no usable master image available.
+Do not proceed if there is no usable approved master.
 
 ---
 
@@ -164,40 +369,143 @@ Optional:
 
 ---
 
-# Product Identity
+# Uploaded Asset Protection
 
-Use uploaded product PNGs as the authoritative reference.
+The uploaded brand logo and uploaded product PNG are PROTECTED SOURCE ASSETS.
 
-Preserve:
+They must be treated as authoritative visual assets.
 
-- silhouette;
-- proportions;
-- case;
-- strap;
-- buttons;
-- crown;
-- product materials;
-- product viewing angle;
-- screen appearance;
-- distinctive physical details.
+The task is to design:
 
-Do not redesign the physical product.
+- layout;
+- MD3 background;
+- composition;
+- lighting;
+- shadow;
+- visual hierarchy
 
-Do not convert it into a different model.
+AROUND the uploaded assets.
+
+The task is NOT to redesign the uploaded assets themselves.
+
+---
+
+# Brand Logo Protection
+
+Do NOT modify the uploaded brand logo.
+
+This includes:
+
+- do not redraw it;
+- do not restyle it;
+- do not reinterpret it;
+- do not simplify it;
+- do not embellish it;
+- do not add effects that alter its original visual identity;
+- do not distort it;
+- do not stretch it;
+- do not recolor it;
+- do not change its internal proportions;
+- do not replace it with a similar logo;
+- do not generate a new logo inspired by it;
+- do not convert it into a 3D object;
+- do not add bevels, metallic effects, glow, outlines, shadows, or other
+  stylization that changes its appearance unless the uploaded logo itself
+  already contains them.
+
+The uploaded logo must remain visually faithful to the original source.
+
+Allowed operations:
+
+- placement;
+- proportional scaling;
+- compositional positioning only.
+
+The logo's internal artwork must remain unchanged.
+
+---
+
+# Product Image Protection
+
+Do NOT modify the uploaded product image itself.
+
+Treat the uploaded product PNG as the authoritative product reference.
+
+Do NOT:
+
+- redesign the product;
+- redraw the product;
+- reinterpret the product;
+- change the product model;
+- change the silhouette;
+- change the case shape;
+- change the strap shape;
+- change the strap holes;
+- change buttons;
+- change crown design;
+- change ports;
+- change hardware details;
+- change screen proportions;
+- change physical materials;
+- change surface finish;
+- change product color;
+- invent missing hardware;
+- remove visible hardware details;
+- add new physical details;
+- stylize the product into another visual style;
+- replace the uploaded product with an approximate generated substitute;
+- create a product that merely looks similar to the uploaded PNG.
+
+The generated result must remain visually faithful to the uploaded product PNG.
+
+Allowed operations:
+
+- proportional scaling;
+- positioning;
+- compositional placement;
+- integration into the MD3 environment;
+- natural lighting;
+- realistic contact shadow;
+- realistic ambient shadow;
+- subtle separation light;
+- same-product color SKU replacement using the uploaded SKU PNG.
+
+Do NOT deform the product merely to fit the composition.
+
+The composition must adapt to the product.
+
+The product must not adapt structurally to the composition.
+
+---
+
+# Protected Asset Priority
+
+If there is any conflict between:
+
+- layout;
+- decorative geometry;
+- visual effect;
+- creative styling;
+
+and the fidelity of the uploaded logo or product PNG:
+
+ASSET FIDELITY HAS PRIORITY.
+
+Never sacrifice product or logo fidelity for visual creativity.
 
 ---
 
 # Allowed Visible Content
 
-Outside text that naturally exists inside the product render/screen, the
-generated main image may contain ONLY:
+Outside text naturally present inside the uploaded product render or screen,
+the generated image may contain ONLY:
 
-- uploaded brand logo;
-- product name;
-- version text;
-- uploaded product;
-- MD3-inspired background geometry;
-- lighting and shadows.
+1. uploaded brand logo;
+2. exact product name;
+3. exact version text;
+4. uploaded product PNG;
+5. MD3-inspired background geometry;
+6. natural lighting and shadows.
 
 Do NOT add:
 
@@ -206,13 +514,16 @@ Do NOT add:
 - selling points;
 - promotional copy;
 - discount labels;
-- certification labels;
-- additional logos;
-- extra symbols;
+- certification marks;
+- extra logos;
+- extra icons;
 - badges;
 - decorative English words;
 - invented UI;
-- invented marketplace stickers.
+- marketplace stickers;
+- artificial labels.
+
+Text naturally visible inside the uploaded product itself may remain.
 
 ---
 
@@ -226,9 +537,25 @@ Aspect ratio:
 
 3:4
 
-Composition must remain suitable for Ozon-style marketplace thumbnails.
+The image must remain suitable for Ozon-style marketplace thumbnails.
 
-Keep critical content away from extreme edges.
+Keep critical information away from extreme edges.
+
+---
+
+# Visual Priority
+
+Preferred hierarchy:
+
+1. Product
+2. Product name
+3. Version
+4. Brand logo
+5. Background decoration
+
+The product must remain the primary visual subject.
+
+Decorative geometry must never overpower the product.
 
 ---
 
@@ -247,15 +574,15 @@ The product name must be highly visible.
 
 Prefer one line.
 
-If the product name is too long:
+If the product name is long:
 
-1. retain one line if readable;
+1. first try a readable one-line layout;
 2. moderately reduce font size;
 3. if still necessary, use maximum two lines.
 
-Do not excessively shrink long product names.
+Do not excessively shrink the title.
 
-Do not split words internally.
+Do not break words internally.
 
 Use semantic line breaks.
 
@@ -264,7 +591,7 @@ Example:
 Xiaomi Smart Band 11
 Active
 
-is valid.
+is acceptable.
 
 ---
 
@@ -272,24 +599,25 @@ is valid.
 
 Use:
 
+- modern neutral sans-serif;
 - Medium;
 - approximately weight 500.
 
-Version text must remain prominent and readable.
+Version text must remain clearly visible.
 
-It should be visually secondary to the product name but should NOT look like
+It should be visually secondary to the product name but must NOT look like
 fine print.
 
-Do not use:
+Do NOT use:
 
-- extremely small text;
-- low opacity;
 - Light 300;
-- very pale text merely to create hierarchy.
+- extremely low opacity;
+- very small subtitle typography;
+- very pale gray simply to weaken the version.
 
 Hierarchy should primarily come from:
 
-Product name = Bold 700
+Product Name = Bold 700
 
 Version = Medium 500
 
@@ -299,103 +627,88 @@ Version = Medium 500
 
 The brand logo, product name, and version form one information hierarchy.
 
-The exact layout may vary between different products.
+Different products may use different layouts.
 
-Do not force all products into one universal template.
+Do NOT force all products into the same universal template.
 
-The layout should respond to:
+The composition may respond to:
 
 - product silhouette;
 - product-name length;
-- viewing angle;
+- product viewing angle;
+- product visual weight;
 - product color;
-- visual weight.
+- available negative space.
 
-Background decoration must adapt around the information area.
+The information hierarchy must remain readable.
 
-Text must not be sacrificed to preserve decoration.
+Background decoration must adapt around the information zone.
 
----
-
-# Logo
-
-Use the uploaded logo faithfully.
-
-Do not redraw, reinterpret, replace, distort, recolor, or invent the logo.
-
-The logo should remain visible but should not dominate the product.
-
-For same-product SKU variants, logo size and placement must remain visually
-unchanged.
-
----
-
-# MD3 Design Direction
-
-Use Google Material Design 3 principles as visual inspiration.
-
-Preferred elements:
-
-- rounded geometry;
-- tonal surfaces;
-- soft gradients;
-- large abstract curves;
-- rounded panels;
-- restrained depth;
-- subtle elevation;
-- clean visual hierarchy;
-- generous spacing;
-- adaptive color.
-
-Do NOT turn the image into an Android app interface.
-
-This is an e-commerce product visual inspired by MD3, not an application UI.
+The information zone must not adapt around decorative clutter.
 
 ---
 
 # Background Geometry
 
-Background geometry should support the product rather than compete with it.
+Use restrained Google Material Design 3 inspired geometry.
 
-It may include:
+Allowed examples:
 
 - large arcs;
 - partial circles;
 - rounded tonal fields;
-- simple curved surfaces;
-- subtle gradients.
+- rounded panels;
+- curved surfaces;
+- subtle gradients;
+- layered tonal shapes.
 
 Strong geometric edges must avoid:
 
-- brand logo;
+- logo;
 - product name;
 - version text.
-
-Maintain visual clearance around important text.
 
 If geometry conflicts with information:
 
 1. move geometry;
-2. scale geometry;
+2. resize geometry;
 3. simplify geometry.
 
-Never reduce readability to preserve decoration.
+Never reduce text readability merely to preserve a decorative shape.
+
+---
+
+# MD3 Design Direction
+
+The image should communicate MD3 through:
+
+- rounded geometry;
+- tonal surfaces;
+- adaptive color;
+- subtle elevation;
+- clean hierarchy;
+- generous spacing;
+- restrained depth;
+- soft gradients;
+- large simple forms.
+
+Do NOT make the image look like an Android application UI.
+
+This is a commercial product visual inspired by MD3.
 
 ---
 
 # Product Priority
 
-The product is the main visual subject.
+The product must:
 
-It should:
+- occupy substantial visual area;
+- remain recognizable at marketplace thumbnail size;
+- maintain correct proportions;
+- have clear edge separation;
+- receive realistic restrained lighting.
 
-- occupy substantial image area;
-- remain clearly recognizable at marketplace thumbnail size;
-- have clear silhouette separation;
-- receive appropriate lighting;
-- retain realistic product proportions.
-
-Avoid making the product unnecessarily small because of decorative elements.
+Do not make the product unnecessarily small to preserve decorative elements.
 
 ---
 
@@ -406,58 +719,67 @@ Use premium restrained studio lighting.
 Allowed:
 
 - controlled key light;
-- subtle highlights;
+- subtle highlight;
+- soft ambient light;
 - realistic contact shadow;
 - soft ambient shadow;
-- gentle separation light where required.
+- subtle edge separation light where required.
 
-Avoid:
+Do NOT use:
 
 - excessive bloom;
-- cinematic smoke;
-- dramatic lens flares;
-- exaggerated neon;
-- unrealistic reflections.
+- dramatic lens flare;
+- cinematic fog;
+- aggressive neon;
+- unrealistic reflections;
+- effects that visually alter the actual product.
+
+Lighting may enhance the product.
+
+Lighting must not change product identity.
 
 ---
 
 # Color System
 
-Different SKU colors may use different MD3 theme colors.
+Different same-product SKU colors may use different coordinated MD3 theme
+colors.
 
-They do NOT need identical background colors.
+The background color does NOT need to remain identical.
 
-However, the same-product layout remains locked.
+However:
 
-## Dark Products
+the layout remains locked.
 
-Suitable themes:
+## Dark Product
+
+Preferred themes:
 
 - graphite;
 - charcoal;
 - dark cool gray;
-- dark neutral surfaces.
+- differentiated dark neutral surfaces.
 
-Ensure dark straps/cases remain visible against the background.
+Maintain clear separation from a black or dark product.
 
 ---
 
-## Light / Colored Products
+## Light / Colored Product
 
-Suitable themes:
+Preferred themes:
 
 - cool gray;
 - warm gray;
-- muted complementary tones;
-- low-saturation tonal surfaces.
+- muted neutral;
+- restrained complementary color.
 
-Do not match the background too closely to the product color.
+Avoid backgrounds that are too similar in hue and brightness to the product.
 
 ---
 
-## White Products
+## White Product
 
-Do not place white products on nearly pure-white backgrounds.
+Do NOT place white products on nearly white backgrounds.
 
 Prefer:
 
@@ -465,16 +787,28 @@ Prefer:
 - taupe;
 - stone;
 - beige-gray;
-- warm neutral;
+- warm gray;
 - muted cool gray.
 
-Maintain clear edge separation.
+Maintain clear silhouette separation.
+
+---
+
+## Pastel Product
+
+For pink, light blue, cream, or other pastel products:
+
+Do not simply match the background to the product color.
+
+Use a related but sufficiently separated tonal palette.
+
+The product must remain visually distinct.
 
 ---
 
 # MASTER LOCK
 
-Once a master image is approved, lock its visual structure.
+Once a candidate is selected and approved, lock its visual structure.
 
 For all same-product variants preserve:
 
@@ -492,170 +826,235 @@ For all same-product variants preserve:
 - background geometry shape;
 - background geometry size;
 - background geometry position;
-- general lighting direction;
-- overall composition.
+- overall composition;
+- primary light direction.
 
 Allowed SKU-specific changes:
 
-- product PNG;
+- uploaded replacement product PNG;
 - background main color;
 - background geometry color;
 - shadow strength;
+- subtle separation lighting;
 - text light/dark value only where required for contrast.
 
 Do NOT modify:
 
-- composition;
-- layout;
+- master layout;
 - typography geometry;
-- background geometry structure;
-- product placement logic.
+- composition;
+- product placement logic;
+- background geometry structure.
 
 ---
 
-# CREATE_MASTER Procedure
+# CREATE_MASTER_OPTIONS Procedure
 
-When mode = CREATE_MASTER:
+When state = CREATE_MASTER_OPTIONS:
 
-1. Inspect uploaded logo.
-2. Inspect product PNG.
-3. Analyze product silhouette and dominant color.
-4. Analyze product-name length.
-5. Design one independent MD3 composition suitable for this product.
-6. Select background color that separates product from background.
-7. Generate exactly one master image.
-8. Verify output using Final QA.
+1. Inspect the uploaded logo.
+2. Inspect the uploaded master product PNG.
+3. Protect both assets from modification.
+4. Analyze product silhouette.
+5. Analyze dominant product color.
+6. Analyze product-name length.
+7. Design five distinct MD3 compositions.
+8. Use the exact uploaded product asset faithfully in all five.
+9. Use the exact uploaded logo faithfully in all five.
+10. Generate exactly five candidate master images.
+11. Run Five-Option QA.
+12. STOP.
+13. Wait for user selection.
 
-The master should be good enough to serve as the only visual reference for
-later SKU replacements.
+Do not automatically continue to SKU generation.
+
+---
+
+# SELECT_MASTER Procedure
+
+When the user selects a candidate:
+
+1. Identify the selected option.
+2. Mark it as MASTER_SELECTED.
+3. Mark MASTER_APPROVED = true.
+4. Lock the ORIGINAL selected candidate.
+5. Discard other candidates from production use.
+6. If this is part of BUILD_SKU_SET, continue with remaining SKUs.
+
+Do not redesign the selected master.
 
 ---
 
 # REPLACE_VARIANT Procedure
 
-When mode = REPLACE_VARIANT:
+When state = REPLACE_VARIANT:
 
-1. Treat Image A as the locked approved master.
-2. Treat Image B as the replacement product PNG.
-3. Do NOT create a new composition.
-4. Replace the product.
-5. Match the original product visual size.
-6. Match the original product center.
-7. Match the original placement logic.
-8. Keep logo and typography visually unchanged.
-9. Keep background geometry structurally unchanged.
-10. Adapt theme colors only when required by the new product color.
-11. Verify using Variant QA.
+1. Use the ORIGINAL approved master as Image A.
+2. Use the uploaded replacement SKU PNG as Image B.
+3. Treat Image B as a protected source asset.
+4. Do NOT redesign Image B.
+5. Replace the master product with the uploaded new SKU.
+6. Preserve the same visual scale.
+7. Preserve the same visual center.
+8. Preserve the same placement logic.
+9. Preserve logo and typography.
+10. Preserve background geometry structure.
+11. Adapt only allowed theme colors and shadow strength.
+12. Run Variant QA.
 
-The desired result should look like the same design file with a different
-product color inserted.
+Never use a previously generated variant as Image A.
+
+Always use the ORIGINAL MASTER.
 
 ---
 
 # BUILD_SKU_SET Procedure
 
-When mode = BUILD_SKU_SET:
+When state = BUILD_SKU_SET:
 
-1. Inspect all uploaded same-product PNGs.
-2. Identify the master SKU.
-3. Generate ONE master using CREATE_MASTER rules.
-4. Treat that result as the locked layout reference.
-5. For each remaining color:
-   - use the locked master as Image A;
-   - use the new color PNG as Image B;
-   - apply REPLACE_VARIANT rules.
-6. Never independently generate variants without referencing the master.
-7. Run SKU Set QA after all variants are complete.
+## Phase 1 — Master Exploration
 
-Conceptually:
+1. Identify the user-selected master SKU color.
+2. Use that SKU PNG as the protected master product asset.
+3. Generate exactly five CREATE_MASTER_OPTIONS.
+4. STOP.
+5. Wait for user selection.
 
-SKU 1
-→ CREATE_MASTER
-→ MASTER
+Do not generate remaining SKUs before the user selects a master.
 
-MASTER + SKU 2 PNG
-→ REPLACE_VARIANT
+## Phase 2 — Master Lock
 
-MASTER + SKU 3 PNG
-→ REPLACE_VARIANT
+1. User selects one option.
+2. Mark it MASTER_APPROVED.
+3. Use that ORIGINAL selected image as the only master source.
 
-MASTER + SKU N PNG
-→ REPLACE_VARIANT
+## Phase 3 — SKU Production
 
-Do not use:
+For each remaining uploaded SKU:
 
-SKU 1 → independent generation
-SKU 2 → independent generation
-SKU 3 → independent generation
+Image A = ORIGINAL MASTER
+
+Image B = uploaded SKU PNG
+
+Generate using REPLACE_VARIANT.
+
+Always:
+
+MASTER + SKU 2
+MASTER + SKU 3
+MASTER + SKU 4
+MASTER + SKU N
+
+Never:
+
+MASTER → SKU 2 → SKU 3 → SKU 4
+
+This avoids cumulative layout drift.
 
 ---
 
-# Final QA — Master
+# Five-Option QA
 
-Before accepting a master verify:
+Before presenting the five candidates, verify:
 
-- exact product name;
-- exact version text;
-- correct uploaded logo;
-- no unwanted text;
-- no invented selling points;
-- no extra badges;
-- no extra labels;
-- product is clearly dominant;
-- product/background contrast is sufficient;
+- all five use the correct uploaded logo;
+- the logo itself has not been modified;
+- all five use the correct uploaded product;
+- the product itself has not been redesigned;
+- all five use the exact product name;
+- all five use the exact version text;
+- none contains extra marketing text;
+- none contains invented badges;
+- all are clearly MD3-inspired;
+- all work as Ozon-style main images;
+- product remains the primary visual subject;
+- product/background separation is sufficient;
 - typography is readable;
-- version is clearly visible;
-- background geometry does not interfere with text;
-- overall visual direction is recognizably MD3-inspired;
-- image works as an e-commerce main image.
+- version remains prominent;
+- the five compositions are meaningfully different.
 
-If major problems exist, regenerate the master.
+If two candidates differ mainly by color but not composition, regenerate one.
+
+---
+
+# Asset Fidelity QA
+
+For EVERY generated image verify:
+
+## Logo
+
+- uploaded logo remains visually unchanged;
+- logo color matches uploaded source;
+- logo proportions match uploaded source;
+- logo artwork has not been redrawn;
+- logo has not been stylized;
+- no approximate substitute logo appears.
+
+## Product
+
+- product matches uploaded product PNG;
+- product model matches uploaded source;
+- product color matches uploaded source;
+- product silhouette matches uploaded source;
+- product structure matches uploaded source;
+- strap/body/case details match uploaded source;
+- buttons/crown/hardware details match uploaded source;
+- product has not been redesigned;
+- no approximate generated substitute is used.
+
+If the logo or product looks regenerated rather than faithfully preserved,
+the image is incorrect.
+
+Regenerate with stronger asset-protection instructions.
 
 ---
 
 # Variant QA
 
-For every variant compare against the approved master.
+Compare every variant directly with the ORIGINAL approved master.
 
-Check:
+Verify:
 
 - logo has not visibly moved;
 - logo has not visibly resized;
-- product name has not visibly moved;
-- product name has not visibly resized;
+- logo artwork remains unchanged;
+- title has not visibly moved;
+- title has not visibly resized;
 - version has not visibly moved;
 - version has not visibly resized;
-- text spacing remains consistent;
+- title/version spacing remains consistent;
 - product visual scale remains consistent;
-- product center remains consistent;
-- background geometry has not changed structure;
-- background geometry has not visibly moved;
-- only appropriate theme colors changed;
-- no additional text appeared.
+- product visual center remains consistent;
+- product physical appearance exactly matches the uploaded SKU;
+- geometry remains structurally identical;
+- geometry has not visibly moved or resized;
+- no additional text appears.
 
-If a variant looks like a newly redesigned poster, reject it and regenerate as
-a locked-master replacement.
+If the result looks like a new poster:
+
+reject it.
+
+Regenerate as a stricter locked-master replacement.
 
 ---
 
 # SKU Set QA
 
-When generating multiple color SKUs:
-
-Rapidly compare all images mentally as a sequence.
+When all color SKUs are complete, compare them as one sequence.
 
 They should feel like:
 
-same template
+SAME MASTER
 +
-different product color
+DIFFERENT UPLOADED PRODUCT SKU
 +
-different coordinated MD3 color theme
+ADAPTIVE MD3 COLOR THEME
 
-They should NOT feel like separate posters.
+They should NOT feel like:
 
-If an element visibly jumps between images, regenerate the affected variant
-using the approved master as the stronger reference.
+independently designed posters.
+
+They should also NOT contain modified versions of the uploaded product.
 
 ---
 
@@ -663,17 +1062,38 @@ using the approved master as the stronger reference.
 
 If the user says:
 
-- approved;
-- confirmed;
-- this is the master;
-- lock this version;
-- use this for the other colors;
-- this one is good;
+- 方案3
+- 选第三个
+- 第三张作为母版
+- 就用这个
+- 这张确认
+- 这张做母版
+- 这个方案可以
+- 锁定这个方案
 
-mark the current image conceptually as MASTER_APPROVED.
+and the reference is unambiguous:
+
+set:
+
+MASTER_APPROVED = true
 
 From that point onward:
 
-same-product colors MUST use REPLACE_VARIANT or BUILD_SKU_SET continuation.
+all same-product SKUs must use the selected ORIGINAL master.
 
-Do not silently redesign the master.
+Do not return to CREATE_MASTER_OPTIONS unless the user explicitly asks to
+redesign or regenerate the five options.
+
+---
+
+# Highest Priority Rule
+
+Uploaded brand logo fidelity and uploaded product image fidelity are mandatory.
+
+If any instruction conflicts with asset fidelity:
+
+asset fidelity wins.
+
+The design must adapt around the uploaded assets.
+
+The uploaded assets must not be redesigned to fit the design.
