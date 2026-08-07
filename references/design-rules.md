@@ -2,23 +2,21 @@
 
 ## Global
 
-Canvas:
+- Canvas: 1200 × 1600 px
+- Aspect: 3:4
+- Marketplace: Ozon-style product cards
 
-1200 × 1600 px
+## Protected Assets
 
-Aspect:
+Uploaded brand logo and uploaded product PNG are protected source assets.
 
-3:4
+Do NOT redraw, recolor, restyle, distort, restructure, reinterpret, or replace them with generated approximations.
 
-Marketplace:
+Allowed only: proportional scaling, placement, composition, natural lighting/shadows around product.
 
-Optimized primarily for Ozon-style product cards.
-
----
+Asset fidelity has priority over creative styling.
 
 ## Visual Priority
-
-Preferred hierarchy:
 
 1. Product
 2. Product name
@@ -26,85 +24,41 @@ Preferred hierarchy:
 4. Brand logo
 5. Background decoration
 
----
+## Typography
 
-## Product Name
+Product name: Bold 700, preferably one line, maximum two lines, no internal word breaks, no excessive shrinking.
 
-Weight:
+Version: Medium 500, clearly visible, not fine print.
 
-700 / Bold
+## MD3 Background
 
-Prefer:
+Use restrained tonal surfaces, arcs, curves, rounded shapes, gradients, soft layering, and controlled elevation.
 
-one line
-
-Maximum:
-
-two lines
-
-Do not excessively shrink long titles.
-
----
-
-## Version
-
-Weight:
-
-500 / Medium
-
-Clearly visible.
-
-Do not use it as low-priority fine print.
-
----
-
-## Background
-
-Use restrained MD3-inspired:
-
-- tonal surfaces
-- curves
-- arcs
-- rounded shapes
-- gradients
-- soft layering
-
-Background decoration should never damage text readability.
-
----
+Background decoration must never damage text readability.
 
 ## Product Separation
 
-Black / dark product:
+- Dark product: differentiated graphite/charcoal tones with controlled highlights.
+- Light/colored product: muted complementary or neutral backgrounds.
+- White product: greige/taupe/stone/beige-gray rather than pure white.
+- Pastel product: avoid background too similar in hue/brightness.
 
-Use differentiated graphite / charcoal tones and controlled highlights.
+## Five Master Options
 
-Blue / colored light product:
+Every new product requires exactly five candidate master compositions before selection:
 
-Use muted complementary or neutral backgrounds.
+1. Balanced Classic
+2. Product Dominant
+3. Tonal Surface
+4. Dynamic Arc
+5. Minimal Premium
 
-White product:
-
-Use greige / taupe / stone / beige-gray rather than pure white.
-
-Pink / pastel product:
-
-Avoid a background so similar in hue and brightness that the product disappears.
-
----
+They must differ in composition, not merely color.
 
 ## Same Product SKU Rule
 
-Structure is locked.
+LOCKED GEOMETRY + PROTECTED ASSETS + ADAPTIVE COLOR.
 
-Color is adaptive.
+Every SKU must use ORIGINAL MASTER + UPLOADED SKU PNG.
 
-Think:
-
-LOCKED GEOMETRY
-+
-ADAPTIVE COLOR
-
-not:
-
-NEW POSTER FOR EVERY SKU.
+Never chain variant edits.
