@@ -2,120 +2,66 @@
 
 请为当前产品生成一整套同款不同颜色 SKU 电商主图。
 
-必须使用：
-
-“先母版 → 后逐个替换”
-
-的流程。
+必须使用“5 个母版候选 → 用户选择 → 锁定母版 → 逐个替换 SKU”的流程。
 
 禁止分别独立设计每一种颜色。
 
 ## Input
 
-产品名称：
+产品名称：{{PRODUCT_NAME}}
+版本：{{VERSION_TEXT}}
+品牌 Logo：使用上传 Logo。
+SKU 产品 PNG：{{SKU_IMAGES}}
+母版颜色：{{MASTER_SKU}}
 
-{{PRODUCT_NAME}}
+如果用户指定母版颜色，必须使用指定颜色。
 
-版本：
+# 最高优先级：素材保护
 
-{{VERSION_TEXT}}
+每一个上传 SKU PNG 都是受保护源素材。不得根据其他颜色 SKU 自行生成近似颜色版本。必须使用对应上传 PNG。
 
-品牌 Logo：
+品牌 Logo 同样受保护，不得修改。
 
-使用上传 Logo。
+# PHASE 1 — MASTER EXPLORATION
 
-SKU 产品 PNG：
+仅使用 {{MASTER_SKU}} 执行 CREATE_MASTER_OPTIONS，生成 5 个真正不同构图方向的 MD3 母版候选。
 
-{{SKU_IMAGES}}
+生成后 STOP。不得继续生成其他 SKU，等待用户选择方案 1–5。
 
-母版颜色：
+# PHASE 2 — MASTER SELECTION
 
-{{MASTER_SKU}}
+用户选择后：selected option = MASTER_SELECTED；MASTER_APPROVED = true。
 
-如果用户已经指定母版颜色，必须使用指定颜色。
+只使用用户选中的 ORIGINAL MASTER。其他候选从生产流程排除。
 
-## STEP 1 — MASTER
-
-首先仅使用母版颜色 PNG：
-
-{{MASTER_SKU}}
-
-根据 CREATE_MASTER 规则创建一张 1200 × 1600 px MD3 母版。
-
-这一步确定并锁定：
-
-- Logo
-- 产品名称
-- 版本
-- 产品大小
-- 产品中心
-- 背景几何结构
-- 构图
-- 光影方向
-
-## STEP 2 — LOCK
-
-母版生成后，将其作为唯一的版式来源。
-
-不得为后续颜色重新构图。
-
-## STEP 3 — SKU REPLACEMENT
+# PHASE 3 — SKU PRODUCTION
 
 对于每一个剩余 SKU：
 
-使用：
-
-Image A = 母版
-
-Image B = 当前颜色 PNG
+Image A = ORIGINAL MASTER
+Image B = 当前 SKU 对应的上传 PNG
 
 按照 REPLACE_VARIANT 规则生成。
 
-每一个颜色都必须从同一张母版派生。
+正确：MASTER + BLACK / MASTER + BLUE / MASTER + WHITE / MASTER + PINK
 
-不要使用前一个变体作为下一个变体的母版。
+错误：BLACK → BLUE → WHITE → PINK
 
-始终使用最初确认的 MASTER。
+# SKU 之间允许
 
-正确：
-
-MASTER + BLACK
-MASTER + BLUE
-MASTER + WHITE
-
-错误：
-
-BLACK → BLUE → WHITE
-
-避免连续编辑造成构图漂移。
-
-## Allowed Differences
-
-SKU 之间允许：
-
-- 产品颜色不同
+- 上传产品 PNG 不同
 - 背景主题色不同
 - MD3 几何配色不同
 - 阴影强弱适配
 - 文字明暗适配
 
-SKU 之间不允许：
+# SKU 之间不允许
 
-- Logo 漂移
-- 标题漂移
-- 版本漂移
-- 产品大小漂移
-- 产品中心漂移
-- 背景几何尺寸变化
-- 背景几何位置变化
+- Logo 漂移或改样
+- 标题/版本漂移
+- 产品大小/中心漂移
+- 背景几何尺寸/位置变化
 - 重新设计构图
+- 修改上传产品外观
 
-## Final Visual Goal
-
-把全部 SKU 快速连续查看时，应感觉：
-
-同一个设计模板在切换产品颜色。
-
-而不是：
-
-多张不同设计师分别完成的海报。
+最终整组图片应像同一个设计模板在切换上传 SKU，而不是多张分别重新设计的海报。
