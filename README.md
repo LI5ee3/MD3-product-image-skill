@@ -1,60 +1,70 @@
-# md3-product-main-image
+# MD3 Product Main Image Skill
 
-A GPT-image skill for generating locked MD3-style e-commerce product main
-images for Ozon. It uses a master-template-first workflow so every color SKU of
-the same product shares one exact layout.
+GPT-image-only workflow for creating product main images.
 
-> Scope: GPT-image only. This skill does not use Photoshop, PSD files, JSX
-> scripts, websites, or deployment pipelines.
+No Photoshop.
+No PSD.
+No website integration.
+No external compositing.
 
 ## Modes
 
-| Mode | What it does |
-| --- | --- |
-| CREATE_MASTER | Creates the first 1200 × 1600 px master for one product |
-| REPLACE_VARIANT | Swaps the product inside an already-confirmed master for one new color SKU |
-| BUILD_SKU_SET | Generates one master, then builds every remaining SKU from that locked master, one at a time |
+### CREATE_MASTER
 
-## How to use
+Use for the first approved image of a new product.
 
-Place the folder in `~/.codex/skills/md3-product-main-image/` (or install the
-zip), then ask in natural language:
+Example:
 
-- Create a master:
-  "Create an MD3 master main image for this product, black SKU, 1200×1600."
-- Replace one variant:
-  "This is the confirmed master; generate the blue SKU from this PNG."
-- Build a SKU set:
-  "Build main images for black, blue, and gray SKUs of this product."
+为 Redmi Watch 6 创建 MD3 产品主图母版。
+产品名称：Redmi Watch 6
+版本：Глобальная версия
+黑色作为母版。
 
-## Files
+---
 
-```text
-md3-product-main-image/
-├── SKILL.md
-├── agents/
-│   └── openai.yaml
-├── prompts/
-│   ├── create-master.md
-│   ├── replace-variant.md
-│   └── build-sku-set.md
-├── references/
-│   └── design-rules.md
-└── README.md
-```
+### REPLACE_VARIANT
 
-## Locked-master rule
+Use after a master is approved.
 
-Once you confirm a master, the skill never redesigns it. Variants may only
-change the product image, background theme colors, shadow strength, and text
-contrast — nothing else.
+Example:
 
-## 中文快速说明
+Image A 是确认好的母版。
+Image B 是蓝色版本 PNG。
 
-- 仅使用 GPT-image 生成，不涉及 Photoshop / PSD / 网站流程。
-- 每个产品独立创建一张 MD3 母版（1200 × 1600 px，适合 Ozon）。
-- 同款不同颜色 SKU 必须锁定母版版式，只允许更换产品 PNG、背景主色、
-  背景几何元素颜色、阴影强弱和必要的文字明暗。
-- 批量模式先出 1 张母版，再逐个替换每个 SKU，禁止并行独立设计。
-- 母版确认后，绝不再回到 CREATE_MASTER。
+按锁定母版模式生成蓝色 SKU。
 
+---
+
+### BUILD_SKU_SET
+
+Use when multiple colors are supplied together.
+
+Example:
+
+为 Redmi Watch 6 生成黑、蓝、白三色主图。
+黑色做母版。
+使用批量 SKU 模式。
+
+The Skill must:
+
+1. generate black master;
+2. use that master for blue;
+3. use that same master for white.
+
+It must not independently design three posters.
+
+---
+
+## Principle
+
+Different products:
+
+may have different layouts.
+
+Same product:
+
+all color SKUs use one locked master.
+
+All products:
+
+use MD3 design principles.
