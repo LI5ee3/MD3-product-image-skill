@@ -16,6 +16,45 @@ Allowed only: proportional scaling, placement, composition, natural lighting/sha
 
 Asset fidelity has priority over creative styling.
 
+
+
+## Atomic Logo
+
+The uploaded logo must be treated as one indivisible raster graphic.
+
+Any wordmark, letters, or brand-name text inside the logo are part of the logo
+artwork and must not be treated as editable text.
+
+Never OCR, re-typeset, regenerate, normalize, translate, or separately
+reconstruct text embedded inside the logo.
+
+Only scale and position the complete logo asset as one unit.
+
+### Atomic Logo QA
+
+Verify:
+
+- symbol and wordmark remain together;
+- embedded logo text is not re-typeset;
+- character shapes and spacing remain faithful;
+- internal logo proportions remain unchanged;
+- no substitute brand wordmark is generated.
+
+## Brand Logo Position
+
+The brand logo is position-locked.
+
+It may appear ONLY in the upper-left safe area.
+
+For 1200 × 1600 px:
+
+- minimum left margin: 60 px;
+- minimum top margin: 80 px;
+- keep the full logo inside the upper-left area;
+- never place it in any other region.
+
+This applies to master candidates, the selected master, variants, and batch SKU outputs.
+
 ## Visual Priority
 
 1. Product
