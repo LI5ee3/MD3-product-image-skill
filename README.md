@@ -1,4 +1,4 @@
-# MD3 Product Main Image Skill v3
+# MD3 Product Main Image Skill v3.2
 
 GPT-image-only workflow for premium e-commerce product main images.
 

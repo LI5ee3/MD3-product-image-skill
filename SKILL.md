@@ -12,7 +12,7 @@ description: >
 
 ## Purpose
 
-Create premium 1200 × 1600 px e-commerce product main images for marketplaces such as Ozon using GPT-image.
+Create premium e-commerce product main images for marketplaces such as Ozon using GPT-image.
 
 Each product receives its own independent master layout. Different products do not need to share the same composition.
 
@@ -86,46 +86,29 @@ Explore meaningful differences in:
 
 After generating the five candidates: STOP. Do not generate other SKUs. Wait for explicit user selection.
 
-# Five Master Candidate Directions
+# Master Candidate Diversity Requirement
 
-These are design directions, not rigid templates. Adapt them to the actual product.
+The five master candidates must be genuinely different in composition.
 
-## Option 1 — Balanced Classic
+They must NOT be five versions of the same layout with only different colors.
 
-- balanced commercial composition;
-- clear information zone;
-- large product;
-- restrained MD3 geometry;
-- strong readability.
+Explore meaningful differences in:
 
-## Option 2 — Product Dominant
+- product placement;
+- product visual scale;
+- information-zone placement;
+- negative-space distribution;
+- MD3 geometry structure;
+- arc / curve placement;
+- tonal surface arrangement;
+- spatial depth;
+- lighting balance;
+- overall visual rhythm.
 
-- significantly larger product;
-- reduced decoration;
-- strong marketplace-thumbnail readability;
-- product visually dominates.
+Do not force any predefined composition categories.
 
-## Option 3 — Tonal Surface
-
-- large rounded MD3 tonal surface;
-- stronger layering;
-- controlled depth/elevation;
-- product visually interacts with tonal field.
-
-## Option 4 — Dynamic Arc
-
-- stronger directional arc/curve;
-- more visual motion;
-- strict text-protection zone;
-- product remains primary.
-
-## Option 5 — Minimal Premium
-
-- maximum negative space;
-- minimal geometry;
-- restrained tonal hierarchy;
-- subtle studio lighting;
-- premium minimal appearance.
+The five candidates should be designed freely according to the actual product
+silhouette, viewing angle, product-name length, product color, and visual weight.
 
 # STATE 2 — SELECT_MASTER
 
