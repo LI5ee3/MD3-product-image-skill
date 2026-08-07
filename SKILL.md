@@ -27,7 +27,174 @@ Never independently redesign every color SKU.
 
 # Highest Priority Rules
 
-## Uploaded Asset Protection
+#
+
+# Atomic Brand Logo Rule
+
+The uploaded brand logo must be treated as ONE INDIVISIBLE raster graphic.
+
+Everything visible inside the uploaded logo image is part of the protected
+logo artwork, including:
+
+- symbol;
+- icon;
+- emblem;
+- wordmark;
+- letters;
+- brand-name text;
+- spacing;
+- internal alignment;
+- color;
+- transparency;
+- anti-aliased edges.
+
+Do NOT interpret any letters, words, or characters inside the uploaded logo
+as editable text.
+
+Do NOT:
+
+- OCR the logo wordmark and typeset it again;
+- regenerate letters using a font;
+- replace the wordmark with ordinary text;
+- correct or normalize the typography;
+- change letter spacing;
+- change character shapes;
+- change wordmark weight;
+- change the relationship between symbol and wordmark;
+- separate the symbol from the wordmark;
+- reconstruct the logo from multiple generated elements.
+
+For example, if an uploaded HUAWEI logo contains both the flower symbol and
+the word "HUAWEI", the word "HUAWEI" is part of the protected logo artwork.
+
+It is NOT editable text.
+
+The complete uploaded logo image must be treated as one atomic visual asset.
+
+Allowed operations on the complete logo asset are ONLY:
+
+- proportional scaling of the entire logo;
+- positioning of the entire logo;
+- placement inside the defined upper-left safe area.
+
+Never reconstruct individual parts of the logo.
+
+---
+
+# Logo Text Exclusion Rule
+
+Text-generation and text-layout rules do NOT apply to text already embedded
+inside the uploaded brand logo.
+
+Any letters, words, numbers, or characters visible inside the uploaded logo
+must remain part of the original logo graphic.
+
+Do NOT:
+
+- transcribe them;
+- rewrite them;
+- typeset them;
+- translate them;
+- correct them;
+- normalize them;
+- regenerate them;
+- separate them from the logo graphic.
+
+Only the user-provided product name and version text are editable/generated
+text elements.
+
+Text embedded inside the uploaded logo is never editable.
+
+# Brand Logo Position Lock
+
+The uploaded brand logo has a FIXED POSITION RULE.
+
+The logo may appear ONLY in the UPPER-LEFT corner of the image.
+
+It must remain fully inside the upper-left safe area.
+
+For a 1200 × 1600 px canvas:
+
+- keep at least 60 px clearance from the left edge;
+- keep at least 80 px clearance from the top edge;
+- keep the entire logo visually within the upper-left zone;
+- do not place any part of the logo outside the canvas;
+- do not place the logo at top-center, top-right, center, bottom, or any other location.
+
+The logo must be top-left anchored in:
+
+- all five master candidates;
+- the selected approved master;
+- every REPLACE_VARIANT output;
+- every BUILD_SKU_SET output.
+
+Background geometry must avoid the logo safe area.
+
+The product name and version text must be arranged around the fixed logo zone,
+not by moving the logo elsewhere.
+
+The logo artwork itself remains protected and may only be proportionally scaled
+and positioned within this upper-left safe area.
+
+
+# Brand Logo Size Lock
+
+The uploaded brand logo is size-controlled in addition to being position-locked.
+
+For a 1200 × 1600 px canvas:
+
+Maximum logo bounding box:
+
+- width: 220 px;
+- height: 100 px.
+
+The logo must preserve its original aspect ratio.
+
+Do NOT:
+
+- stretch the logo;
+- compress the logo;
+- crop the logo;
+- distort the logo;
+- force it to fill the entire bounding box;
+- resize it merely to create visual variety between master candidates.
+
+Recommended visual target:
+
+- horizontal logos should normally occupy approximately 10%–18% of the canvas width;
+- however, preserve the original logo proportions instead of forcing a fixed width.
+
+The logo must remain clearly readable but visually subordinate to:
+
+1. the product;
+2. the product name.
+
+## Five-Candidate Consistency
+
+Across all five master candidates:
+
+- logo position must remain in the same upper-left safe zone;
+- logo visual size should remain consistent;
+- logo scale must NOT be used as a composition variable.
+
+The five candidates should differ through product placement, layout, negative
+space, MD3 geometry, tonal surfaces, lighting, and visual balance — not through
+changing the brand logo size.
+
+## Locked Master Consistency
+
+Once a master candidate is selected:
+
+- logo width is locked;
+- logo height is locked;
+- logo position is locked.
+
+All subsequent REPLACE_VARIANT and BUILD_SKU_SET outputs must preserve the same
+logo visual size and position as the ORIGINAL MASTER.
+
+Do not resize the logo according to SKU color, background color, or theme.
+
+# Uploaded Asset Protection
 
 The uploaded brand logo and uploaded product PNG are PROTECTED SOURCE ASSETS.
 
@@ -545,6 +712,26 @@ For EVERY image verify:
 - no approximate generated substitute.
 
 If logo or product looks regenerated rather than faithfully preserved, reject and regenerate with stronger asset-protection instructions.
+
+
+# Atomic Logo QA
+
+For EVERY generated image verify:
+
+- the complete uploaded logo appears as one intact graphic;
+- symbol and wordmark remain together exactly as uploaded;
+- any text embedded inside the logo has NOT been re-typeset;
+- letter shapes match the uploaded logo graphic;
+- letter spacing matches the uploaded logo graphic;
+- symbol-to-wordmark spacing remains unchanged;
+- logo transparency and internal alignment remain faithful;
+- no part of the logo has been reconstructed independently;
+- no generated substitute wordmark appears.
+
+If the model has regenerated the wordmark as editable text or reconstructed
+any part of the logo, the output is incorrect.
+
+Regenerate with stronger Atomic Brand Logo instructions.
 
 # Variant QA
 

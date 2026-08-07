@@ -1,4 +1,4 @@
-# MD3 Product Main Image Skill v3.2
+# MD3 Product Main Image Skill v3.5.3
 
 GPT-image-only workflow for premium e-commerce product main images.
 
@@ -58,3 +58,6 @@ ORIGINAL MASTER + 白色 PNG
 工作流不得改变：Logo 图形、Logo 颜色、Logo 比例、产品身份、产品结构、产品颜色、产品物理细节。
 
 构图适应素材，素材不为了构图而被重构。
+
+
+- Brand logo is fixed to the upper-left safe area only.
