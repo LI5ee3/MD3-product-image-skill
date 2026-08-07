@@ -103,3 +103,26 @@ LOCKED GEOMETRY + PROTECTED ASSETS + ADAPTIVE COLOR.
 Every SKU must use ORIGINAL MASTER + UPLOADED SKU PNG.
 
 Never chain variant edits.
+
+
+## Separate Master Candidate Output
+
+Five master candidates means five separate image outputs.
+
+Never combine candidates into one image.
+
+Forbidden:
+
+- contact sheet;
+- collage;
+- grid;
+- mood board;
+- comparison board;
+- multi-panel image.
+
+Each candidate must be a standalone strict 3:4 / 1200 × 1600 px image.
+
+Generate candidates sequentially.
+
+If five separate images cannot be reliably generated in one response,
+generate one candidate at a time rather than combining them.
