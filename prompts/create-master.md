@@ -1,54 +1,144 @@
-# Create Master Prompt
+# CREATE MASTER PROMPT
 
-Use for **MODE A — CREATE_MASTER**. Fill every placeholder, attach the brand
-logo and product PNG, then send the prompt to GPT-image.
+请为当前产品生成一张电商产品主图母版，用于后续同款不同颜色 SKU 的精确替换。
 
-```text
-You are creating an e-commerce product main image for Ozon in Google Material
-Design 3 (MD3) style.
+这是当前产品自己的独立母版。
 
-Canvas: 1200 x 1600 px, portrait 3:4.
+不要求与其他产品使用相同模板或相同构图。
+请根据当前产品的外观、产品名称长度、产品颜色、产品比例，自由设计最合适的 MD3 电商主图。
 
-Allowed content only:
-1. The attached brand logo.
-2. Product name: "{{PRODUCT_NAME}}".
-3. Version text: "{{VERSION_TEXT}}".
-4. The attached product PNG (color: {{PRODUCT_COLOR}}).
-5. MD3-style background geometric elements: subtle tonal shapes, elevation
-   surfaces, restrained geometry.
-6. Natural light and shadow that give the product dimensionality.
+## 设计目标
 
-Forbidden:
-- Any other text.
-- Feature selling points, parameter copy, promotional labels, badges, prices,
-  ratings, or extra icons.
-- Non-MD3 decorations such as heavy gradients, neon effects, or noisy patterns.
+- 这是“母版主图”
+- 后续同款不同颜色 SKU 将严格沿用这张图的版式与构图
+- 只需要为当前这个产品建立一套独立模板
+- 不要求与其他产品共用模板
+- 整体使用 Google Material Design 3（MD3）设计语言
+- 画面简洁、高级、现代
+- 适合 Ozon 等电商平台主图展示
 
-Layout:
-- Logo in the top-left safe area, with a fixed size and position.
-- Product name prominent, modern sans-serif, Bold 700. Prefer one line; if it
-  is too long, use at most two lines. Never shrink it below readable size.
-- Version text directly below the product name, Medium 500, aligned with the
-  name.
-- Background elements must avoid the logo, product name, and version text
-  areas.
-- The product is the main visual: large, centered in a stable showcase area,
-  with natural light and shadow.
+## 输出
 
-Color:
-- Use an MD3 tonal theme matched to the product color.
-- Keep clear separation between product and background; the product must not
-  blend into the background.
-- Dark product: graphite / deep cool gray theme.
-- Light product: warm gray / cool gray / beige gray theme.
-- White product: never place it on a near-white background.
+画布：
 
-Consistency — this image is the master:
-- Establish fixed positions and sizes for: logo, product name, version text,
-  product showcase area, and background geometry.
-- This layout will be locked and reused for every future color variant of this
-  product.
+1200 × 1600 px
 
-Output: one 1200 x 1600 px image.
-```
+只允许出现：
 
+1. 上传的品牌 Logo
+2. 产品名称：{{PRODUCT_NAME}}
+3. 版本文字：{{VERSION_TEXT}}
+4. 上传的当前产品 PNG
+5. MD3 风格背景几何元素
+6. 自然产品光影
+
+不要添加：
+
+- 其他文字
+- 功能卖点
+- 参数文案
+- 促销信息
+- 标签
+- 额外 Logo
+- 额外图标说明
+- 装饰性英文单词
+
+产品本身屏幕或包装上原有内容可以保留。
+
+## Logo
+
+- 使用上传 Logo
+- 不重新绘制
+- 不改变品牌设计
+- 放在清晰安全的位置
+- 不要让 Logo 比产品名称或产品本身更抢眼
+
+## 产品名称
+
+文字：
+
+{{PRODUCT_NAME}}
+
+- 使用现代无衬线字体
+- Material / Roboto / Google Sans 风格
+- Bold 700
+- 必须醒目
+- 优先一行
+- 如果名称较长，可适当缩小
+- 如果仍无法合理显示，最多两行
+- 不要为了强行一行而把字体缩得过小
+- 不允许从单词中间断开
+
+## 版本
+
+文字：
+
+{{VERSION_TEXT}}
+
+- Medium 500
+- 位于产品名称下方
+- 清晰、醒目
+- 比产品名称弱一级
+- 但不能像脚注
+- 不要使用过浅、过细或过小的文字
+
+## 构图
+
+- 产品是画面第一视觉主体
+- 产品应足够大
+- 产品轮廓清晰
+- 背景几何元素不得影响 Logo、产品名称、版本的阅读
+- MD3 几何可以使用圆弧、圆形、圆角 tonal surface、柔和渐变等
+- 不要堆叠过多装饰
+
+## 光影
+
+增加自然、克制的产品光影：
+
+- 真实接触阴影
+- 柔和环境阴影
+- 必要的轮廓分离光
+- 柔和高光
+
+不要做夸张电影灯光。
+
+## 色彩
+
+根据当前产品 PNG 的颜色选择 MD3 色彩主题。
+
+目标不是让背景和产品同色，而是让二者协调且有清晰分离。
+
+深色产品：
+
+- graphite
+- charcoal
+- cool dark gray
+
+浅色产品：
+
+- warm gray
+- cool gray
+- muted neutral
+
+白色产品：
+
+- 不使用接近纯白背景
+- 优先 greige / stone / taupe / beige-gray
+
+## 母版要求
+
+请明确建立稳定的：
+
+- Logo 位置和大小
+- 产品名称位置和大小
+- 版本文字位置和大小
+- 产品视觉大小
+- 产品视觉中心
+- 背景几何形状
+- 背景几何大小
+- 背景几何位置
+- 光源方向
+
+后续颜色 SKU 将完全依据这张母版。
+
+请输出一张可作为后续 SKU 锁定参考的母版主图。
