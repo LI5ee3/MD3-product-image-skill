@@ -98,6 +98,49 @@ Logo 内部所有字母、Wordmark、品牌名称文字均属于 Logo 图形本�
 
 所有后续 SKU 必须与 ORIGINAL MASTER 保持一致。
 
+# 母版候选独立输出规则
+
+批量 SKU 模式的母版探索阶段也必须遵守：
+
+5 个母版候选 = 5 张独立图片。
+
+不得生成：
+
+- 五宫格
+- 拼版
+- Contact Sheet
+- Collage
+- Grid
+- Multi-panel
+
+必须按顺序逐张生成：
+
+MASTER OPTION 1
+→ 单独 3:4 图片
+
+MASTER OPTION 2
+→ 单独 3:4 图片
+
+MASTER OPTION 3
+→ 单独 3:4 图片
+
+MASTER OPTION 4
+→ 单独 3:4 图片
+
+MASTER OPTION 5
+→ 单独 3:4 图片
+
+然后：
+
+STOP
+→ WAIT FOR USER SELECTION
+
+如果当前界面不能在一次回复中生成 5 张独立图片，
+先生成 OPTION 1 后停止，等待用户继续。
+
+不得用一张拼版图代替 5 张独立候选。
+
+
 # PHASE 1 — MASTER EXPLORATION
 
 仅使用 {{MASTER_SKU}} 执行 CREATE_MASTER_OPTIONS，生成 5 个真正不同构图方向的 MD3 母版候选。
