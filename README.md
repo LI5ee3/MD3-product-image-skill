@@ -1,63 +1,441 @@
-# MD3 Product Main Image Skill v3.5.3
+# MD3 Product Main Image Skill v3.6
 
-GPT-image-only workflow for premium e-commerce product main images.
+GPT-image-only workflow for creating Ozon-style e-commerce product main images.
 
-No Photoshop. No PSD. No external compositing. No website workflow.
+This version does NOT use Photoshop, PSD automation, website integration, or
+external compositing.
 
-## v3 核心变化
+---
 
-- 每个新产品先生成 5 个母版候选
-- 用户明确选择其中 1 个后才锁定母版
-- 支持单个 SKU 替换
-- 支持批量 SKU
-- 品牌 Logo 作为受保护素材，不允许修改
-- 产品 PNG 作为受保护素材，不允许修改
-- 禁止生成“相似但不完全相同”的 Logo 或产品替代版本
-- 所有 SKU 始终从 ORIGINAL MASTER 派生
+# Core Workflow
 
-## 新产品流程
+For every new product:
 
-CREATE_MASTER_OPTIONS → 生成 5 个 → STOP → 用户选择 → SELECT_MASTER → MASTER_APPROVED
+1. Upload the brand logo.
+2. Upload the product PNG chosen as the master SKU.
+3. Provide the product name and version text.
+4. Generate five master candidates as FIVE SEPARATE image outputs.
+5. Review the five standalone images.
+6. Select one option.
+7. Lock that original image as ORIGINAL MASTER.
+8. Generate every remaining color SKU directly from ORIGINAL MASTER.
 
-## 单个变体
+Never generate five candidates inside one collage/contact sheet.
 
-ORIGINAL MASTER + 上传 SKU PNG → REPLACE_VARIANT
+Never generate variants in a chain.
 
-## 批量 SKU
+Correct:
 
-母版颜色 SKU → 5 个候选 → 用户选择 → 锁定 ORIGINAL MASTER → ORIGINAL MASTER + SKU 2 / SKU 3 / SKU N
+ORIGINAL MASTER + SKU 2
+ORIGINAL MASTER + SKU 3
+ORIGINAL MASTER + SKU 4
 
-绝不链式编辑变体。
+Incorrect:
 
-## 示例
+MASTER → SKU 2 → SKU 3 → SKU 4
 
-上传 Logo + 黑色产品 PNG，然后说：
+---
 
-产品名称：Redmi Watch 6
-版本：Глобальная версия
-黑色作为母版。
-生成 5 个 MD3 母版方案供我选择。
+# Master Candidate Output Rule
 
-生成 5 个后必须停止。
+"Generate five master candidates" means:
 
-你回复：
+- five independent image files;
+- one design per image;
+- one standalone 3:4 canvas per candidate.
 
-方案 3，就用这个。
+Forbidden:
 
-此时 OPTION 3 = MASTER_SELECTED，MASTER_APPROVED = true。
+- contact sheet;
+- collage;
+- grid;
+- mood board;
+- comparison board;
+- storyboard;
+- multi-panel image;
+- five designs inside one canvas.
 
-如果还上传了蓝色和白色 PNG，后续应分别执行：
+Do not render option numbers such as 01, 02, 03, 04, 05 inside the artwork.
 
-ORIGINAL MASTER + 蓝色 PNG
-ORIGINAL MASTER + 白色 PNG
+Option numbering belongs only to the conversation.
 
-## 受保护素材原则
+## Sequential Generation
 
-工作流可以改变：位置、等比例大小、背景、构图、光影、阴影。
+Preferred sequence:
 
-工作流不得改变：Logo 图形、Logo 颜色、Logo 比例、产品身份、产品结构、产品颜色、产品物理细节。
+OPTION 1 → one standalone image  
+OPTION 2 → one standalone image  
+OPTION 3 → one standalone image  
+OPTION 4 → one standalone image  
+OPTION 5 → one standalone image  
+→ wait for user selection
 
-构图适应素材，素材不为了构图而被重构。
+If the interface cannot reliably generate five separate images in one response:
 
+- generate OPTION 1 only;
+- stop;
+- wait for the user to request OPTION 2;
+- continue one image at a time.
 
-- Brand logo is fixed to the upper-left safe area only.
+Never replace separate outputs with a collage.
+
+---
+
+# Canvas Rules
+
+Every generated image must use:
+
+- strict aspect ratio: 3:4
+- target size: 1200 × 1600 px
+
+This applies to:
+
+- all master candidates;
+- selected master;
+- single SKU variants;
+- batch SKU outputs.
+
+Do not generate another ratio first and crop afterward.
+
+---
+
+# Brand Logo Rules
+
+The uploaded logo is a protected atomic visual asset.
+
+## Atomic Logo
+
+Treat the entire uploaded logo as ONE indivisible graphic.
+
+This includes:
+
+- symbol;
+- emblem;
+- wordmark;
+- letters;
+- brand-name text;
+- spacing;
+- colors;
+- transparency.
+
+Text embedded inside the logo is NOT editable text.
+
+Do not:
+
+- OCR and re-typeset it;
+- regenerate the wordmark;
+- change character shapes;
+- change letter spacing;
+- change font weight;
+- separate symbol and wordmark;
+- rebuild the logo;
+- substitute a similar logo.
+
+Only scale and position the entire logo as one unit.
+
+## Logo Position
+
+Logo may appear ONLY in the upper-left safe area.
+
+For 1200 × 1600 px:
+
+- minimum left margin: 60 px
+- minimum top margin: 80 px
+
+Logo must remain fully inside the canvas.
+
+## Logo Size
+
+Maximum bounding box:
+
+- width: 220 px
+- height: 100 px
+
+Preserve original aspect ratio.
+
+Do not stretch, compress, crop, or distort.
+
+Across the five master candidates:
+
+- logo location logic stays upper-left;
+- logo visual size stays consistent.
+
+After master selection:
+
+- logo width is locked;
+- logo height is locked;
+- logo position is locked.
+
+---
+
+# Product Image Rules
+
+Uploaded product PNG is a protected source asset.
+
+Do not redesign or approximate the product.
+
+Do not change:
+
+- model;
+- color;
+- silhouette;
+- case/body shape;
+- strap shape;
+- buttons;
+- crown;
+- ports;
+- material;
+- screen proportions;
+- physical details.
+
+Allowed:
+
+- proportional scaling;
+- positioning;
+- composition;
+- natural contact shadow;
+- ambient shadow;
+- subtle separation light.
+
+The design adapts to the product.
+
+The product must not be structurally changed to fit the design.
+
+---
+
+# Allowed Visible Content
+
+Only:
+
+1. uploaded brand logo;
+2. exact product name;
+3. exact version text;
+4. uploaded product PNG;
+5. MD3 background geometry;
+6. natural lighting and shadows.
+
+No:
+
+- selling points;
+- specifications;
+- promotions;
+- extra icons;
+- badges;
+- certification labels;
+- decorative text;
+- extra logos;
+- marketplace stickers.
+
+---
+
+# Typography
+
+Product name:
+
+- modern sans-serif;
+- Material / Roboto / Google Sans inspired;
+- Bold 700;
+- preferably one line;
+- maximum two lines;
+- do not break words internally;
+- do not shrink excessively.
+
+Version:
+
+- Medium 500;
+- clear and readable;
+- visually secondary to title;
+- not faint fine print.
+
+---
+
+# MD3 Direction
+
+Use Material Design 3 as visual inspiration:
+
+- rounded geometry;
+- tonal surfaces;
+- large curves;
+- soft gradients;
+- restrained elevation;
+- generous whitespace;
+- adaptive color;
+- clean hierarchy.
+
+Do not make the image look like an Android app UI.
+
+---
+
+# Master Candidate Diversity
+
+Five candidates must differ meaningfully in composition.
+
+Do NOT use fixed predefined composition categories.
+
+Explore differences in:
+
+- product placement;
+- product visual scale;
+- information-zone placement;
+- negative space;
+- MD3 geometry;
+- arcs / curves;
+- tonal surfaces;
+- depth;
+- lighting balance;
+- overall visual rhythm.
+
+Changing only the background color does not count as a different candidate.
+
+---
+
+# Master Selection
+
+After the five standalone candidates exist, wait for user selection.
+
+Examples:
+
+"方案3"
+"选第3个"
+"第三张作为母版"
+"方案3，就用这个"
+
+Once unambiguous:
+
+MASTER_SELECTED = selected option
+MASTER_APPROVED = true
+
+The selected ORIGINAL image becomes the only production master.
+
+---
+
+# Variant Replacement
+
+Image A = ORIGINAL MASTER  
+Image B = uploaded new SKU PNG
+
+This is a locked-master edit, not a new poster.
+
+Lock:
+
+- logo artwork;
+- logo size;
+- logo position;
+- product-name size and position;
+- version size and position;
+- title/version spacing;
+- product visual size;
+- product visual center;
+- background geometry shape;
+- background geometry size;
+- background geometry position;
+- overall composition.
+
+Allowed changes:
+
+- uploaded SKU product;
+- background main color;
+- MD3 geometry color;
+- shadow strength;
+- separation lighting;
+- text light/dark value only when contrast requires it.
+
+---
+
+# Batch SKU Mode
+
+Batch mode MUST pause for master selection.
+
+Flow:
+
+1. choose master SKU;
+2. generate five master candidates as separate images;
+3. stop;
+4. wait for user selection;
+5. lock selected ORIGINAL MASTER;
+6. generate remaining SKUs from that same ORIGINAL MASTER.
+
+Do not continue to other colors before the user selects the master.
+
+---
+
+# QA
+
+For every image verify:
+
+- strict 3:4 ratio;
+- target 1200 × 1600;
+- uploaded logo remains visually faithful;
+- logo wordmark has not been re-typeset;
+- logo remains in upper-left safe area;
+- logo fits within 220 × 100 px maximum bounding box;
+- product remains faithful to uploaded PNG;
+- product is not redesigned;
+- product name is exact;
+- version text is exact;
+- no extra text appears;
+- no extra icons or badges appear.
+
+For master candidates also verify:
+
+- every option is a separate standalone image;
+- no collage/contact sheet/grid is used;
+- no option number appears inside artwork;
+- candidates are genuinely different in composition.
+
+For variants also verify:
+
+- logo does not move or resize;
+- title/version do not move or resize;
+- product center and visual scale remain consistent;
+- background geometry does not move, resize, or change shape.
+
+---
+
+# Recommended Chat Usage
+
+## Start a new product
+
+Upload logo + master product PNG, then say:
+
+使用 md3-product-main-image。
+产品名称：HUAWEI WATCH FIT 5 Pro
+版本文字：Глобальная версия
+当前上传产品作为母版 SKU。
+开始母版探索。
+
+必须逐张生成 5 个独立的 3:4 母版候选。
+不要拼版。
+如果一次无法输出 5 张独立图片，先只生成方案 1。
+
+## Continue options
+
+继续生成方案 2。
+保持全部规范。
+只生成一张独立 3:4 图片，不得拼版。
+
+Repeat for 3, 4, and 5.
+
+## Select master
+
+方案 3 作为正式 ORIGINAL MASTER，锁定。
+
+## Generate a variant
+
+Upload ORIGINAL MASTER + new SKU PNG, then say:
+
+使用已锁定的 ORIGINAL MASTER。
+Image A 是正式母版。
+Image B 是当前 SKU PNG。
+进入 REPLACE_VARIANT。
+严格锁定版式，只替换产品并适配主题色。
+
+## Batch SKU
+
+Upload logo + all SKU PNGs, then say:
+
+使用 BUILD_SKU_SET。
+黑色作为母版 SKU。
+先逐张生成 5 个独立母版候选。
+不要拼版。
+生成完候选后等待我选择，不要提前生成其他颜色。

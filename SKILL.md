@@ -1,11 +1,10 @@
 ---
 name: md3-product-main-image
 description: >
-  GPT-image-only workflow for creating premium Google Material Design 3 inspired
-  e-commerce product main images. Generates five master candidates for a new
-  product, waits for user selection, locks the selected master, and creates
-  same-product SKU variants from that original master while protecting uploaded
-  logos and product PNGs from redesign or alteration.
+  GPT-image-only workflow for creating premium MD3 e-commerce product main images.
+  Generates five master candidates as five SEPARATE image outputs, one at a time,
+  waits for user selection, then locks the selected original master for single or
+  batch SKU replacement while protecting uploaded logos and product images.
 ---
 
 # MD3 Product Main Image
@@ -228,30 +227,137 @@ Do NOT add selling points, specifications, promotional copy, discounts, badges, 
 3. REPLACE_VARIANT
 4. BUILD_SKU_SET
 
+# Separate Master Output Rule
+
+The five master candidates must be generated as FIVE SEPARATE IMAGE OUTPUTS.
+
+This is a hard rule.
+
+NEVER place multiple candidates inside one image.
+
+Do NOT create:
+
+- contact sheets;
+- collages;
+- grids;
+- mood boards;
+- comparison boards;
+- storyboards;
+- multi-panel layouts;
+- five-in-one layouts;
+- thumbnail sheets.
+
+Each master candidate must be its own complete standalone image.
+
+Each standalone candidate must independently use:
+
+- strict 3:4 aspect ratio;
+- target size 1200 × 1600 px;
+- one complete composition;
+- one intact uploaded brand logo;
+- one exact product name;
+- one exact version text;
+- one intact uploaded product PNG;
+- one complete MD3 background composition.
+
+Do NOT place option numbers such as:
+
+- 01;
+- 02;
+- 03;
+- 04;
+- 05;
+- Option 1;
+- 方案1
+
+inside the generated artwork.
+
+Option numbers are conversation labels only.
+
+## Sequential Generation Requirement
+
+Generate the five candidates sequentially:
+
+1. GENERATE_OPTION_1
+2. GENERATE_OPTION_2
+3. GENERATE_OPTION_3
+4. GENERATE_OPTION_4
+5. GENERATE_OPTION_5
+6. WAIT_FOR_SELECTION
+
+Each generation step produces exactly ONE standalone image.
+
+After each image is generated, continue to the next option only if the interface
+can reliably create another separate image output.
+
+If the interface cannot reliably return five separate images in one response,
+prioritize standalone output quality over quantity:
+
+- generate Option 1 only;
+- stop;
+- wait for the user to say "continue" or request the next option.
+
+Never solve this limitation by combining multiple candidates into one image.
+
+
 # STATE 1 — CREATE_MASTER_OPTIONS
 
-Use when this is a new product, there is no approved master, the user asks for a new master, or the user asks for a fresh set of options.
+Use when:
 
-Generate exactly FIVE master candidates.
+- this is a new product;
+- there is no approved master;
+- the user asks to create a product main image;
+- the user asks to create a master;
+- the user asks for multiple design options;
+- the user starts a new SKU set;
+- the user explicitly asks to regenerate the master options.
 
-All five must use the SAME uploaded logo, SAME uploaded master product PNG, SAME product name, SAME version text, SAME canvas size, and SAME MD3 design direction.
+The target is FIVE master candidates, but they must be generated as FIVE
+SEPARATE standalone images, never as one combined image.
 
-The five candidates must be meaningfully different in composition. Changing only background color does NOT count.
+Generation sequence:
 
-Explore meaningful differences in:
+GENERATE_OPTION_1
+→ one standalone 3:4 image
 
-- product placement;
-- product scale;
-- information-zone placement;
-- negative-space distribution;
-- MD3 geometry;
-- arc position;
-- tonal surface structure;
-- depth;
-- lighting balance;
-- overall composition.
+GENERATE_OPTION_2
+→ one standalone 3:4 image
 
-After generating the five candidates: STOP. Do not generate other SKUs. Wait for explicit user selection.
+GENERATE_OPTION_3
+→ one standalone 3:4 image
+
+GENERATE_OPTION_4
+→ one standalone 3:4 image
+
+GENERATE_OPTION_5
+→ one standalone 3:4 image
+
+→ WAIT_FOR_SELECTION
+
+All five candidates must use the SAME:
+
+- uploaded brand logo;
+- uploaded master product PNG;
+- exact product name;
+- exact version text;
+- strict 3:4 ratio;
+- target size 1200 × 1600 px;
+- MD3 design direction;
+- protected source assets.
+
+The candidates must explore meaningfully different compositions.
+
+Do NOT create five nearly identical images with only different background colors.
+
+Do NOT create a collage/contact sheet/grid to display all five candidates.
+
+After the fifth standalone candidate is generated:
+
+STOP.
+
+Do not generate other color SKUs.
+
+Wait for explicit user selection.
 
 # Master Candidate Diversity Requirement
 
@@ -345,6 +451,8 @@ Use when the user uploads multiple colors of the same product and asks for a com
 Workflow MUST be:
 
 1. Identify the master SKU color.
+2. Generate the five candidates sequentially as separate images.
+3. Never combine them into one contact sheet, collage, grid, or multi-panel image.
 2. Run CREATE_MASTER_OPTIONS for that SKU.
 3. Generate exactly five master candidates.
 4. STOP.
