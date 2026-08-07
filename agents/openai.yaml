@@ -1,0 +1,4 @@
+interface:
+  display_name: "MD3 Product Main Image"
+  short_description: "Generate locked MD3 Ozon product main images"
+  default_prompt: "Generate an MD3 product main image for this product, 1200x1600, black SKU as the master."
