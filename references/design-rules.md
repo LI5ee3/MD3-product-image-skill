@@ -1,190 +1,139 @@
-# MD3 Product Main Image Design Rules
+# Design Rules — v4.0
 
-## Global
+## Core Principle
 
-- Canvas: 1200 × 1600 px
-- Aspect: 3:4
-- Marketplace: Ozon-style product cards
+Constrain visual outcomes, not specific hues.
 
-## Protected Assets
+## Canvas
 
-Uploaded brand logo and uploaded product PNG are protected source assets.
+- strict 3:4
+- target 1200 × 1600 px
 
-Do NOT redraw, recolor, restyle, distort, restructure, reinterpret, or replace them with generated approximations.
+## Logo
 
-Allowed only: proportional scaling, placement, composition, natural lighting/shadows around product.
-
-Asset fidelity has priority over creative styling.
-
-
-
-## Atomic Logo
-
-The uploaded logo must be treated as one indivisible raster graphic.
-
-Any wordmark, letters, or brand-name text inside the logo are part of the logo
-artwork and must not be treated as editable text.
-
-Never OCR, re-typeset, regenerate, normalize, translate, or separately
-reconstruct text embedded inside the logo.
-
-Only scale and position the complete logo asset as one unit.
-
-### Atomic Logo QA
-
-Verify:
-
-- symbol and wordmark remain together;
-- embedded logo text is not re-typeset;
-- character shapes and spacing remain faithful;
-- internal logo proportions remain unchanged;
-- no substitute brand wordmark is generated.
-
-## Brand Logo Position
-
-The brand logo is position-locked.
-
-It may appear ONLY in the upper-left safe area.
-
-For 1200 × 1600 px:
-
-- minimum left margin: 60 px;
-- minimum top margin: 80 px;
-- keep the full logo inside the upper-left area;
-- never place it in any other region.
-
-This applies to master candidates, the selected master, variants, and batch SKU outputs.
-
-## Visual Priority
-
-1. Product
-2. Product name
-3. Version
-4. Brand logo
-5. Background decoration
-
-## Typography
-
-Product name: Bold 700, preferably one line, maximum two lines, no internal word breaks, no excessive shrinking.
-
-Version: Medium 500, clearly visible, not fine print.
-
-## Lively MD3 Mood
-
-Use MD3 not only as a geometric language, but also as a tonal mood system.
-
-Target mood:
-
-- lively;
-- bright;
-- light;
-- youthful;
-- clean;
-- breathable;
-- modern;
-- e-commerce friendly.
-
-Avoid:
-
-- overly black;
-- overly dark;
-- heavy;
-- oppressive;
-- dated;
-- luxury-dark showroom mood;
-- thick dark pedestal scenes.
-
-Dark products should still feel fresh through brighter neutral tonal layering,
-cool-gray / blue-gray / graphite-gray support, and cleaner breathing space.
-
-
-## MD3 Background
-
-Use restrained tonal surfaces, arcs, curves, rounded shapes, gradients, soft layering, and controlled elevation.
-
-Background decoration must never damage text readability.
-
-## Product Separation
-
-- Dark product: differentiated graphite/charcoal tones with controlled highlights.
-- Light/colored product: muted complementary or neutral backgrounds.
-- White product: greige/taupe/stone/beige-gray rather than pure white.
-- Pastel product: avoid background too similar in hue/brightness.
-
-## Five Master Options
-
-A new product requires exactly five candidate master compositions before
-master selection.
-
-They must differ meaningfully in composition, not merely in color.
-
-Do not use predefined fixed composition categories.
-
-The five options should be designed responsively around the actual product,
-while exploring differences in product placement, scale, information-zone
-placement, negative space, MD3 geometry, tonal surfaces, depth, lighting, and
-overall visual balance.
-
-## Same Product SKU Rule
-
-LOCKED GEOMETRY + PROTECTED ASSETS + ADAPTIVE COLOR.
-
-Every SKU must use ORIGINAL MASTER + UPLOADED SKU PNG.
-
-Never chain variant edits.
-
-
-## Separate Master Candidate Output
-
-Five master candidates means five separate image outputs.
-
-Never combine candidates into one image.
-
-Forbidden:
-
-- contact sheet;
-- collage;
-- grid;
-- mood board;
-- comparison board;
-- multi-panel image.
-
-Each candidate must be a standalone strict 3:4 / 1200 × 1600 px image.
-
-Generate candidates sequentially.
-
-If five separate images cannot be reliably generated in one response,
-generate one candidate at a time rather than combining them.
-
-
-## Dark Product Background Priority
-
-Black or dark products should generally use lighter MD3 background systems.
-
-Preferred:
-
-- light cool gray;
-- mist gray;
-- pale blue-gray;
-- soft neutral gray;
-- stone gray;
-- warm light gray.
-
-Avoid defaulting to black-on-black or dark-on-dark poster compositions.
-
-The aim is marketplace-card visibility, stronger thumbnail readability, and
-cleaner commercial presentation.
-
+- uploaded logo is an indivisible protected graphic
+- upper-left safe area only
+- minimum left clearance: 60 px
+- minimum top clearance: 80 px
+- maximum bounding box: 220 × 100 px
+- preserve original aspect ratio
+- never re-typeset embedded wordmark text
 
 ## Information Zone
 
-- Logo stays in the upper-left safe area.
-- Product name and version stay in the upper half.
-- Product name appears below the logo.
-- Product-name left edge should align with the logo left edge whenever visually appropriate.
-- Version aligns with the product-name left edge.
-- Keep breathable logo-to-title spacing.
-- Keep stable title-to-version spacing.
-- Long titles use at most two lines.
-- The text block must not invade the product's core display area.
-- After master selection, information-zone geometry is locked.
+- title and version stay in upper half
+- title below logo
+- preferred title-left alignment with logo-left edge
+- version aligns with title
+- maintain breathable logo-to-title spacing
+- maintain stable title-to-version spacing
+- text block must not invade product core display area
+- long titles: maximum two lines
+
+## Product
+
+- uploaded PNG is authoritative
+- no redraw
+- no recolor
+- no structural modification
+- proportional scale and placement only
+- restrained natural shadows allowed
+
+## MD3
+
+Target:
+- bright
+- light
+- lively
+- youthful
+- clean
+- breathable
+- modern
+- e-commerce friendly
+
+Use:
+- rounded geometry
+- curves
+- tonal surfaces
+- soft gradients
+- subtle elevation
+- generous whitespace
+
+Avoid:
+- Android-app UI look
+- oppressive heavy-dark mood
+- theatrical black-studio treatment
+- bulky pedestal dominance
+- excessive visual effects
+
+## Adaptive Color
+
+No fixed background palette.
+
+No product-color-to-background-color lookup table.
+
+Every product and every master candidate independently evaluates:
+
+- luminance
+- saturation
+- material
+- visual weight
+- local accents
+- silhouette separation
+- composition
+- MD3 tonal balance
+- marketplace thumbnail readability
+
+Use luminance separation to preserve product clarity.
+Keep hue adaptive.
+
+### Dark products
+
+Require enough luminance separation.
+Do not prescribe hue.
+
+### Light products
+
+Require enough silhouette/luminance separation.
+Do not prescribe hue.
+
+### Colored products
+
+Do not mechanically match product hue.
+Do not mechanically use a complementary hue.
+Let palette selection remain free.
+Hard requirements:
+- clear product/background separation
+- lively modern e-commerce result
+
+## Candidate Diversity
+
+Five candidates:
+- separate images
+- meaningfully different compositions
+- color evaluated independently
+- no forced color-family quotas
+- no forced hue differences
+- similar palettes are allowed when genuinely appropriate
+
+## Variant
+
+Lock:
+- logo
+- text
+- information zone
+- product visual-size logic
+- product center
+- background geometry
+- composition
+
+Adapt:
+- background color
+- geometry fill colors
+- tonal-surface colors
+- shadow intensity
+- subtle separation light
+- text light/dark value when needed
+
+Every SKU re-evaluates its palette independently.
+Do not inherit the previous SKU palette as a default.
