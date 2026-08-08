@@ -5,11 +5,12 @@
 流程：
 
 1. 指定母版 SKU
-2. 只使用母版 SKU 生成 5 个独立候选
+2. 只使用母版 SKU 生成第 1 张独立候选图
 3. 停止
-4. 等待用户选择 ORIGINAL MASTER
-5. 锁定 ORIGINAL MASTER
-6. 其他 SKU 全部直接从 ORIGINAL MASTER 生成
+4. 如用户要求，继续逐张生成其他候选
+5. 等待用户选择 ORIGINAL MASTER
+6. 锁定 ORIGINAL MASTER
+7. 其他 SKU 全部直接从 ORIGINAL MASTER 生成
 
 正确：
 
@@ -33,6 +34,7 @@ MASTER → SKU 2 → SKU 3 → SKU 4
 
 不使用固定配色模板。
 不使用固定视觉情绪模板。
+不使用固定展示模板。
 
 核心：
 
