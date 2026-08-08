@@ -1,4 +1,4 @@
-# MD3 Product Main Image Skill v3.8
+# MD3 Product Main Image Skill v3.9
 
 GPT-image-only workflow for creating Ozon-style e-commerce product main images.
 
@@ -6,7 +6,7 @@ This version does NOT use Photoshop, PSD automation, website integration, or
 external compositing.
 ---
 
-# Mood Update in v3.8
+# Mood Update in v3.9
 
 This version adds an explicit “lively MD3” mood rule.
 
@@ -46,7 +46,7 @@ For black or dark products:
 
 ---
 
-# Black/Dark Product Update in v3.8
+# Black/Dark Product Update in v3.9
 
 This version adds a stronger marketplace-first rule for black and dark products.
 
@@ -519,3 +519,21 @@ Upload logo + all SKU PNGs, then say:
 先逐张生成 5 个独立母版候选。
 不要拼版。
 生成完候选后等待我选择，不要提前生成其他颜色。
+
+---
+
+# Information Zone Update in v3.9
+
+v3.9 adds a strict information-zone rule:
+
+- logo remains in the upper-left safe area;
+- product name and version text must stay in the upper half;
+- product name appears below the logo;
+- title should align with the logo's left edge whenever visually appropriate;
+- version aligns with the title;
+- logo-to-title spacing must feel breathable but connected;
+- title-to-version spacing remains stable;
+- long titles may use at most two lines;
+- the text block must not invade the product's core display area.
+
+After a master is selected, the information-zone geometry is locked for all same-product SKU variants.

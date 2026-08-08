@@ -539,6 +539,34 @@ Allowed only:
 
 The logo artwork itself must remain visually unchanged.
 
+
+# Information Zone Position and Alignment Rule
+
+The brand logo, product name, and version text must form one stable information zone.
+
+- Brand logo stays in the upper-left safe area.
+- Product name must appear below the logo.
+- Product name and version text must remain in the UPPER HALF of the canvas.
+- Product-name left edge should align with the logo left edge whenever visually appropriate.
+- Version-text left edge should align with the product-name left edge.
+- Keep intentional vertical breathing room between logo and product name.
+- Keep a stable, natural hierarchy gap between product name and version.
+- The information zone must not invade the product's core display area.
+- Long product names may use at most two lines and must still remain in the upper half.
+- Do not push the information zone toward the center or lower half to solve layout conflicts.
+
+Across all five master candidates, preserve the same upper-half information-zone logic.
+
+After master selection, lock:
+- title position;
+- version position;
+- logo/title left-alignment relationship;
+- logo-to-title spacing;
+- title-to-version spacing;
+- complete information-zone geometry.
+
+All same-product variants must preserve the ORIGINAL MASTER information zone.
+
 # Product Image Protection
 
 Treat every uploaded product PNG as the authoritative product asset.
