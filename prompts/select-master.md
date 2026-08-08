@@ -1,24 +1,26 @@
-# SELECT MASTER
+# SELECT_MASTER
 
-用户正在从 5 个母版候选方案中选择正式母版。
+Use only after the user explicitly selects one master candidate.
 
-识别明确选择，例如：
+Examples:
 
-- “方案3” → OPTION 3
-- “第二张” → OPTION 2
-- “选第五个” → OPTION 5
-- “一号做母版” → OPTION 1
-- “方案3不错，就用这个” → OPTION 3
+- 方案3
+- 第三张作为母版
+- 选第3个
+- 方案3，就用这个
 
-选择明确后：
+Then:
 
-1. 将对应原始候选图标记为 MASTER_SELECTED。
-2. 设置 MASTER_APPROVED = true。
-3. 后续所有同款 SKU 必须直接使用该原始候选图作为 Image A。
-4. 不得混入其他候选方案元素。
-5. 不得再自行改变母版构图。
-6. 如果当前处于 BUILD_SKU_SET，才可以继续处理剩余 SKU。
+MASTER_SELECTED = selected original candidate
+MASTER_APPROVED = true
 
-如果用户只是评价某个方案但没有明确选择，不要擅自锁定。
+The selected ORIGINAL image becomes the sole production master.
 
-如果用户要求重新生成五个方案，则返回 CREATE_MASTER_OPTIONS，在新母版选择前不得继续 SKU 生产。
+Do not:
+
+- blend rejected candidates;
+- recreate a “similar” master;
+- redraw the selected candidate;
+- use another candidate as the variant source.
+
+All variants must use the exact selected ORIGINAL MASTER as Image A.
