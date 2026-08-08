@@ -27,8 +27,9 @@ During `PREFLIGHT`, inspect the available image-generation interface.
   confirms that model.
 - When explicit model selection is unavailable, use the available
   image-generation tool without claiming or assuming which image model it uses.
-- Use an explicit 1200 x 1600 output-size control when the interface exposes
-  one. Do not invent unsupported model, quality, or size parameters.
+- Request an exact portrait 3:4 aspect ratio through the interface when that
+  control is available. Do not invent unsupported model, quality, or size
+  parameters.
 
 ## Build the required outbound prompt
 
@@ -37,7 +38,8 @@ the bracketed input values. Do not summarize, omit, or weaken any line.
 
 ```text
 Generate exactly one standalone portrait 3:4 e-commerce product image.
-Final delivery target: exactly 1200 x 1600 px.
+Keep the final output at an exact portrait 3:4 aspect ratio. Do not require a
+fixed pixel resolution.
 
 Use the supplied logo and product PNG as protected source assets.
 Product name: "[EXACT PRODUCT NAME]"
@@ -48,10 +50,10 @@ Visual hierarchy:
 2. product name: second
 3. logo: third
 
-On the final 1200 x 1600 canvas:
-- preferred visible logo height: 72-96 px
-- maximum visible logo height: 120 px
-- maximum visible logo width: 200 px
+On the final 3:4 canvas:
+- preferred visible logo height: 4.5%-6% of canvas height
+- maximum visible logo height: 7.5% of canvas height
+- maximum visible logo width: 16.7% of canvas width
 
 Keep the logo flat and source-faithful. Do not let scene lighting affect it,
 add a gradient, or apply any three-dimensional treatment.
@@ -61,16 +63,16 @@ Also include the applicable protected-asset, information-group, typography,
 visible-content, and workflow-state constraints from this skill. Pass the exact
 Google Classic MD3 style block above unchanged.
 
-Before generation, verify that the outbound prompt contains `1200 x 1600`,
-`72-96 px`, `120 px`, `200 px`, and all three hierarchy levels. Compare the
-style block exactly with the block above. Correct any omission or difference
-before calling the image generator.
+Before generation, verify that the outbound prompt contains `3:4`, `4.5%-6%`,
+`7.5%`, `16.7%`, and all three hierarchy levels. Compare the style block exactly
+with the block above. Correct any omission or difference before calling the
+image generator.
 
 ## Follow the execution loop
 
 Use this loop for every output:
 
-`PREFLIGHT -> BUILD_PROMPT -> GENERATE -> FINALIZE_CANVAS -> VALIDATE -> DELIVER`
+`PREFLIGHT -> BUILD_PROMPT -> GENERATE -> FINALIZE_OUTPUT -> VALIDATE -> DELIVER`
 
 Generate the complete image in one pass from the original inputs. Do not repair
 a failed hard constraint by locally repainting, inpainting, or regenerating part
@@ -81,14 +83,14 @@ Make at most three complete-image attempts for one output. If the third attempt
 still fails, stop and report the failed validation items. Do not deliver it as
 valid.
 
-## Keep the canvas fixed
+## Keep the aspect ratio fixed
 
 - Generate exactly one standalone image in each round.
-- Deliver a portrait 3:4 image at exactly 1200 x 1600 px.
+- Deliver an exact portrait 3:4 image at the generator's supported resolution.
+- Do not require a specific pixel resolution or reject an exact 3:4 output
+  solely because of its pixel dimensions.
 - Do not create a collage, grid, contact sheet, candidate label, or multi-panel.
 - Do not generate at another ratio and crop to 3:4.
-- If the generator cannot output 1200 x 1600 directly, accept only an exact 3:4
-  source, resize it proportionally without cropping, and verify the final size.
 - Do not generate if exact 3:4 cannot be guaranteed.
 
 ## Follow the workflow
@@ -169,17 +171,17 @@ Enforce this visual hierarchy among the three main elements:
 The logo must never become the first visual focus. This is a hard failure
 regardless of its pixel dimensions.
 
-Keep the logo in a comfortable upper-left safe area. For a 1200 x 1600 canvas,
-use these approximate visual references:
+Keep the logo in a comfortable upper-left safe area. Use these approximate
+visual references on the final canvas:
 
-- left safe margin: about 60 px or more
-- top safe margin: about 80 px or more
-- preferred visible height: 72-96 px
+- left safe margin: about 5% of canvas width or more
+- top safe margin: about 5% of canvas height or more
+- preferred visible height: 4.5%-6% of canvas height
 
 Use these hard maximums for the logo's visible artwork bounds:
 
-- visible height: 120 px
-- visible width: 200 px
+- visible height: 7.5% of canvas height
+- visible width: 16.7% of canvas width
 
 The safe margins and preferred height are visual guidelines, not pixel-perfect
 validation targets. The maximum height and width are mandatory.
@@ -289,27 +291,28 @@ using arbitrary clashing colors.
 
 ## Finalize before validation
 
-Perform delivery validation only on the final 1200 x 1600 file, never on the
+Perform delivery validation only on the final exported 3:4 file, never on the
 image generator's raw output.
 
 1. Confirm that the raw output is exact 3:4. Reject it if it is not.
-2. If needed, resize it proportionally to exactly 1200 x 1600 without cropping.
-3. Confirm the final canvas dimensions.
-4. Measure the logo's visible artwork bounds on the final file with an
-   image-analysis tool. Do not estimate its pixel dimensions visually.
+2. Export it without cropping or changing its aspect ratio. Do not impose a
+   fixed pixel resolution.
+3. Confirm that the final file remains exact portrait 3:4.
+4. Measure the logo's visible artwork bounds as percentages of the final canvas
+   with an image-analysis tool. Do not estimate them visually.
 5. Run every hard-failure check below on the final file.
 6. Deliver only after all checks pass.
 
-Any resize invalidates earlier size measurements. Measure the logo again after
-the final canvas has been completed.
+If export changes the pixel dimensions, re-confirm the aspect ratio and measure
+the logo's relative bounds again.
 
 ## Validate before delivery
 
 Treat these as hard failures:
 
 - output count is not exactly one
-- final canvas is not exactly 1200 x 1600 portrait 3:4 or was cropped from another ratio
-- logo visible artwork exceeds 120 px in height or 200 px in width
+- final canvas is not exact portrait 3:4 or was cropped from another ratio
+- logo visible artwork exceeds 7.5% of canvas height or 16.7% of canvas width
 - logo or product is recreated, altered, distorted, substituted, or cropped
 - product, product name, and logo do not read as first, second, and third in
   the visual hierarchy
@@ -328,11 +331,11 @@ Treat these as hard failures:
 - an SKU variant derives from another generated variant
 - sibling SKU palettes are not clearly distinguishable at thumbnail size
 
-Treat approximate logo margins, the preferred 72-96 px logo height, optical
+Treat approximate logo margins, the preferred 4.5%-6% logo height, optical
 alignment, spacing, font choice, font weight, and line breaking as visual
-judgments. The visual hierarchy and 120 px height and 200 px width maximums are
-not approximate. Do not fail solely because another guideline differs by a few
-pixels while preserving the intended visual result.
+judgments. The visual hierarchy and 7.5% height and 16.7% width maximums are not
+approximate. Do not fail solely because another guideline differs slightly
+while preserving the intended visual result.
 
 If a hard failure occurs, invalidate the entire result and regenerate from the
 original inputs, subject to the three-attempt limit. For a master candidate,
