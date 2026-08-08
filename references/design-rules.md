@@ -69,6 +69,35 @@ Product name: Bold 700, preferably one line, maximum two lines, no internal word
 
 Version: Medium 500, clearly visible, not fine print.
 
+## Lively MD3 Mood
+
+Use MD3 not only as a geometric language, but also as a tonal mood system.
+
+Target mood:
+
+- lively;
+- bright;
+- light;
+- youthful;
+- clean;
+- breathable;
+- modern;
+- e-commerce friendly.
+
+Avoid:
+
+- overly black;
+- overly dark;
+- heavy;
+- oppressive;
+- dated;
+- luxury-dark showroom mood;
+- thick dark pedestal scenes.
+
+Dark products should still feel fresh through brighter neutral tonal layering,
+cool-gray / blue-gray / graphite-gray support, and cleaner breathing space.
+
+
 ## MD3 Background
 
 Use restrained tonal surfaces, arcs, curves, rounded shapes, gradients, soft layering, and controlled elevation.
@@ -126,3 +155,22 @@ Generate candidates sequentially.
 
 If five separate images cannot be reliably generated in one response,
 generate one candidate at a time rather than combining them.
+
+
+## Dark Product Background Priority
+
+Black or dark products should generally use lighter MD3 background systems.
+
+Preferred:
+
+- light cool gray;
+- mist gray;
+- pale blue-gray;
+- soft neutral gray;
+- stone gray;
+- warm light gray.
+
+Avoid defaulting to black-on-black or dark-on-dark poster compositions.
+
+The aim is marketplace-card visibility, stronger thumbnail readability, and
+cleaner commercial presentation.
