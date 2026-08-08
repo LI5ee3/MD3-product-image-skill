@@ -1,139 +1,96 @@
-# Design Rules — v4.0
+# Design Rules v5.0
 
-## Core Principle
+## 核心
 
-Constrain visual outcomes, not specific hues.
+限制质量与功能，不限制具体色相，不限制固定视觉气质。
 
-## Canvas
+## 画布
 
-- strict 3:4
-- target 1200 × 1600 px
+- 3:4
+- 1200 × 1600 px
 
 ## Logo
 
-- uploaded logo is an indivisible protected graphic
-- upper-left safe area only
-- minimum left clearance: 60 px
-- minimum top clearance: 80 px
-- maximum bounding box: 220 × 100 px
-- preserve original aspect ratio
-- never re-typeset embedded wordmark text
+- 完整原子化保护
+- 左上安全区
+- 左距 ≥ 60 px
+- 上距 ≥ 80 px
+- 最大 220 × 100 px
+- 保持宽高比
+- Logo 内嵌文字不得重新排版
 
-## Information Zone
+## 信息区
 
-- title and version stay in upper half
-- title below logo
-- preferred title-left alignment with logo-left edge
-- version aligns with title
-- maintain breathable logo-to-title spacing
-- maintain stable title-to-version spacing
-- text block must not invade product core display area
-- long titles: maximum two lines
+- 标题和版本必须位于上半部分
+- 标题位于 Logo 下方
+- 标题优先与 Logo 形成统一视觉左轴
+- 版本与标题左对齐
+- Logo → 标题保持合理间距
+- 标题 → 版本保持稳定间距
+- 长标题最多两行
+- 文字区不得侵入产品核心展示区
 
-## Product
+## 产品
 
-- uploaded PNG is authoritative
-- no redraw
-- no recolor
-- no structural modification
-- proportional scale and placement only
-- restrained natural shadows allowed
+- 上传 PNG 是唯一权威来源
+- 不重绘
+- 不改色
+- 不改结构
+- 只允许等比例缩放、定位和自然光影
 
 ## MD3
 
-Target:
-- bright
-- light
-- lively
-- youthful
-- clean
-- breathable
-- modern
-- e-commerce friendly
+- 作为设计语言参考
+- 不是固定模板
+- 不强制固定元素组合
+- 根据当前产品和构图自由选择适合的 MD3 设计元素
+- 不做成 Android App UI
 
-Use:
-- rounded geometry
-- curves
-- tonal surfaces
-- soft gradients
-- subtle elevation
-- generous whitespace
+## 视觉气质
 
-Avoid:
-- Android-app UI look
-- oppressive heavy-dark mood
-- theatrical black-studio treatment
-- bulky pedestal dominance
-- excessive visual effects
+- 不预设固定视觉情绪
+- 不设置固定明度倾向
+- 不设置固定冷暖倾向
+- 不设置固定风格列表
+- 由当前产品与构图自行决定
 
-## Adaptive Color
+## 配色
 
-No fixed background palette.
+- 无固定背景色
+- 无产品颜色到背景颜色对照表
+- 无候选色彩家族配额
+- 每个候选独立评估
+- 每个 SKU 独立评估
+- 通过明度、Tonal 分层、轮廓分离保证产品清晰
+- 具体色相自由
 
-No product-color-to-background-color lookup table.
+## 五个候选
 
-Every product and every master candidate independently evaluates:
+- 5 张独立图片
+- 每个候选从同一原始输入重新开始
+- 不是连续迭代
+- 不以前一个候选为设计起点
+- 差异主要来自构图，而不是强制换色
 
-- luminance
-- saturation
-- material
-- visual weight
-- local accents
-- silhouette separation
-- composition
-- MD3 tonal balance
-- marketplace thumbnail readability
+## SKU
 
-Use luminance separation to preserve product clarity.
-Keep hue adaptive.
+锁定：
 
-### Dark products
+- Logo
+- 信息区
+- 产品展示区域
+- 产品尺寸逻辑
+- 产品中心
+- 背景几何
+- 构图
 
-Require enough luminance separation.
-Do not prescribe hue.
+自适应：
 
-### Light products
+- 背景主色
+- 几何填充色
+- Tonal Surface 配色
+- 阴影
+- 必要分离光
+- 必要的文字明暗
 
-Require enough silhouette/luminance separation.
-Do not prescribe hue.
-
-### Colored products
-
-Do not mechanically match product hue.
-Do not mechanically use a complementary hue.
-Let palette selection remain free.
-Hard requirements:
-- clear product/background separation
-- lively modern e-commerce result
-
-## Candidate Diversity
-
-Five candidates:
-- separate images
-- meaningfully different compositions
-- color evaluated independently
-- no forced color-family quotas
-- no forced hue differences
-- similar palettes are allowed when genuinely appropriate
-
-## Variant
-
-Lock:
-- logo
-- text
-- information zone
-- product visual-size logic
-- product center
-- background geometry
-- composition
-
-Adapt:
-- background color
-- geometry fill colors
-- tonal-surface colors
-- shadow intensity
-- subtle separation light
-- text light/dark value when needed
-
-Every SKU re-evaluates its palette independently.
-Do not inherit the previous SKU palette as a default.
+不继承前一个 SKU 的配色偏好。
