@@ -1,9 +1,9 @@
 ---
-name: md3-product-main-image
+name: md3-product-image
 description: Create 3:4 e-commerce product main images in Google Classic Material Design 3, protect supplied logo and product assets, develop independent master candidates one at a time, and derive same-product SKU variants directly from one user-approved ORIGINAL MASTER. Use when generating a product master image, replacing a product with another SKU, or building a consistent same-product SKU image set.
 ---
 
-# MD3 Product Main Image
+# MD3 Product Image
 
 ## Use the visual language
 
@@ -26,24 +26,27 @@ a failed hard constraint by locally repainting, inpainting, or regenerating part
 of the image. Invalidate the result and regenerate the whole image from its
 original inputs.
 
+Make at most three complete-image attempts for one output. If the third attempt
+still fails, stop and report the failed validation items. Do not deliver it as
+valid.
+
 ## Keep the canvas fixed
 
 - Generate exactly one standalone image in each round.
-- Use a portrait 3:4 canvas with a target size of 1200 x 1600 px.
+- Deliver a portrait 3:4 image at exactly 1200 x 1600 px.
 - Do not create a collage, grid, contact sheet, candidate label, or multi-panel.
 - Do not generate at another ratio and crop to 3:4.
 - If the generator cannot output 1200 x 1600 directly, accept only an exact 3:4
-  source and resize it proportionally without cropping.
+  source, resize it proportionally without cropping, and verify the final size.
 - Do not generate if exact 3:4 cannot be guaranteed.
 
-## Select the workflow state
+## Follow the workflow
 
-Use exactly one state:
+Use exactly one state at a time:
 
 1. `CREATE_MASTER_OPTIONS`
 2. `WAIT_FOR_MASTER_SELECTION`
 3. `REPLACE_VARIANT`
-4. `BUILD_SKU_SET`
 
 ### CREATE_MASTER_OPTIONS
 
@@ -76,13 +79,17 @@ Treat this as locked-master product replacement, not a new poster design.
 Derive every SKU directly from `ORIGINAL MASTER + CURRENT SKU`. Never use a
 generated SKU variant as the source for another variant.
 
-### BUILD_SKU_SET
+### Build an SKU set
 
-Choose the master SKU, generate master candidates one at a time, wait for the
-user to select the `ORIGINAL MASTER`, and only then generate every remaining SKU
-directly from that master.
+Treat this as a workflow across the three states, not as a fourth state:
 
-Do not generate the remaining SKUs before master approval.
+1. Choose the master SKU and enter `CREATE_MASTER_OPTIONS`.
+2. Enter `WAIT_FOR_MASTER_SELECTION` after each candidate.
+3. After approval, enter `REPLACE_VARIANT` for each remaining SKU.
+4. Generate and validate each SKU separately before starting the next.
+
+Do not generate remaining SKUs before master approval or generate multiple SKU
+images in one generation.
 
 ## Protect the brand logo
 
@@ -132,9 +139,9 @@ group, not as three unrelated objects.
 - Keep the group in the upper half and out of the core product display area.
 - Preserve the group's complete geometry after `ORIGINAL MASTER` approval.
 
-Do not use a technical coordinate such as `INFO_X`. Do not resize or reposition
-the logo after generation while leaving the text behind. If the group is
-visibly broken, regenerate the complete image from the original inputs.
+Do not resize or reposition the logo after generation while leaving the text
+behind. If the group is visibly broken, regenerate the complete image from the
+original inputs.
 
 ## Set typography by hierarchy
 
@@ -143,7 +150,7 @@ all characters, capitalization, numbers, punctuation, language, and word order.
 Do not translate, rewrite, abbreviate, invent, or duplicate text.
 
 Use a clean, modern, neutral sans-serif treatment compatible with Classic MD3.
-Do not require a specific font family or an exact numeric font weight.
+Choose font and weight by the intended visual hierarchy.
 
 - Make the product name the clear primary text level.
 - Make the version readable but visibly secondary.
@@ -198,9 +205,14 @@ For every SKU variant, preserve the `ORIGINAL MASTER`:
 - background structure and geometry
 - overall composition and primary light direction
 
-Replace only the product with the current SKU source. Adapt the palette as
-needed to suit that SKU while preserving the locked structure. Text lightness
-may change only when necessary for contrast.
+Only these may change for the current SKU:
+
+- source product PNG
+- background main color and background-element colors
+- shadow strength and subtle separation light when needed
+- text lightness when needed for contrast
+
+Do not change anything else from the approved master.
 
 Give sibling color SKUs clearly distinguishable background palettes at
 thumbnail size. Do not create distinction by changing the locked layout or by
@@ -211,21 +223,27 @@ using arbitrary clashing colors.
 Treat these as hard failures:
 
 - output count is not exactly one
-- canvas is not portrait 3:4 or was cropped from another ratio
+- final canvas is not exactly 1200 x 1600 portrait 3:4 or was cropped from another ratio
 - logo or product is recreated, altered, distorted, substituted, or cropped
 - logo is visibly unsafe, unrecognizably small, or overpoweringly large
 - a visible patch, backing rectangle, or local-repair seam appears around the logo
 - required text is incorrect, missing, invented, duplicated, or unreadable
 - forbidden text, icon, logo, badge, label, or UI appears
-- the information group is visibly incoherent
+- the information group lacks a clear visual left axis, leaves the upper half,
+  or intrudes into the core product display area
+- the product is not clearly recognizable, prominent, and separated from the background
 - a master candidate depends on a previous rejected candidate
 - an SKU variant fails to preserve the approved master structure
 - an SKU variant derives from another generated variant
+- sibling SKU palettes are not clearly distinguishable at thumbnail size
 
 Treat approximate logo margins and size, optical alignment, spacing, font
 choice, font weight, and line breaking as visual judgments. Do not fail solely
-because a valid image differs by a few pixels or does not match an exact CSS-like
-typography value.
+because a valid image differs by a few pixels while preserving the intended
+visual result.
 
 If a hard failure occurs, invalidate the entire result and regenerate from the
-original inputs. Never deliver a locally patched result as valid.
+original inputs, subject to the three-attempt limit. For a master candidate,
+use the original logo, product PNG, product name, and version text. For a
+variant, use the approved `ORIGINAL MASTER` and current SKU PNG. Never deliver a
+locally patched result as valid.
