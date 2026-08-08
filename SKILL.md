@@ -1,564 +1,231 @@
 ---
 name: md3-product-main-image
-version: 6.4
-description: >
-  Create product main images using Classic Material Design 3 as the sole visual language.
-  The skill protects source assets, enforces a 3:4 master-image workflow, keeps information-zone
-  geometry stable, and derives same-product SKU variants directly from one locked ORIGINAL MASTER.
+description: Create 3:4 e-commerce product main images in Google Classic Material Design 3, protect supplied logo and product assets, develop independent master candidates one at a time, and derive same-product SKU variants directly from one user-approved ORIGINAL MASTER. Use when generating a product master image, replacing a product with another SKU, or building a consistent same-product SKU image set.
 ---
 
-# MD3 Product Main Image Skill v6.4
+# MD3 Product Main Image
 
-## 1. Design Language
+## Use the visual language
 
-Use **Classic Material Design 3 only**.
+Use Google Classic Material Design 3 (MD3) as the sole visual style.
 
 Do not use Material 3 Expressive.
 
-For static product imagery, Classic M3 is interpreted through:
+Do not impose a fixed MD3 template. Independently determine the composition,
+palette, geometry, spatial relationships, lighting, and visual mood for the
+current product.
 
-- Color
-- Shape
-- Surface
-- Elevation
-- Typography
+## Follow the execution loop
 
-Reference:
-`references/classic-m3-principles.md`
+Use this loop for every output:
 
-Core visual target:
+`PREFLIGHT -> GENERATE -> VALIDATE`
 
-**realistic product + graphic Classic M3 environment**
+Generate the complete image in one pass from the original inputs. Do not repair
+a failed hard constraint by locally repainting, inpainting, or regenerating part
+of the image. Invalidate the result and regenerate the whole image from its
+original inputs.
 
-Core principle:
+## Keep the canvas fixed
 
-**Graphic-first, depth-second.**
+- Generate exactly one standalone image in each round.
+- Use a portrait 3:4 canvas with a target size of 1200 x 1600 px.
+- Do not create a collage, grid, contact sheet, candidate label, or multi-panel.
+- Do not generate at another ratio and crop to 3:4.
+- If the generator cannot output 1200 x 1600 directly, accept only an exact 3:4
+  source and resize it proportionally without cropping.
+- Do not generate if exact 3:4 cannot be guaranteed.
 
----
+## Select the workflow state
 
-## 2. Execution Model
-
-Every generation follows:
-
-**PREFLIGHT → GENERATE → VALIDATE**
-
-Hard-constraint failures are not repaired locally.
-
-If a hard constraint fails:
-
-**invalidate the whole result → regenerate from original inputs**
-
----
-
-## 3. Workflow States
+Use exactly one state:
 
 1. `CREATE_MASTER_OPTIONS`
 2. `WAIT_FOR_MASTER_SELECTION`
 3. `REPLACE_VARIANT`
 4. `BUILD_SKU_SET`
 
----
+### CREATE_MASTER_OPTIONS
 
-## 4. PREFLIGHT
+Require the source brand logo, source product PNG, exact product name, and exact
+version text.
 
-Before generation, verify the applicable hard constraints.
+Generate one standalone candidate, then stop. When the user asks for another
+candidate, start again from the original logo, original product PNG, product
+name, and version text. Do not redesign the previous candidate or automatically
+inherit its composition, palette, product placement, logo scale, geometry,
+lighting, or visual mood. Natural similarity is acceptable when it is an
+independent design decision.
 
-### Canvas
-- exactly 1 image in the current round
-- portrait
-- exact 3:4 aspect ratio
-- target size 1200 × 1600 px
-- no substitute ratio
-- no crop-to-3:4 workflow
+### WAIT_FOR_MASTER_SELECTION
 
-If exact 1200 × 1600 is unavailable but exact 3:4 is guaranteed, proportional resizing without cropping is allowed.
+Wait for explicit user selection. Only the selected candidate becomes the
+`ORIGINAL MASTER`.
 
-If exact 3:4 cannot be guaranteed, do not generate.
+Do not blend rejected candidates, regenerate a substitute master, or derive SKU
+variants from an unselected candidate.
 
-### Required inputs
-- source brand Logo is available
-- source product PNG is available
-- exact product name is known
-- exact version text is known
+### REPLACE_VARIANT
 
-### Master-candidate mode
-- one standalone candidate only
-- no collage, grid, contact sheet, or multi-panel
-- no candidate number inside the artwork
+Require:
 
-### Variant mode
-- Image A is the approved ORIGINAL MASTER
-- Image B is the current SKU source PNG
+- Image A: the user-approved `ORIGINAL MASTER`
+- Image B: the source PNG for the current SKU
 
----
+Treat this as locked-master product replacement, not a new poster design.
+Derive every SKU directly from `ORIGINAL MASTER + CURRENT SKU`. Never use a
+generated SKU variant as the source for another variant.
 
-## 5. CREATE_MASTER_OPTIONS
+### BUILD_SKU_SET
 
-Generate one standalone master candidate per round.
+Choose the master SKU, generate master candidates one at a time, wait for the
+user to select the `ORIGINAL MASTER`, and only then generate every remaining SKU
+directly from that master.
 
-Each candidate starts again from:
+Do not generate the remaining SKUs before master approval.
 
-`BRAND LOGO + PRODUCT PNG + PRODUCT NAME + VERSION TEXT`
+## Protect the brand logo
 
-Do not use the previous candidate as a redesign base.
+Treat the uploaded logo as one indivisible protected graphic. Everything inside
+the asset belongs to it, including its symbol, emblem, wordmark, embedded text,
+letterforms, spacing, weight, proportions, alignment, colors, transparency, and
+edge detail.
 
-Do not automatically inherit the previous candidate's:
+Allow only proportional scaling and positioning. Do not recreate, re-typeset,
+split, rebuild, recolor, distort, substitute, or reinterpret the logo. Do not
+turn embedded logo text into editable typography.
 
-- composition
-- palette
-- product position
-- product scale
-- Shape arrangement
-- Surface arrangement
-- spatial hierarchy
-- lighting
-- visual rhythm
+Preserve the transparent-area semantics of the logo source. Place the logo
+directly on the image background. Do not add a backing plate or produce a
+visible rectangular or square patch around it.
 
-Natural similarity is acceptable if independently judged appropriate.
+Use the visible artwork bounds, not the transparent PNG canvas bounds, when
+judging placement and alignment.
 
-After one valid candidate is generated, stop and wait for the user to continue or select a master.
+Keep the logo in a comfortable upper-left safe area. For a 1200 x 1600 canvas,
+use these approximate visual references:
 
----
+- left safe margin: about 60 px or more
+- top safe margin: about 80 px or more
+- preferred maximum visible size: about 220 x 100 px
 
-## 6. WAIT_FOR_MASTER_SELECTION
+These are visual guidelines, not pixel-perfect validation targets. Do not
+regenerate an otherwise valid image because of a minor numerical deviation.
 
-Only lock a master after explicit user selection.
+Keep the logo clearly recognizable at normal viewing size. It must not feel
+disproportionately small, overpower the information group, touch or visibly
+crowd an edge, or be cropped.
 
-The selected original candidate becomes the sole:
+During master exploration, let logo scale adapt naturally to each independent
+composition. After the user selects the `ORIGINAL MASTER`, lock the logo's
+artwork, visual size, and position for all SKU variants.
 
-**ORIGINAL MASTER**
+## Build one information group
 
-Do not:
+Treat the logo, product name, and version text as one coherent information
+group, not as three unrelated objects.
 
-- blend rejected candidates
-- regenerate a substitute master
-- derive SKUs from an unselected candidate
+- Place the product name below the logo and the version below the product name.
+- Establish a clear visual left axis using the logo's visible artwork edge.
+- Judge alignment optically; do not require mathematical coordinate equality.
+- Keep spacing deliberate and visually balanced.
+- Keep the group in the upper half and out of the core product display area.
+- Preserve the group's complete geometry after `ORIGINAL MASTER` approval.
 
----
+Do not use a technical coordinate such as `INFO_X`. Do not resize or reposition
+the logo after generation while leaving the text behind. If the group is
+visibly broken, regenerate the complete image from the original inputs.
 
-## 7. REPLACE_VARIANT
+## Set typography by hierarchy
 
-Inputs:
+Render the supplied product name and version text exactly as provided. Preserve
+all characters, capitalization, numbers, punctuation, language, and word order.
+Do not translate, rewrite, abbreviate, invent, or duplicate text.
 
-- Image A = ORIGINAL MASTER
-- Image B = current SKU source PNG
+Use a clean, modern, neutral sans-serif treatment compatible with Classic MD3.
+Do not require a specific font family or an exact numeric font weight.
 
-This is a locked-master product replacement, not a new poster design.
-
-Every SKU derives directly from:
-
-`ORIGINAL MASTER + CURRENT SKU`
-
-Correct:
-
-- ORIGINAL MASTER + SKU 2
-- ORIGINAL MASTER + SKU 3
-- ORIGINAL MASTER + SKU 4
-
-Incorrect:
-
-- MASTER → SKU 2 → SKU 3 → SKU 4
-
-Never use a generated SKU variant as the source for another SKU.
-
----
-
-## 8. BUILD_SKU_SET
-
-1. choose the master SKU
-2. generate master candidates one at a time
-3. user selects ORIGINAL MASTER
-4. lock ORIGINAL MASTER
-5. generate every remaining SKU directly from ORIGINAL MASTER
-
-Do not generate remaining SKUs before master approval.
-
----
-
-## 9. Brand Logo Protection
-
-Treat the uploaded Logo as one indivisible protected graphic.
-
-Everything inside the source Logo belongs to the asset, including:
-
-- symbol
-- emblem
-- wordmark
-- brand text
-- letterforms
-- spacing
-- weight
-- internal proportions
-- alignment
-- colors
-- transparency
-- edge detail
-
-Embedded Logo text is not editable text.
-
-Only proportional scaling and positioning are allowed.
-
-Do not recreate, re-typeset, split, rebuild, recolor, or substitute the Logo.
-
----
-
-## 10. Logo Placement and Scale
-
-On a 1200 × 1600 canvas:
-
-- visible Logo left edge ≥ 60 px
-- visible Logo top edge ≥ 80 px
-- entire visible Logo remains inside the canvas
-
-Maximum visible Logo bounds:
-
-- width ≤ 220 px
-- height ≤ 100 px
-
-Use the **visible artwork bounds**, not the transparent PNG canvas bounds, for alignment.
-
-Preserve source aspect ratio.
-
-Across master candidates, keep Logo visual scale consistent.
-
-After ORIGINAL MASTER approval, Logo position and scale are locked.
-
----
-
-## 11. Atomic Information Zone
-
-Treat:
-
-**Logo + Product Name + Version Text**
-
-as one layout system.
-
-Use one shared visual left axis:
-
-**INFO_X**
-
-Preferred alignment:
-
-- visible Logo left edge = INFO_X
-- product-name left edge = INFO_X
-- version-text left edge = INFO_X
-
-Required structure:
-
-- product name below Logo
-- product name and version remain in the upper half
-- Logo → product name spacing is stable
-- product name → version spacing is stable
-- information zone does not invade the core product display area
-
-Long product names:
-
-- prefer one line
-- maximum two lines
-- do not split words internally
-- moderate size reduction is allowed
-- information zone remains in the upper half
-
-After ORIGINAL MASTER approval, lock the entire information-zone geometry.
-
----
-
-## 12. No Local Repair of Hard Constraints
-
-Logo, product, information-zone geometry, and canvas ratio must be correct in the full-image generation.
-
-Do not perform local repainting or local regeneration to fix:
-
-- Logo size or position
-- Logo artwork
-- title alignment
-- version alignment
-- product fidelity
-- canvas ratio
-
-If any of these fail, invalidate the whole result and regenerate from original inputs.
-
-This prevents:
-
-- rectangular background color mismatch around Logo repairs
-- broken background continuity
-- Logo/title alignment drift
-- product patch artifacts
-
----
-
-## 13. Product Asset Protection
-
-The uploaded product PNG is authoritative.
-
-Do not:
-
-- redraw
-- substitute a similar model
-- recolor
-- alter silhouette
-- alter structure
-- alter material
-- alter screen proportions
-- alter buttons, crown, ports, or holes
-- add nonexistent hardware
-- remove real details
-
-Allowed:
-
-- proportional scaling
-- positioning
-- composition placement
-- natural contact shadow
-- restrained ambient shadow
-- subtle separation light when necessary
-
----
-
-## 14. Allowed Visible Content
-
-Only:
-
-1. source brand Logo
-2. exact product name
-3. exact version text
-4. source product PNG
-5. Classic M3 visual design elements
-6. natural lighting and shadows that support hierarchy
+- Make the product name the clear primary text level.
+- Make the version readable but visibly secondary.
+- Prefer one line for the product name; use at most two lines when needed.
+- Do not split words internally.
+- Reduce size moderately when necessary without making the text weak or tiny.
+- Keep letterforms clean, undistorted, and legible at normal and thumbnail size.
+
+Treat hierarchy, spacing, line breaking, and optical alignment as visual design
+judgments rather than pixel-perfect targets. Incorrect, missing, invented,
+duplicated, or unreadable text is a hard failure; a minor stylistic deviation
+that preserves the intended hierarchy is not.
+
+After `ORIGINAL MASTER` approval, lock the product-name and version content,
+visual scale, placement, line breaks, spacing, and hierarchy for every SKU.
+
+## Protect the product asset
+
+Treat the uploaded product PNG as authoritative. Do not redraw it, substitute a
+similar model, recolor it, alter its silhouette, structure, material, screen
+proportions, controls, ports, holes, or other real details, add nonexistent
+hardware, or remove genuine details.
+
+Allow only proportional scaling, positioning, composition placement, natural
+contact shadow, restrained ambient shadow, and subtle separation light when
+needed.
+
+## Limit visible content
+
+Allow only:
+
+1. the source brand logo
+2. the exact product name
+3. the exact version text
+4. the source product PNG
+5. visual elements belonging to the Classic MD3 composition
+6. restrained lighting and shadows supporting the composition
 
 Real text already present on the product may remain.
 
-Do not add:
-
-- selling points
-- specifications
-- promotional labels
-- discounts
-- certifications
-- extra logos
-- extra icons
-- badges
-- decorative copy
-- marketplace stickers
-- invented UI
-
----
-
-## 15. Typography
-
-Product name:
-
-- modern neutral sans-serif
-- Google Sans / Roboto / Material-like
-- Bold 700
-- primary text hierarchy
-- prefer one line
-- maximum two lines
-
-Version text:
-
-- Medium 500
-- clearly readable
-- secondary hierarchy
-- not tiny or footnote-like
-
----
-
-## 16. Classic M3 Static Product Visual
-
-The product remains realistic.
-
-The environment remains graphic, simplified, tonal, and structured.
-
-### Color
-Use tonal relationships to organize:
-
-- Surface separation
-- hierarchy
-- product/background separation
-- visual rhythm
-
-No fixed color table.
-No fixed product-color mapping.
-Hue remains adaptive.
-
-### Shape
-Use Shape to organize:
-
-- composition
-- attention
-- Surface relationships
-- product/background relationships
-
-No specific Shape is mandatory.
-
-### Surface
-Interpret Surface primarily as a:
-
-**graphic visual layer**
-
-Surface can establish:
-
-- zoning
-- support
-- overlap
-- tonal structure
-- visual rhythm
-
-It does not need to simulate literal physical materials or architecture.
-
-### Elevation
-Interpret Elevation primarily as:
-
-**layer hierarchy**
-
-Express it through:
-
-- tonal difference
-- overlap
-- soft shadow
-- restrained depth
-
-Do not rely on realistic architectural depth as the main visual language.
-
-### Composition order
-Build in this order:
-
-1. Surface structure
-2. Shape relationships
-3. tonal relationships
-4. information hierarchy
-5. restrained depth
-6. realistic product lighting
-
-The image should first read as a designed Classic M3 graphic composition and only secondarily as spatial.
-
----
-
-## 17. Thumbnail Readability
-
-At reduced size:
-
-- product remains recognizable
-- product/background separation remains clear
-- product name remains basically readable
-- hierarchy remains clear
-- composition remains intact
-
-This is a functional requirement only; it does not prescribe a specific layout or scene.
-
----
-
-## 18. SKU Structure Lock
-
-During `REPLACE_VARIANT`, preserve Image A:
-
-- Logo artwork
-- Logo scale
-- Logo position
-- product-name content, size, and position
-- version content, size, and position
-- information-zone geometry
-- product display region
-- product visual-scale logic
-- product visual center
-- Shape structure
-- Surface structure
-- background geometry size and position
-- overall composition
-- primary light direction
-
-Do not redesign the layout.
-
----
-
-## 19. SKU Adaptive Palette
-
-For each SKU, independently reassess:
-
-- background main color
-- Surface tonal relationships
-- Shape fill colors
-- shadow intensity
-- subtle separation light
-- text light/dark value only if needed
-
-Do not inherit the previous SKU's palette preference.
-
-Core rule:
-
-**Lock structure, adapt palette.**
-
----
-
-## 20. SKU Background Differentiation
-
-Different color SKUs of the same product must have clearly distinguishable background palettes.
-
-Do not reuse:
-
-- the same background main color
-- a nearly identical hue family
-- a nearly identical tonal palette
-- a palette differing only by slight brightness
-
-At thumbnail size, sibling SKUs should be obviously distinguishable.
-
-At the same time:
-
-- keep Classic M3 tonal harmony
-- keep product/background separation
-- do not use arbitrary clashing colors only to force difference
-- do not change locked layout or geometry to create SKU distinction
-
-If a new SKU is too similar to an existing one:
-
-- preserve the locked structure
-- recalculate the current SKU palette
-- validate again
-
-No fixed color mapping is used.
-
----
-
-## 21. VALIDATE
-
-Before delivery, validate:
-
-### Hard validation
-- exactly 1 image
-- exact portrait 3:4
-- not cropped from another ratio
-- target 1200 × 1600, or exact 3:4 source eligible for proportional resize
-- source Logo faithfully preserved
-- source product faithfully preserved
-- product name exact
-- version text exact
-- no extra text, icon, or badge
-
-### Information-zone validation
-- visible Logo left edge follows INFO_X
-- product name follows INFO_X
-- version follows INFO_X
-- spacing relationships remain intact
-- no local Logo patching occurred
-- no rectangular background mismatch appears around the Logo
-
-### Master-candidate validation
-- one standalone candidate only
-- no collage
-- independently designed from original inputs
-
-### SKU validation
-- Image A is ORIGINAL MASTER
-- information zone remains locked
-- product center and scale logic remain consistent
-- Shape / Surface structure remains locked
-- current SKU palette is independently evaluated
-- current SKU background is clearly distinct from sibling SKUs
-
-If any hard validation fails:
-
-**invalidate the result → regenerate from original inputs**
-
-Do not locally repair the failed element.
+Do not add selling points, specifications, promotional labels, discounts,
+certifications, extra logos, extra icons, badges, decorative copy, marketplace
+stickers, or invented UI.
+
+## Lock the approved master
+
+For every SKU variant, preserve the `ORIGINAL MASTER`:
+
+- logo artwork, visual size, and position
+- product-name and version typography and information-group geometry
+- product display region, visual-scale logic, and visual center
+- background structure and geometry
+- overall composition and primary light direction
+
+Replace only the product with the current SKU source. Adapt the palette as
+needed to suit that SKU while preserving the locked structure. Text lightness
+may change only when necessary for contrast.
+
+Give sibling color SKUs clearly distinguishable background palettes at
+thumbnail size. Do not create distinction by changing the locked layout or by
+using arbitrary clashing colors.
+
+## Validate before delivery
+
+Treat these as hard failures:
+
+- output count is not exactly one
+- canvas is not portrait 3:4 or was cropped from another ratio
+- logo or product is recreated, altered, distorted, substituted, or cropped
+- logo is visibly unsafe, unrecognizably small, or overpoweringly large
+- a visible patch, backing rectangle, or local-repair seam appears around the logo
+- required text is incorrect, missing, invented, duplicated, or unreadable
+- forbidden text, icon, logo, badge, label, or UI appears
+- the information group is visibly incoherent
+- a master candidate depends on a previous rejected candidate
+- an SKU variant fails to preserve the approved master structure
+- an SKU variant derives from another generated variant
+
+Treat approximate logo margins and size, optical alignment, spacing, font
+choice, font weight, and line breaking as visual judgments. Do not fail solely
+because a valid image differs by a few pixels or does not match an exact CSS-like
+typography value.
+
+If a hard failure occurs, invalidate the entire result and regenerate from the
+original inputs. Never deliver a locally patched result as valid.

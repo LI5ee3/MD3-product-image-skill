@@ -1,73 +1,44 @@
-# MD3 产品主图 Skill v6.4
+# md3-product-main-image
 
-v6.4 是按**标准 Skill**思路重新简化后的完整重构版本。
-
-不再为普通聊天单独制作 Standalone Prompt，也不再保留聊天专用工作流文件。
-
-## 核心方向
-
-只使用：
-
-> **Classic Material Design 3**
-
-核心视觉目标：
-
-> **真实产品 + 图形化 Classic M3 环境**
-
-核心原则：
-
-> **Graphic-first, depth-second**
-
-## 核心硬约束
-
-- 单回合只生成 1 张母版候选
-- portrait 3:4
-- 目标 1200 × 1600 px
-- 不允许其他比例替代后裁切
-- Logo 原子化保护
-- 产品 PNG 保护
-- Logo / 产品名称 / 版本文字组成 Atomic Information Zone
-- 使用统一 `INFO_X` 左轴
-- 禁止对 Logo、产品、信息区做局部后期修补
-- 硬约束失败时整张重新生成
-- ORIGINAL MASTER 锁定
-- SKU 不链式派生
-- 同一产品不同 SKU 的背景必须明显区分
-
-## Classic M3
-
-不把 Classic M3 做成固定模板。
-
-重点使用：
-
-- Color
-- Shape
-- Surface
-- Elevation
-- Typography
-
-其中：
-
-- Surface 主要理解为图形化视觉层
-- Elevation 主要理解为图层层级
-- 产品保持真实
-- 环境保持图形化、简化、tonal、结构化
+用于生成电商产品主图的标准 Codex Skill。它只采用 Google Classic
+Material Design 3，并通过一张用户确认的 `ORIGINAL MASTER` 保持同款不同
+SKU 的版式一致。
 
 ## 文件结构
 
 ```text
-md3-product-main-image-v6.4/
+md3-product-main-image/
 ├── SKILL.md
-├── README.md
-└── references/
-    └── classic-m3-principles.md
+└── README.md
 ```
 
-## 使用方式
+没有 `references/`、`prompts/`、`scripts/` 或 `agents/` 目录。Classic M3
+不再由额外参考文件解释，全部必要执行规则都在 `SKILL.md` 中。
 
-加载整个 Skill 后直接描述当前任务即可。
+## 核心工作流
 
-例如：
+1. 用品牌 Logo、产品 PNG、准确的产品名称和版本文字生成一张母版候选。
+2. 每轮只生成一张；需要下一张时，从原始素材重新独立设计。
+3. 用户明确选择后，该图才成为 `ORIGINAL MASTER`。
+4. 每个后续 SKU 都直接由 `ORIGINAL MASTER + 当前 SKU PNG` 生成，禁止链式派生。
+
+## 当前 Logo 与文字原则
+
+- Logo 是不可拆分、不可重绘的受保护素材，只允许等比例缩放和定位。
+- Logo 的透明区保持透明语义，不得生成底板、矩形补丁或局部修复接缝。
+- 约 60 px 左边距、80 px 上边距和 220 x 100 px 最大可见尺寸仅是视觉参考，
+  不是像素级硬校验。
+- Logo 不得小到难以识别，也不得过大、贴边或被裁切。
+- 母版候选之间不强制 Logo 尺度一致；选定母版后才锁定。
+- Logo、产品名称和版本文字作为一个完整信息组，形成清晰的视觉左轴，
+  但不使用 `INFO_X` 或数学式坐标校验。
+- 产品名称与版本文字必须逐字准确；字体、字重、间距和换行按视觉层级判断，
+  不再强制指定字体名或 700/500 等 CSS 式数值。
+- 硬约束失败时整张作废并从原始输入重生成，不做局部补丁。
+
+## 使用示例
+
+创建母版候选：
 
 ```text
 使用 md3-product-main-image。
@@ -75,39 +46,34 @@ md3-product-main-image-v6.4/
 产品名称：Xiaomi Smart Scale S200
 版本文字：Глобальная версия
 
-当前上传的 Logo 为品牌 Logo。
-当前上传的产品 PNG 作为母版 SKU。
-
+当前上传的是品牌 Logo 和母版 SKU 产品 PNG。
 进入 CREATE_MASTER_OPTIONS。
 ```
 
-继续下一张候选：
+继续探索：
 
 ```text
 继续生成下一张独立母版候选。
 ```
 
-选择母版：
+确认母版：
 
 ```text
-方案 3 作为 ORIGINAL MASTER。
+将当前方案设为 ORIGINAL MASTER。
 ```
 
 替换 SKU：
 
 ```text
 Image A 是 ORIGINAL MASTER。
-Image B 是当前 SKU 产品 PNG。
-
+Image B 是当前 SKU 的原始产品 PNG。
 进入 REPLACE_VARIANT。
 ```
 
-## 版本维护原则
+## 画布与交付
 
-后续每次更新：
-
-- 重新整合完整 Skill
-- 删除被新规则替代的旧表达
-- 避免重复规则
-- 避免补丁式累积
-- 保持硬约束明确、创意规则简洁
+- 每轮正好一张独立图片
+- 竖版 3:4
+- 目标尺寸 1200 x 1600 px
+- 禁止从其他比例裁切为 3:4
+- 仅当源图本身严格为 3:4 时，允许不裁切的等比例缩放
