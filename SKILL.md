@@ -863,3 +863,181 @@ If the result looks like a new poster, reject and regenerate as a stricter locke
 Uploaded logo fidelity and uploaded product fidelity are mandatory.
 
 If any instruction conflicts with asset fidelity: ASSET FIDELITY WINS.
+
+
+# Lively MD3 Tone and Mood Rule
+
+The visual language must use Material Design 3, but the MOOD must remain:
+
+- lively;
+- bright;
+- light;
+- youthful;
+- clean;
+- breathable;
+- modern;
+- e-commerce friendly;
+- premium without feeling old or heavy.
+
+This rule is especially important for dark products.
+
+A dark product must NOT automatically result in a mostly black or oppressive image.
+
+## Preferred mood
+
+Aim for:
+
+- soft tonal surfaces;
+- brighter layered neutrals;
+- light-to-mid gray structures;
+- cool gray / blue-gray / stone-gray tonal depth;
+- gentle contrast;
+- open whitespace;
+- clear product-background separation;
+- fresh, contemporary energy.
+
+## Avoid
+
+Do NOT create an image that feels:
+
+- too black;
+- too dark;
+- too heavy;
+- too old-fashioned;
+- too formal in a dated way;
+- like a luxury dark showroom;
+- like a heavy exhibition pedestal scene;
+- like a black studio backdrop;
+- like a dramatic premium poster instead of an e-commerce main image.
+
+## Background restriction
+
+Even for black or dark products:
+
+- avoid large pure-black backgrounds;
+- avoid turning most of the canvas into near-black;
+- prefer gray, cool-gray, graphite-gray, blue-gray, mist-gray, or other lighter MD3 tonal combinations;
+- ensure the overall image still feels bright enough and commercially attractive.
+
+## Base / pedestal restriction
+
+If a base, platform, or pedestal is used:
+
+- it must stay visually light;
+- it must not become the dominant visual weight of the composition;
+- it must not feel thick, bulky, or heavy;
+- prefer thinner, lighter, softer tonal-surface style bases;
+- it may be omitted if it makes the image feel heavy.
+
+## Geometry behavior
+
+MD3 geometry must function as light layered visual structure,
+not as a dark theatrical set.
+
+Use:
+
+- soft rounded surfaces;
+- tonal layers;
+- airy arcs;
+- clean curved shapes;
+- subtle elevation.
+
+Avoid:
+
+- oppressive dark masses;
+- over-dominant dark arcs;
+- visually heavy geometric blocks.
+
+## Product priority
+
+The product should remain the visual focus, but the overall scene should still
+feel fresh and lively rather than dramatic and heavy.
+
+## Variant consistency
+
+This tone rule applies to:
+
+- all master candidates;
+- the selected master;
+- all REPLACE_VARIANT outputs;
+- all BUILD_SKU_SET outputs.
+
+
+# Dark Product Background Priority Rule
+
+For black or dark products, the preferred direction is a LIGHTER MD3 background,
+not a darker one.
+
+This is a high-priority e-commerce rule.
+
+## Default preference for dark products
+
+When the product itself is black, graphite, charcoal, dark gray, dark blue, or
+otherwise visually dark, prefer:
+
+- light cool gray;
+- mist gray;
+- pale blue-gray;
+- soft neutral gray;
+- stone gray;
+- warm light gray;
+- light-to-mid tonal-surface backgrounds.
+
+Do NOT automatically assume that a dark product should be placed on a dark
+background.
+
+## Avoid for dark products
+
+Unless the user explicitly requests a dark poster look, avoid:
+
+- large black backgrounds;
+- near-black canvases;
+- very dark showroom scenes;
+- heavy dark pedestal scenes;
+- dark-on-dark low-separation compositions.
+
+## E-commerce card logic
+
+The goal is better visibility inside marketplace list cards.
+
+Dark products should stand out through:
+
+- clearer silhouette separation;
+- brighter surrounding tonal surfaces;
+- lighter, cleaner overall presentation;
+- faster recognition in thumbnail browsing.
+
+Do not sacrifice thumbnail readability merely to create a dramatic premium-dark look.
+
+## Priority over mood ambiguity
+
+If there is ambiguity between:
+
+A) a dramatic dark premium poster look
+and
+B) a brighter, cleaner, more sellable marketplace image,
+
+prefer B by default.
+
+
+# Tone and Mood QA
+
+For EVERY generated image verify:
+
+- the image feels lively, bright, light, and modern;
+- the image does not feel too black, too heavy, or old-fashioned;
+- dark products are separated from the background without relying on large pure-black areas;
+- the background uses MD3 tonal layering rather than a black studio look;
+- any pedestal/base remains visually light and not dominant;
+- the image feels suitable for e-commerce rather than a heavy luxury poster.
+
+
+# Marketplace Thumbnail QA
+
+For dark-product images verify:
+
+- the product is clearly readable in thumbnail size;
+- the background is bright enough for strong silhouette separation;
+- the composition feels suitable for Ozon-style card browsing;
+- the image is not relying on a mostly black backdrop;
+- the product looks commercial and clickable rather than dark and heavy.

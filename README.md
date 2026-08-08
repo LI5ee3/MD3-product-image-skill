@@ -1,9 +1,89 @@
-# MD3 Product Main Image Skill v3.6
+# MD3 Product Main Image Skill v3.8
 
 GPT-image-only workflow for creating Ozon-style e-commerce product main images.
 
 This version does NOT use Photoshop, PSD automation, website integration, or
 external compositing.
+---
+
+# Mood Update in v3.8
+
+This version adds an explicit “lively MD3” mood rule.
+
+The design must not only follow MD3 geometry, but also preserve a brighter,
+lighter, younger, more breathable e-commerce mood.
+
+This is especially important for dark products.
+
+## Required mood
+
+- bright
+- light
+- lively
+- youthful
+- clean
+- fresh
+- modern
+- premium without feeling heavy
+
+## Avoid
+
+- large pure-black backgrounds
+- overly dark compositions
+- heavy exhibition pedestal feeling
+- old-fashioned commercial poster tone
+- luxury-dark showroom mood
+- black studio backdrop look
+
+## Practical interpretation
+
+For black or dark products:
+
+- do NOT automatically use a mostly black background;
+- prefer brighter gray / cool-gray / blue-gray / graphite-gray tonal surfaces;
+- keep the pedestal/base light, thin, and visually secondary;
+- preserve product contrast without making the whole image oppressive.
+
+---
+
+# Black/Dark Product Update in v3.8
+
+This version adds a stronger marketplace-first rule for black and dark products.
+
+## Core rule
+
+For black or dark products, prefer lighter MD3 backgrounds by default.
+
+Recommended directions:
+
+- light cool gray
+- mist gray
+- pale blue-gray
+- soft neutral gray
+- stone gray
+- warm light gray
+
+## Avoid by default
+
+Unless the user explicitly asks for a dark-poster look, avoid:
+
+- large black backgrounds
+- near-black canvases
+- dark-on-dark low-separation scenes
+- heavy dark pedestals
+- dark showroom moods
+
+## Why
+
+The purpose is to improve:
+
+- thumbnail readability
+- product silhouette separation
+- Ozon-style list-card visibility
+- commercial clickability
+
+The image should be optimized for marketplace browsing, not only for standalone poster aesthetics.
+
 
 ---
 
