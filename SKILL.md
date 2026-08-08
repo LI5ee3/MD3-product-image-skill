@@ -1,9 +1,46 @@
 ---
 name: md3-product-image
-description: Create 3:4 e-commerce product main images in Google Classic Material Design 3, protect supplied logo and product assets, develop independent master candidates one at a time, and derive same-product SKU variants directly from one user-approved ORIGINAL MASTER. Use when generating a product master image, replacing a product with another SKU, or building a consistent same-product SKU image set.
+description: Create exact portrait 3:4 Google Classic MD3 e-commerce product images with one coherently generated product scene, a source-faithful logo, strong exact typography, independent master candidates, and locked same-product SKU variants. Use when creating a product main image, exploring master candidates, or replacing the product with another SKU while preserving an approved master.
 ---
 
 # MD3 Product Image
+
+## Require the source inputs
+
+For a master candidate, require:
+
+- Image 1: product reference
+- Image 2: original Logo PNG
+- exact complete product name
+- exact brand text
+- exact remaining product-name or model text after the brand
+- exact version text, when required
+
+Confirm that the brand followed by the remaining product-name text preserves the
+complete product name exactly. Never render placeholder labels or brackets.
+
+For an SKU variant, also require the user-approved `ORIGINAL MASTER` and the
+current SKU product reference.
+
+## Run generation preflight
+
+Before building a prompt:
+
+1. Confirm that an image-generation tool is available.
+2. Confirm that it can receive the product reference and every scene reference
+   required for the current state. Keep the Logo out of scene-generation calls.
+3. Use GPT Image 2 only when explicit model selection is available and confirms
+   that model. Otherwise use the available capability without naming or
+   assuming its model.
+4. Request the highest practical image quality.
+5. Request an exact portrait 3:4 aspect ratio when the interface exposes that
+   control. Do not invent unsupported model, quality, or size parameters.
+6. Confirm that the original Logo and exact text can be added afterward without
+   redrawing, recoloring, or altering them.
+7. Stop and report the missing capability if exact 3:4 generation, required
+   scene inputs, or exact information-group composition cannot be supported.
+
+Do not require a fixed pixel resolution.
 
 ## Pass the visual style unchanged
 
@@ -15,85 +52,32 @@ Use Google Classic Material Design 3 (MD3) as the sole visual style.
 Do not use Material 3 Expressive.
 ```
 
-## Check image-generation capability
+Do not reword, summarize, expand, or replace this style block.
 
-During `PREFLIGHT`, inspect the available image-generation interface.
+## Follow the execution sequence
 
-- Confirm that an image-generation tool is available and can receive every
-  required source image. If not, stop and report the missing capability.
-- Use GPT Image 2 only when the interface exposes explicit model selection and
-  confirms that model.
-- When explicit model selection is unavailable, use the available
-  image-generation tool without claiming or assuming which image model it uses.
-- Request an exact portrait 3:4 aspect ratio through the interface when that
-  control is available. Do not invent unsupported model, quality, or size
-  parameters.
+Use this sequence for every final output:
 
-## Build the required outbound prompt
+`PREFLIGHT -> BUILD_PROMPT -> GENERATE_SCENE -> VALIDATE_SCENE -> ADD_INFORMATION_GROUP -> VALIDATE_FINAL -> DELIVER`
 
-Include this non-style constraint block in every generation prompt. Replace only
-the bracketed input values. Do not summarize, omit, or weaken any line.
+The product, environment, platform, lighting, shadows, reflections, ambient
+color, perspective, scale, and spatial relationships must be generated
+together as one coherent scene.
 
-```text
-Generate exactly one standalone portrait 3:4 e-commerce product image.
-Keep the final output at an exact portrait 3:4 aspect ratio. Do not require a
-fixed pixel resolution.
+Never generate a background-only image for later product placement. Never
+paste, alpha-composite, or programmatically overlay the product onto a completed
+background.
 
-Use the supplied logo and product PNG as protected source assets.
-Product name: "[EXACT PRODUCT NAME]"
-Version text: "[EXACT VERSION TEXT]"
+Only the original Logo PNG and exact specified typography may be added after an
+accepted unified product scene has been generated.
 
-Visual hierarchy:
-1. product: first
-2. product name: second
-3. logo: third
+Make at most three complete-scene attempts for one output. If the third attempt
+still fails scene validation, stop and report the failed items. Never deliver a
+failed result as valid.
 
-Logo visual guidance on the final 3:4 canvas:
-- preferred visible logo height: 4.5%-6% of canvas height
-- preferred left safe margin: about 5% of canvas width or more
-- preferred top safe margin: about 5% of canvas height or more
+## Use one workflow state at a time
 
-Keep the logo flat and source-faithful. Do not let scene lighting affect it,
-add a gradient, or apply any three-dimensional treatment.
-```
-
-Also include the applicable protected-asset, information-group, typography,
-visible-content, and workflow-state constraints from this skill. Pass the exact
-Google Classic MD3 style block above unchanged.
-
-Before generation, verify that the outbound prompt contains `3:4`, `4.5%-6%`,
-the two `5%` safe-margin references, and all three hierarchy levels. Compare the
-style block exactly with the block above. Correct any omission or difference
-before calling the image generator.
-
-## Follow the execution loop
-
-Use this loop for every output:
-
-`PREFLIGHT -> BUILD_PROMPT -> GENERATE -> FINALIZE_OUTPUT -> VALIDATE -> DELIVER`
-
-Generate the complete image in one pass from the original inputs. Do not repair
-a failed hard constraint by locally repainting, inpainting, or regenerating part
-of the image. Invalidate the result and regenerate the whole image from its
-original inputs.
-
-Make at most three complete-image attempts for one output. If the third attempt
-still fails, stop and report the failed validation items. Do not deliver it as
-valid.
-
-## Keep the aspect ratio fixed
-
-- Generate exactly one standalone image in each round.
-- Deliver an exact portrait 3:4 image at the generator's supported resolution.
-- Do not require a specific pixel resolution or reject an exact 3:4 output
-  solely because of its pixel dimensions.
-- Do not create a collage, grid, contact sheet, candidate label, or multi-panel.
-- Do not generate at another ratio and crop to 3:4.
-- Do not generate if exact 3:4 cannot be guaranteed.
-
-## Follow the workflow
-
-Use exactly one state at a time:
+Use exactly one of these states:
 
 1. `CREATE_MASTER_OPTIONS`
 2. `WAIT_FOR_MASTER_SELECTION`
@@ -101,228 +85,357 @@ Use exactly one state at a time:
 
 ### CREATE_MASTER_OPTIONS
 
-Require the source brand logo, source product PNG, exact product name, and exact
-version text.
+Generate one standalone candidate and stop. If the user requests another
+candidate, begin again from the original product, original Logo, and exact
+text. Do not redesign a rejected candidate or automatically inherit its
+composition, palette, placement, geometry, lighting, or mood.
 
-Generate one standalone candidate, then stop. When the user asks for another
-candidate, start again from the original logo, original product PNG, product
-name, and version text. Do not redesign the previous candidate or automatically
-inherit its composition, palette, product placement, logo scale, geometry,
-lighting, or visual mood. Natural similarity is acceptable when it is an
-independent design decision.
+Natural similarity is acceptable only when it follows from an independent
+design decision.
 
 ### WAIT_FOR_MASTER_SELECTION
 
-Wait for explicit user selection. Only the selected candidate becomes the
+Wait for explicit selection. Only the selected final image becomes the
 `ORIGINAL MASTER`.
 
-Do not blend rejected candidates, regenerate a substitute master, or derive SKU
+Do not blend rejected candidates, create a substitute master, or derive SKU
 variants from an unselected candidate.
 
 ### REPLACE_VARIANT
 
-Require:
+Use the `ORIGINAL MASTER` as the composition reference and the current SKU
+product reference as the authoritative product source. Treat this as locked
+master replacement, not a new poster design.
 
-- Image A: the user-approved `ORIGINAL MASTER`
-- Image B: the source PNG for the current SKU
+Generate the current SKU and its environmental response coherently. Do not
+paste the SKU onto the master. Derive every SKU directly from the
+`ORIGINAL MASTER` and `CURRENT SKU`; never derive one generated SKU from
+another.
 
-Treat this as locked-master product replacement, not a new poster design.
-Derive every SKU directly from `ORIGINAL MASTER + CURRENT SKU`. Never use a
-generated SKU variant as the source for another variant.
+Preserve the approved master:
 
-### Build an SKU set
+- Logo artwork, visible scale, and position
+- product-name and version typography
+- information-group geometry
+- product display region and visual-scale logic
+- background structure and geometry
+- overall composition and primary light direction
 
-Treat this as a workflow across the three states, not as a fourth state:
+Only the current product source, coordinated background colors, necessary
+shadow strength, subtle separation light, and text lightness for contrast may
+change. Keep sibling SKU palettes distinguishable at thumbnail size without
+changing the locked layout.
 
-1. Choose the master SKU and enter `CREATE_MASTER_OPTIONS`.
-2. Enter `WAIT_FOR_MASTER_SELECTION` after each candidate.
-3. After approval, enter `REPLACE_VARIANT` for each remaining SKU.
-4. Generate and validate each SKU separately before starting the next.
+## Build the mandatory scene prompt
 
-Do not generate remaining SKUs before master approval or generate multiple SKU
-images in one generation.
+Include the following block in every master scene-generation prompt. Replace
+only bracketed values and append the unchanged Google Classic MD3 style block.
+Do not summarize, omit, or weaken its requirements.
 
-## Protect the brand logo
+```text
+Create one portrait 3:4 e-commerce product image using the supplied inputs.
 
-### Enforce hard requirements
+Image 1 is the product reference and must be used as the primary image input.
+The original Logo PNG is intentionally excluded from this scene-generation
+call. Do not render or approximate the information-group Logo; the exact source
+Logo will be added after the unified scene passes validation.
 
-Enforce this visual hierarchy:
+The later exact information text is:
+- Complete product name: "[FULL PRODUCT NAME]"
+- Brand: "[BRAND]"
+- Remaining product name or model: "[PRODUCT NAME OR MODEL WITHOUT BRAND]"
+- Version text: "[VERSION TEXT]"
 
-1. product: first
-2. product name: second
-3. logo: third
+Generate the complete unified product scene now. The first generated image must
+already contain the product in its final environment and approximate final
+composition.
 
-The logo becoming the first visual focus is a hard failure regardless of its
-dimensions.
+Generate the product, environment, platform, lighting, shadows, reflections,
+ambient color, perspective, scale, and spatial relationships together as one
+coherent image.
 
-Allow only proportional scaling and positioning. Do not recreate, re-typeset,
-split, recolor, distort, or substitute the logo. Preserve its original colors,
-transparency, letterforms, spacing, proportions, and edge detail.
+Do not generate or save a background-only image. Do not leave product placement
+for later compositing.
 
-Do not add a backing plate, visible rectangular patch, or local-repair seam
-around the logo.
+Create a graphic-first Google Classic MD3 product showcase using large
+overlapping rounded panels, soft 2.5D organic geometric fields, restrained
+physical depth, matte surfaces, soft elevation, and a low product platform.
 
-Keep the logo flat and source-faithful. Do not let scene lighting affect it, add
-a gradient, or apply any three-dimensional treatment. Preserve such a property
-only when it is intrinsic to the supplied logo source.
+Keep the composition spacious, balanced, clean, and visually layered without
+becoming a realistic room, architectural interior, furniture scene, or physical
+exhibition environment.
 
-Do not crop the logo, place it against or visibly crowd an edge, make it
-disproportionately small, or make it unrecognizable at normal viewing size.
+Derive the tonal palette from the current product. Do not prescribe specific
+colors. Use one neutral base and a small number of coordinated, low-saturation
+supporting tones.
 
-Use the logo's visible artwork bounds, not the transparent PNG canvas bounds,
-when judging it.
+Place a contrasting tonal field behind the product so that its complete
+silhouette remains clearly separated from the environment. Do not allow a
+white, dark, or similarly colored product to blend into nearby background
+shapes.
 
-### Apply visual guidance
+Render the product from Image 1 as the primary physical subject. Preserve its
+identity, geometry, proportions, construction, materials, controls, display
+content, colors, and fine details.
 
-Keep the logo in a comfortable upper-left safe area. Prefer:
+Do not redesign, deform, simplify, recolor, replace, duplicate, or invent any
+product component.
 
-- visible height: 4.5%-6% of canvas height
-- left safe margin: about 5% of canvas width or more
-- top safe margin: about 5% of canvas height or more
+Environmental lighting may naturally affect product highlights, reflections,
+shading, ambient color response, and contact shadows so that it belongs in the
+environment. Match light direction, softness, color temperature, perspective,
+sharpness, reflections, and depth.
 
-These are visual references. Do not fail an otherwise valid result because of a
-minor deviation.
+Generate physically coherent contact shadows and ambient occlusion at actual
+contact points. Reject cutout edges, halos, generic blurred silhouette shadows,
+unsupported floating, missing contact shadows, mismatched illumination, or a
+pasted-on appearance.
 
-### Keep position and text relationship
+Use exactly one product. Do not generate additional products, SKU variants,
+floating copies, reflections resembling duplicate products, or incomplete
+product fragments.
 
-Place the logo in a comfortable upper-left safe area. Place the product name
-below the logo and the version below the product name. Treat all three as one
-coherent information group.
+Reserve comfortable continuous negative space in the upper-left area for the
+later information group. Determine its required size from the actual complete
+product-name length before finalizing product placement.
 
-Establish a clear visual left axis using the logo's visible artwork edge. Keep
-the information group in the upper half and out of the core product display
-area.
+The reserved area must support the complete product name at a strong, clearly
+readable scale. Do not create a narrow information area that would force the
+title to become small.
 
-Do not resize or reposition the logo while leaving the product name and version
-text behind.
+Do not generate any card, panel, container, backing plane, pill, plaque,
+rectangle, border, frame, isolated color field, or local repair area behind the
+information group.
 
-### Preserve master and SKU consistency
+Keep the product as the first visual focus. Reserve enough space for the
+complete product name to become the second visual focus, followed by the Logo
+and version text.
 
-During master exploration, let logo scale adapt naturally to each independent
-composition. After the user selects the `ORIGINAL MASTER`, lock the logo's
-artwork, visual size, and position. Every SKU variant must inherit them without
-further change.
+Use clean high-key studio lighting from a large upper-front soft source, gentle
+fill light, restrained separation light, soft natural contact shadows, and
+subtle controlled reflections. Keep highlights clean and shadows short and
+diffused.
+
+Do not generate information-group text, Logo, brand mark, letters, icons,
+labels, badges, prices, specifications, slogans, promotional copy, or
+watermarks. Preserve only authentic markings already present on the product.
+
+Avoid Material 3 Expressive, background-only generation, later product cutout
+compositing, information cards, backing planes, multiple products, duplicate
+products, realistic rooms, furniture, shelves, decorative props, product boxes,
+detailed scenery, architectural interiors, complex textures, busy patterns,
+neon, glassmorphism, excessive gradients, deep perspective, product
+deformation, extra text, additional logos, icons, labels, badges, prices,
+specifications, slogans, promotional content, and watermarks.
+```
+
+For `REPLACE_VARIANT`, adapt only the input roles: use the approved master as
+the composition reference and the current SKU image as the authoritative
+product. Keep every applicable scene, integration, hierarchy, lighting, and
+avoidance requirement.
+
+Before generation, verify that the outbound prompt contains:
+
+- exact portrait `3:4`
+- the complete unified-scene requirement
+- the no-background-only requirement
+- the unchanged Google Classic MD3 style block
+- upper-left continuous negative space without a panel
+- product/background silhouette separation
+- one product only
+- no generated information-group Logo or typography
+
+Correct any omission before calling the image generator.
+
+## Validate the unified scene first
+
+Before adding the Logo or typography, reject the scene if:
+
+- the canvas is not exact portrait 3:4 or was cropped from another ratio
+- the product appears pasted onto a separately generated background
+- product geometry, controls, display, materials, colors, or identity changed
+- lighting, reflections, perspective, contact shadows, or ambient color do not
+  match the environment
+- the product is not the clear first visual focus
+- the product blends into the background
+- more than one product or a duplicate-like reflection appears
+- the upper-left continuous information area is too small for strong typography
+- the information area contains a card, panel, frame, backing shape, or isolated
+  color field
+- forbidden content appears
+
+If the scene fails, discard it and regenerate the complete scene from the
+original inputs. Do not repair, inpaint, extend, locally erase, or use the
+failed image as a reference.
+
+## Add one exact information group
+
+After scene acceptance, add the original Logo and exact typography directly to
+the continuous upper-left negative space.
+
+Order the group vertically:
+
+1. Logo
+2. complete product name
+3. version text, when supplied
+
+Use the Logo's visible artwork left edge as the shared visual left axis. Ignore
+the transparent PNG canvas boundary. Keep the complete group in the upper half
+and outside the product's core display area.
+
+Move the three elements as one group. Do not resize or reposition only the Logo
+while leaving the text behind.
+
+## Enforce the visual hierarchy
+
+The mandatory viewing order is:
+
+1. product
+2. complete product name
+3. Logo
+4. version text
+
+The order must remain obvious at normal and thumbnail size. The complete
+product name must attract attention before the Logo. A Logo within its suggested
+size range still fails if it becomes more prominent than the product name.
+
+## Protect the Logo
+
+Use Image 2 as one exact, flat asset. Treat transparent pixels as transparency,
+never as a color or background.
+
+Allow only proportional scaling and positioning. Preserve the original visible
+artwork, colors, transparency, letterforms, spacing, proportions, and edge
+details.
+
+Do not redraw, retype, split, rearrange, recolor, deform, simplify, relight,
+shade, texture, reflect, replace, or add effects. Do not add a backing tile,
+gradient, three-dimensional treatment, scene color contamination, or local
+repair seam. Environmental lighting must not affect the Logo. Preserve an
+effect only when it is intrinsic to the supplied source.
+
+Do not crop, crowd an edge, make the Logo unrecognizably small, or use its
+transparent canvas as the measurement boundary.
+
+Use these visual recommendations:
+
+- visible Logo height: 4.5%-6% of canvas height
+- left safe margin: approximately 5% of canvas width or more
+- top safe margin: approximately 5% of canvas height or more
+
+These are not pixel-perfect failure thresholds. Minor deviation alone is not a
+failure when the Logo remains recognizable and correctly occupies the third
+visual level.
+
+During independent master exploration, let Logo scale adapt naturally. After
+selection, lock the Logo artwork, visible scale, and position for every SKU.
 
 ## Set typography by hierarchy
 
-Render the supplied product name and version text exactly as provided. Preserve
-all characters, capitalization, numbers, punctuation, language, and word order.
+Render the supplied complete product name and version text exactly. Preserve
+all characters, capitalization, punctuation, spacing, language, and word order.
 Do not translate, rewrite, abbreviate, invent, or duplicate text.
 
-Use a clean, modern, neutral sans-serif treatment compatible with Classic MD3.
-Choose font and weight by the intended visual hierarchy.
+Use clean, restrained Google Classic MD3 sans-serif typography with enough
+weight for clear recognition. Avoid thin, light, condensed, stretched,
+distorted, or disproportionately spaced lettering.
 
-- Make the product name the clear primary text level.
-- Make the version readable but visibly secondary.
-- Prefer one line for the product name; use at most two lines when needed.
-- Do not split words internally.
-- Reduce size moderately when necessary without making the text weak or tiny.
-- Keep letterforms clean, undistorted, and legible at normal and thumbnail size.
+### Break the product name correctly
 
-Treat hierarchy, spacing, line breaking, and optical alignment as visual design
-judgments rather than pixel-perfect targets. Incorrect, missing, invented,
-duplicated, or unreadable text is a hard failure; a minor stylistic deviation
-that preserves the intended hierarchy is not.
+Use no more than two lines.
 
-After `ORIGINAL MASTER` approval, lock the product-name and version content,
-visual scale, placement, line breaks, spacing, and hierarchy for every SKU.
+Use one line only when the complete name remains large, strong, readable, and
+unmistakably the second visual focus. Never choose a small size merely to keep
+the name on one line.
 
-## Protect the product asset
+When two lines are required, use exactly:
 
-Treat the uploaded product PNG as authoritative. Do not redraw it, substitute a
-similar model, recolor it, alter its silhouette, structure, material, screen
-proportions, controls, ports, holes, or other real details, add nonexistent
-hardware, or remove genuine details.
+```text
+[BRAND]
+[PRODUCT NAME OR MODEL WITHOUT BRAND]
+```
 
-Allow only proportional scaling, positioning, composition placement, natural
-contact shadow, restrained ambient shadow, and subtle separation light when
-needed.
+Keep the brand alone on line 1 and all remaining product-name or model text on
+line 2. Never split a word, add a third line, reorder text, or make the brand
+line resemble a small label or subtitle. Both lines must read as one complete
+product-name group.
+
+### Keep the product name strong
+
+Prefer a visible letter height of approximately 4%-5% of canvas height for each
+product-name line. Measure visible letters, not nominal point size or invisible
+font metrics.
+
+This range is visual guidance, not a pixel-perfect threshold. Regardless of the
+measured percentage, fail typography that appears small at normal size, becomes
+difficult to read at thumbnail size, or attracts less attention than the Logo.
+
+If the name cannot fit within two lines at the required strength, enlarge the
+reserved information area or regenerate the scene with a better composition.
+Do not compensate by shrinking the title, adding a third line, splitting words,
+distorting letters, compressing spacing excessively, overlapping the product,
+or leaving the information group.
+
+### Keep the version subordinate
+
+Place the exact version text below the product name. Prefer a visible letter
+height of approximately 2%-2.5% of canvas height. Keep it clearly legible but
+subordinate to the product name and Logo.
+
+If no version text is supplied, omit the version line without inventing a
+replacement.
+
+After master approval, lock the complete product name, version content, visible
+scale, placement, line breaks, spacing, and hierarchy for every SKU.
 
 ## Limit visible content
 
 Allow only:
 
-1. the source brand logo
-2. the exact product name
-3. the exact version text
-4. the source product PNG
-5. visual elements belonging to the Classic MD3 composition
-6. restrained lighting and shadows supporting the composition
+1. the source Logo
+2. the exact complete product name
+3. the exact version text, when supplied
+4. the single source product
+5. visual elements belonging to the Google Classic MD3 composition
+6. restrained supporting lighting and shadows
 
-Real text already present on the product may remain.
+Authentic text already present on the product may remain. Add no selling points,
+specifications, promotions, labels, discounts, certifications, extra Logos,
+icons, badges, marketplace stickers, invented UI, or watermarks.
 
-Do not add selling points, specifications, promotional labels, discounts,
-certifications, extra logos, extra icons, badges, decorative copy, marketplace
-stickers, or invented UI.
+## Validate the final image
 
-## Lock the approved master
+Validate only the final exported 3:4 file at normal and thumbnail size.
 
-For every SKU variant, preserve the `ORIGINAL MASTER`:
+Reject it if:
 
-- logo artwork, visual size, and position
-- product-name and version typography and information-group geometry
-- product display region, visual-scale logic, and visual center
-- background structure and geometry
-- overall composition and primary light direction
+- the final canvas is not exact portrait 3:4
+- the product, product name, Logo, and version do not read in the required order
+- the product name is small, weak, or difficult to read
+- the Logo attracts attention before the product name
+- the Logo differs from its source or receives an added color, background,
+  gradient, lighting effect, or dimensional treatment
+- the information group sits on a card, frame, panel, backing shape, or isolated
+  color field
+- required text is missing, changed, misspelled, reordered, duplicated, or
+  unreadable
+- a one-line title was made weak merely to avoid the required two-line structure
+- a two-line title does not place the brand first and the remaining name second
+- the information group lacks one left axis, leaves the upper half, or intrudes
+  into the product's core display area
+- the product is changed, cropped, duplicated, poorly integrated, or insufficiently
+  separated from the background
+- forbidden visible content appears
+- a master candidate depends on a rejected candidate
+- an SKU fails to preserve the approved master or derives from another SKU
 
-Only these may change for the current SKU:
+If only the Logo or typography fails, preserve the accepted unified scene and
+rebuild the complete information group from the original Logo and exact text.
+Do not locally repair part of a damaged Logo or word.
 
-- source product PNG
-- background main color and background-element colors
-- shadow strength and subtle separation light when needed
-- text lightness when needed for contrast
+If the required typography cannot fit because the information area is too
+small, treat it as a scene failure and regenerate the unified scene from the
+original inputs with more continuous space. Never shrink the title to preserve
+a failed composition.
 
-Do not change anything else from the approved master.
-
-Give sibling color SKUs clearly distinguishable background palettes at
-thumbnail size. Do not create distinction by changing the locked layout or by
-using arbitrary clashing colors.
-
-## Finalize before validation
-
-Perform delivery validation only on the final exported 3:4 file, never on the
-image generator's raw output.
-
-1. Confirm that the raw output is exact 3:4. Reject it if it is not.
-2. Export it without cropping or changing its aspect ratio. Do not impose a
-   fixed pixel resolution.
-3. Confirm that the final file remains exact portrait 3:4.
-4. Judge the logo by its visible artwork bounds, not its transparent PNG canvas
-   bounds.
-5. Run every hard-failure check below on the final file.
-6. Deliver only after all checks pass.
-
-## Validate before delivery
-
-Treat these as hard failures:
-
-- output count is not exactly one
-- final canvas is not exact portrait 3:4 or was cropped from another ratio
-- logo or product is recreated, altered, distorted, substituted, or cropped
-- product, product name, and logo do not read as first, second, and third in
-  the visual hierarchy
-- logo becomes the first visual focus, regardless of its pixel dimensions
-- logo is visibly unsafe or unrecognizably small
-- scene lighting, an added gradient, or a three-dimensional treatment affects
-  the logo
-- a visible patch, backing rectangle, or local-repair seam appears around the logo
-- required text is incorrect, missing, invented, duplicated, or unreadable
-- forbidden text, icon, logo, badge, label, or UI appears
-- the information group lacks a clear visual left axis, leaves the upper half,
-  or intrudes into the core product display area
-- the product is not clearly recognizable, prominent, and separated from the background
-- a master candidate depends on a previous rejected candidate
-- an SKU variant fails to preserve the approved master structure
-- an SKU variant derives from another generated variant
-- sibling SKU palettes are not clearly distinguishable at thumbnail size
-
-Treat the approximate logo margins and preferred 4.5%-6% logo height as visual
-guidance. Do not fail solely because of a minor deviation. Treat optical
-alignment, spacing, font choice, font weight, and line breaking as visual
-judgments.
-
-If a hard failure occurs, invalidate the entire result and regenerate from the
-original inputs, subject to the three-attempt limit. For a master candidate,
-use the original logo, product PNG, product name, and version text. For a
-variant, use the approved `ORIGINAL MASTER` and current SKU PNG. Never deliver a
-locally patched result as valid.
+Deliver only after every applicable check passes.
