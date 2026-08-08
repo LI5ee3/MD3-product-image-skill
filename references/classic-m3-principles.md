@@ -1,43 +1,60 @@
 # Classic M3 Principles for Static Product Visuals
 
-本文件用于把 Classic Material Design 3 基础视觉原则适配到静态产品主图。
+This reference adapts Classic Material Design 3 foundations to static product imagery.
 
-它不是 UI 组件规范，也不是固定海报模板。
+It is not a UI component specification and not a fixed poster template.
+
+## Core target
+
+**Realistic product + graphic Classic M3 environment**
 
 ## Color
-使用 tonal relationships 组织层级与 Surface 关系。
-具体 hue 自适应。
-不使用固定 palette 映射。
+
+Use tonal relationships to organize hierarchy, Surface separation, and product/background contrast.
+
+Hue is adaptive.
 
 ## Shape
-Shape 用于组织构图、注意力和 Surface 关系。
-不规定固定几何组合。
+
+Shape organizes composition, attention, and Surface relationships.
+
+No fixed geometry is mandatory.
 
 ## Surface
-背景优先理解为有层级关系的视觉 Surface。
-可用于分区、承托、层级、tonal 关系和视觉节奏。
+
+Surface should primarily be understood as a **graphic visual layer**.
+
+It can create zoning, support, overlap, tonal structure, and rhythm.
+
+It does not need to simulate literal physical materials.
 
 ## Elevation
-通过 tonal difference、soft shadow、overlap、subtle depth 表达层级。
-不要求建立高写实物理空间。
+
+Elevation should primarily be understood as **layer hierarchy**.
+
+Use tonal difference, overlap, soft shadow, and restrained depth.
 
 ## Typography
-通过字号、字重、位置、间距建立清晰信息层级。
+
+Use size, weight, spacing, and position to establish information hierarchy.
 
 ## Static Product Adaptation
-核心：
+
+Use:
 
 **Graphic-first, depth-second**
 
-先建立图形与 tonal 构成，再加入克制空间深度。
-产品本身保持真实。
+Build graphic structure first.
+Add restrained depth second.
+Keep the product itself realistic.
 
 ## Creative Freedom
-不预设：
-- 固定色相
-- 固定明度
-- 固定 Shape
-- 固定 Surface 数量
-- 固定构图
-- 固定产品位置
-- 固定视觉情绪
+
+Do not preset fixed:
+
+- hue
+- Shape
+- Surface count
+- composition
+- product position
+- visual mood
