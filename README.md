@@ -10,7 +10,7 @@
 ```text
 使用 md3-product-image
 
-产品名称：Xiaomi Smart Scale S200
+产品名称：
 版本文字：Глобальная версия
 
 使用当前上传的品牌 Logo 和产品 PNG 创建母版候选
@@ -19,7 +19,7 @@
 确认母版后替换 SKU：
 
 ```text
-Image A 是 ORIGINAL MASTER
-Image B 是当前 SKU 的产品 PNG
+这是当前 SKU 的产品 PNG
+根据 ORIGINAL MASTER
 生成这个 SKU
 ```
