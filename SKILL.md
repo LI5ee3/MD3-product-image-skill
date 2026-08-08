@@ -1,6 +1,6 @@
 ---
 name: md3-product-image
-description: Create exact portrait 3:4 Google Classic MD3 e-commerce product images with one coherently generated product scene, a source-faithful logo, strong exact typography, independent master candidates, and locked same-product SKU variants. Use when creating a product main image, exploring master candidates, or replacing the product with another SKU while preserving an approved master.
+description: Create exact portrait 3:4 Google Classic MD3 e-commerce product images with one coherently generated product scene, a source-faithful logo, strong exact typography, independent master candidates, and locked-layout SKU variants with visibly SKU-adaptive background palettes. Use when creating a product main image, exploring master candidates, or replacing the product with another SKU while preserving an approved master.
 ---
 
 # MD3 Product Image
@@ -121,9 +121,22 @@ Preserve the approved master:
 - background structure and geometry
 - overall composition and primary light direction
 
-Only the current product source, coordinated background colors, necessary
-shadow strength, subtle separation light, and text lightness for contrast may
-change. Keep sibling SKU palettes distinguishable at thumbnail size without
+Lock the background's structure, geometry, color-role relationships, and
+relative light-dark hierarchy, but do not lock its actual hues or palette.
+
+When the current SKU's dominant product color differs visibly from the master
+SKU, re-derive the background base and supporting colors from the current SKU.
+This palette adaptation is mandatory, not optional. At least one large
+background field and one supporting field must change visibly at thumbnail
+size. Changing only the product color does not satisfy this requirement.
+
+Keep the new palette coordinated with the current SKU while preserving clear
+product-background separation. Do not make the background so similar to the
+product that its silhouette becomes weak.
+
+Only the current product source, background color assignments, necessary shadow
+strength, subtle separation light, and text lightness for contrast may change.
+Keep sibling SKU backgrounds distinguishable at thumbnail size without
 changing the locked layout.
 
 ## Build the mandatory scene prompt
@@ -232,7 +245,32 @@ specifications, slogans, promotional content, and watermarks.
 For `REPLACE_VARIANT`, adapt only the input roles: use the approved master as
 the composition reference and the current SKU image as the authoritative
 product. Keep every applicable scene, integration, hierarchy, lighting, and
-avoidance requirement.
+avoidance requirement. Append this SKU palette block without weakening it:
+
+```text
+Lock the ORIGINAL MASTER's background geometry, shape placement, depth,
+materials, relative light-dark hierarchy, composition, and primary light
+direction. Do not lock or copy its actual background hues.
+
+Compare the CURRENT SKU's dominant product color with the ORIGINAL MASTER
+product. When they differ visibly, re-derive the background base and supporting
+colors from the CURRENT SKU. The background palette must visibly change; this
+is mandatory, not optional.
+
+Change the color of at least one large background field and one supporting
+field so that the master and current SKU backgrounds remain clearly
+distinguishable at thumbnail size. A product-only color change does not count
+as background palette adaptation.
+
+Preserve the number, geometry, position, depth, material, and visual role of
+the master background fields. Change their color assignments without
+redesigning the layout. Do not preserve the master hues merely because the
+master is used as a reference image.
+
+Derive the new palette from the CURRENT SKU without prescribing specific
+colors. Maintain clear contrast between the CURRENT SKU and every adjacent
+background field so that the product remains the first visual focus.
+```
 
 Before generation, verify that the outbound prompt contains:
 
@@ -244,6 +282,8 @@ Before generation, verify that the outbound prompt contains:
 - product/background silhouette separation
 - one product only
 - no generated information-group Logo or typography
+- for a visibly different SKU color, the mandatory SKU palette block and a
+  thumbnail-visible background change rather than a product-only color change
 
 Correct any omission before calling the image generator.
 
@@ -262,6 +302,12 @@ Before adding the Logo or typography, reject the scene if:
 - the upper-left continuous information area is too small for strong typography
 - the information area contains a card, panel, frame, backing shape, or isolated
   color field
+- for an SKU whose dominant product color visibly differs from the master, the
+  background palette remains materially the same at thumbnail size
+- an SKU changes only the product color without changing at least one large
+  background field and one supporting field
+- an adapted background becomes too similar to the current SKU and weakens its
+  silhouette
 - forbidden content appears
 
 If the scene fails, discard it and regenerate the complete scene from the
@@ -427,7 +473,10 @@ Reject it if:
   separated from the background
 - forbidden visible content appears
 - a master candidate depends on a rejected candidate
-- an SKU fails to preserve the approved master or derives from another SKU
+- an SKU changes locked master geometry, composition, or lighting structure
+- an SKU with a visibly different product color fails mandatory background
+  palette adaptation
+- an SKU derives from another generated SKU
 
 If only the Logo or typography fails, preserve the accepted unified scene and
 rebuild the complete information group from the original Logo and exact text.
