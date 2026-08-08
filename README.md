@@ -20,13 +20,14 @@
 确认母版：
 
 ```text
-将这张图设为ORIGINAL MASTER
+将这张图设为ORIGINAL MASTER，并在本组 SKU 中保持不变
 ```
 
-确认母版后生成其他SKU：
+之后每次生成其他SKU：
 
 ```text
-根据已设定的ORIGINAL MASTER
+继续使用当前已锁定的同一ORIGINAL MASTER
 使用当前上传的产品图生成这个SKU
 根据当前SKU重新推导背景配色，同时保持母版结构、构图、光影方向和信息组不变
+将输出作为SKU_VARIANT，不能替换、覆盖或重新锁定为ORIGINAL MASTER
 ```
