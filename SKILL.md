@@ -21,8 +21,6 @@ During `PREFLIGHT`, inspect the available image-generation interface.
 
 - Confirm that an image-generation tool is available and can receive every
   required source image. If not, stop and report the missing capability.
-- Confirm that the final file's dimensions and the logo's visible artwork bounds
-  can be measured. If not, stop rather than claim that validation passed.
 - Use GPT Image 2 only when the interface exposes explicit model selection and
   confirms that model.
 - When explicit model selection is unavailable, use the available
@@ -50,10 +48,10 @@ Visual hierarchy:
 2. product name: second
 3. logo: third
 
-On the final 3:4 canvas:
+Logo visual guidance on the final 3:4 canvas:
 - preferred visible logo height: 4.5%-6% of canvas height
-- maximum visible logo height: 7.5% of canvas height
-- maximum visible logo width: 16.7% of canvas width
+- preferred left safe margin: about 5% of canvas width or more
+- preferred top safe margin: about 5% of canvas height or more
 
 Keep the logo flat and source-faithful. Do not let scene lighting affect it,
 add a gradient, or apply any three-dimensional treatment.
@@ -64,9 +62,9 @@ visible-content, and workflow-state constraints from this skill. Pass the exact
 Google Classic MD3 style block above unchanged.
 
 Before generation, verify that the outbound prompt contains `3:4`, `4.5%-6%`,
-`7.5%`, `16.7%`, and all three hierarchy levels. Compare the style block exactly
-with the block above. Correct any omission or difference before calling the
-image generator.
+the two `5%` safe-margin references, and all three hierarchy levels. Compare the
+style block exactly with the block above. Correct any omission or difference
+before calling the image generator.
 
 ## Follow the execution loop
 
@@ -146,73 +144,64 @@ images in one generation.
 
 ## Protect the brand logo
 
-Treat the uploaded logo as one indivisible protected graphic. Everything inside
-the asset belongs to it, including its symbol, emblem, wordmark, embedded text,
-letterforms, spacing, weight, proportions, alignment, colors, transparency, and
-edge detail.
+### Enforce hard requirements
 
-Allow only proportional scaling and positioning. Do not recreate, re-typeset,
-split, rebuild, recolor, distort, substitute, or reinterpret the logo. Do not
-turn embedded logo text into editable typography.
-
-Preserve the transparent-area semantics of the logo source. Place the logo
-directly on the image background. Do not add a backing plate or produce a
-visible rectangular or square patch around it.
-
-Use the visible artwork bounds, not the transparent PNG canvas bounds, when
-judging placement and alignment.
-
-Enforce this visual hierarchy among the three main elements:
+Enforce this visual hierarchy:
 
 1. product: first
 2. product name: second
 3. logo: third
 
-The logo must never become the first visual focus. This is a hard failure
-regardless of its pixel dimensions.
+The logo becoming the first visual focus is a hard failure regardless of its
+dimensions.
 
-Keep the logo in a comfortable upper-left safe area. Use these approximate
-visual references on the final canvas:
+Allow only proportional scaling and positioning. Do not recreate, re-typeset,
+split, recolor, distort, or substitute the logo. Preserve its original colors,
+transparency, letterforms, spacing, proportions, and edge detail.
 
+Do not add a backing plate, visible rectangular patch, or local-repair seam
+around the logo.
+
+Keep the logo flat and source-faithful. Do not let scene lighting affect it, add
+a gradient, or apply any three-dimensional treatment. Preserve such a property
+only when it is intrinsic to the supplied logo source.
+
+Do not crop the logo, place it against or visibly crowd an edge, make it
+disproportionately small, or make it unrecognizable at normal viewing size.
+
+Use the logo's visible artwork bounds, not the transparent PNG canvas bounds,
+when judging it.
+
+### Apply visual guidance
+
+Keep the logo in a comfortable upper-left safe area. Prefer:
+
+- visible height: 4.5%-6% of canvas height
 - left safe margin: about 5% of canvas width or more
 - top safe margin: about 5% of canvas height or more
-- preferred visible height: 4.5%-6% of canvas height
 
-Use these hard maximums for the logo's visible artwork bounds:
+These are visual references. Do not fail an otherwise valid result because of a
+minor deviation.
 
-- visible height: 7.5% of canvas height
-- visible width: 16.7% of canvas width
+### Keep position and text relationship
 
-The safe margins and preferred height are visual guidelines, not pixel-perfect
-validation targets. The maximum height and width are mandatory.
+Place the logo in a comfortable upper-left safe area. Place the product name
+below the logo and the version below the product name. Treat all three as one
+coherent information group.
 
-Keep the logo clearly recognizable at normal viewing size. It must not feel
-disproportionately small, outrank the product name, touch or visibly crowd an
-edge, or be cropped.
+Establish a clear visual left axis using the logo's visible artwork edge. Keep
+the information group in the upper half and out of the core product display
+area.
 
-Keep the logo flat and source-faithful. Do not let scene lighting affect it,
-add a gradient, or apply any three-dimensional treatment. Preserve any such
-property only when it is already intrinsic to the supplied logo source.
+Do not resize or reposition the logo while leaving the product name and version
+text behind.
+
+### Preserve master and SKU consistency
 
 During master exploration, let logo scale adapt naturally to each independent
 composition. After the user selects the `ORIGINAL MASTER`, lock the logo's
-artwork, visual size, and position for all SKU variants.
-
-## Build one information group
-
-Treat the logo, product name, and version text as one coherent information
-group, not as three unrelated objects.
-
-- Place the product name below the logo and the version below the product name.
-- Establish a clear visual left axis using the logo's visible artwork edge.
-- Judge alignment optically; do not require mathematical coordinate equality.
-- Keep spacing deliberate and visually balanced.
-- Keep the group in the upper half and out of the core product display area.
-- Preserve the group's complete geometry after `ORIGINAL MASTER` approval.
-
-Do not resize or reposition the logo after generation while leaving the text
-behind. If the group is visibly broken, regenerate the complete image from the
-original inputs.
+artwork, visual size, and position. Every SKU variant must inherit them without
+further change.
 
 ## Set typography by hierarchy
 
@@ -298,13 +287,10 @@ image generator's raw output.
 2. Export it without cropping or changing its aspect ratio. Do not impose a
    fixed pixel resolution.
 3. Confirm that the final file remains exact portrait 3:4.
-4. Measure the logo's visible artwork bounds as percentages of the final canvas
-   with an image-analysis tool. Do not estimate them visually.
+4. Judge the logo by its visible artwork bounds, not its transparent PNG canvas
+   bounds.
 5. Run every hard-failure check below on the final file.
 6. Deliver only after all checks pass.
-
-If export changes the pixel dimensions, re-confirm the aspect ratio and measure
-the logo's relative bounds again.
 
 ## Validate before delivery
 
@@ -312,7 +298,6 @@ Treat these as hard failures:
 
 - output count is not exactly one
 - final canvas is not exact portrait 3:4 or was cropped from another ratio
-- logo visible artwork exceeds 7.5% of canvas height or 16.7% of canvas width
 - logo or product is recreated, altered, distorted, substituted, or cropped
 - product, product name, and logo do not read as first, second, and third in
   the visual hierarchy
@@ -331,11 +316,10 @@ Treat these as hard failures:
 - an SKU variant derives from another generated variant
 - sibling SKU palettes are not clearly distinguishable at thumbnail size
 
-Treat approximate logo margins, the preferred 4.5%-6% logo height, optical
+Treat the approximate logo margins and preferred 4.5%-6% logo height as visual
+guidance. Do not fail solely because of a minor deviation. Treat optical
 alignment, spacing, font choice, font weight, and line breaking as visual
-judgments. The visual hierarchy and 7.5% height and 16.7% width maximums are not
-approximate. Do not fail solely because another guideline differs slightly
-while preserving the intended visual result.
+judgments.
 
 If a hard failure occurs, invalidate the entire result and regenerate from the
 original inputs, subject to the three-attempt limit. For a master candidate,
