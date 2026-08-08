@@ -1,25 +1,16 @@
 # SELECT_MASTER
 
-只在用户明确选择某个候选后执行。
+当用户明确选择某一候选时：
+
+将该原始候选锁定为唯一 ORIGINAL MASTER。
 
 例如：
 
-- 方案3
-- 第三张作为母版
-- 选第3个
-- 方案3，就用这个
+- 方案3作为 ORIGINAL MASTER
+- 选第3张
+- 第三张作为正式母版
 
-然后：
+后续所有 SKU 必须直接从该 ORIGINAL MASTER 派生。
 
-MASTER_SELECTED = selected original candidate
-MASTER_APPROVED = true
-
-选中的原始候选图成为唯一 ORIGINAL MASTER。
-
-后续 SKU 必须直接使用这个 ORIGINAL MASTER。
-
-不要：
-
-- 混合其他候选
-- 重新生成“类似母版”
-- 使用其他候选作为 SKU 来源
+不得混合其他候选。
+不得重新生成一个“相似母版”作为替代。
