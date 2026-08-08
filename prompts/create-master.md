@@ -14,25 +14,29 @@
 
 【任务】
 
-使用 md3-product-main-image 的 CREATE_MASTER_OPTIONS。
+使用 md3-product-main-image。
+
+进入 CREATE_MASTER_OPTIONS。
 
 当前回合只生成 1 张独立母版候选图。
 
-使用 Classic Material Design 3 作为唯一视觉设计语言。
+必须执行：
 
-严格遵守 Skill 中的：
+PREFLIGHT → GENERATE → VALIDATE
 
-- 画布规则
-- Logo 原子化保护
-- 产品 PNG 保护
-- 信息区规则
-- Classic M3 Color / Shape / Surface / Elevation / Typography 原则
-- 候选独立设计规则
+PREFLIGHT：
+- 只输出 1 张
+- 严格 portrait 3:4
+- 目标 1200 × 1600 px
+- 不允许其他比例替代
+- 不允许先生成其他比例再裁切
+- Logo、产品 PNG、产品名称、版本文字均已确认
 
-当前候选必须从原始输入重新独立设计。
+如果无法保证严格 3:4，不要生成无效候选。
 
-不要把之前生成的候选作为修改基础。
+设计只使用 Classic Material Design 3。
 
-不要生成拼版、五宫格或多方案合集。
+当前候选必须从原始输入重新独立设计，
+不要把之前候选作为修改基础。
 
-只生成当前这一张独立候选图。
+生成后必须通过 VALIDATE 才算有效候选。
