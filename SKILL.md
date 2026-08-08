@@ -7,35 +7,70 @@ description: Create 3:4 e-commerce product main images in Google Classic Materia
 
 ## Pass the visual style unchanged
 
-Pass the Classic MD3 style instruction to the image generator unchanged:
+Pass the Google Classic MD3 style instruction to the image generator unchanged:
 
 ```text
 Use Google Classic Material Design 3 (MD3) as the sole visual style.
 
 Do not use Material 3 Expressive.
-
-Do not interpret Classic MD3 as a realistic room, studio set,
-architectural environment, or physical exhibition stage.
 ```
 
-Do not expand it into prescribed colors, shapes, surfaces, elevation,
-lighting, materials, platforms, or scene descriptions.
+## Check image-generation capability
 
-Add task facts and non-style constraints outside the block. Do not paraphrase
-or supplement the block with a fixed MD3 template or prose that translates
-Classic MD3 into visual attributes. Let the image generator independently
-determine composition, palette, geometry, spatial relationships, lighting, and
-visual mood for the current product.
+During `PREFLIGHT`, inspect the available image-generation interface.
+
+- Confirm that an image-generation tool is available and can receive every
+  required source image. If not, stop and report the missing capability.
+- Confirm that the final file's dimensions and the logo's visible artwork bounds
+  can be measured. If not, stop rather than claim that validation passed.
+- Use GPT Image 2 only when the interface exposes explicit model selection and
+  confirms that model.
+- When explicit model selection is unavailable, use the available
+  image-generation tool without claiming or assuming which image model it uses.
+- Use an explicit 1200 x 1600 output-size control when the interface exposes
+  one. Do not invent unsupported model, quality, or size parameters.
+
+## Build the required outbound prompt
+
+Include this non-style constraint block in every generation prompt. Replace only
+the bracketed input values. Do not summarize, omit, or weaken any line.
+
+```text
+Generate exactly one standalone portrait 3:4 e-commerce product image.
+Final delivery target: exactly 1200 x 1600 px.
+
+Use the supplied logo and product PNG as protected source assets.
+Product name: "[EXACT PRODUCT NAME]"
+Version text: "[EXACT VERSION TEXT]"
+
+Visual hierarchy:
+1. product: first
+2. product name: second
+3. logo: third
+
+On the final 1200 x 1600 canvas:
+- preferred visible logo height: 72-96 px
+- maximum visible logo height: 120 px
+- maximum visible logo width: 200 px
+
+Keep the logo flat and source-faithful. Do not let scene lighting affect it,
+add a gradient, or apply any three-dimensional treatment.
+```
+
+Also include the applicable protected-asset, information-group, typography,
+visible-content, and workflow-state constraints from this skill. Pass the exact
+Google Classic MD3 style block above unchanged.
+
+Before generation, verify that the outbound prompt contains `1200 x 1600`,
+`72-96 px`, `120 px`, `200 px`, and all three hierarchy levels. Compare the
+style block exactly with the block above. Correct any omission or difference
+before calling the image generator.
 
 ## Follow the execution loop
 
 Use this loop for every output:
 
-`PREFLIGHT -> GENERATE -> VALIDATE`
-
-During `PREFLIGHT`, inspect the outbound generation prompt. If the Classic MD3
-style block was changed, paraphrased, or expanded, correct the prompt before
-calling the image generator.
+`PREFLIGHT -> BUILD_PROMPT -> GENERATE -> FINALIZE_CANVAS -> VALIDATE -> DELIVER`
 
 Generate the complete image in one pass from the original inputs. Do not repair
 a failed hard constraint by locally repainting, inpainting, or regenerating part
@@ -252,25 +287,39 @@ Give sibling color SKUs clearly distinguishable background palettes at
 thumbnail size. Do not create distinction by changing the locked layout or by
 using arbitrary clashing colors.
 
+## Finalize before validation
+
+Perform delivery validation only on the final 1200 x 1600 file, never on the
+image generator's raw output.
+
+1. Confirm that the raw output is exact 3:4. Reject it if it is not.
+2. If needed, resize it proportionally to exactly 1200 x 1600 without cropping.
+3. Confirm the final canvas dimensions.
+4. Measure the logo's visible artwork bounds on the final file with an
+   image-analysis tool. Do not estimate its pixel dimensions visually.
+5. Run every hard-failure check below on the final file.
+6. Deliver only after all checks pass.
+
+Any resize invalidates earlier size measurements. Measure the logo again after
+the final canvas has been completed.
+
 ## Validate before delivery
 
 Treat these as hard failures:
 
 - output count is not exactly one
 - final canvas is not exactly 1200 x 1600 portrait 3:4 or was cropped from another ratio
+- logo visible artwork exceeds 120 px in height or 200 px in width
 - logo or product is recreated, altered, distorted, substituted, or cropped
 - product, product name, and logo do not read as first, second, and third in
   the visual hierarchy
 - logo becomes the first visual focus, regardless of its pixel dimensions
-- logo visible artwork exceeds 120 px in height or 200 px in width
 - logo is visibly unsafe or unrecognizably small
 - scene lighting, an added gradient, or a three-dimensional treatment affects
   the logo
 - a visible patch, backing rectangle, or local-repair seam appears around the logo
 - required text is incorrect, missing, invented, duplicated, or unreadable
 - forbidden text, icon, logo, badge, label, or UI appears
-- the result reads as a realistic room, studio set, architectural environment,
-  or physical exhibition stage
 - the information group lacks a clear visual left axis, leaves the upper half,
   or intrudes into the core product display area
 - the product is not clearly recognizable, prominent, and separated from the background
