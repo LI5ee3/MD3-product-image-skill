@@ -174,3 +174,17 @@ Avoid defaulting to black-on-black or dark-on-dark poster compositions.
 
 The aim is marketplace-card visibility, stronger thumbnail readability, and
 cleaner commercial presentation.
+
+
+## Information Zone
+
+- Logo stays in the upper-left safe area.
+- Product name and version stay in the upper half.
+- Product name appears below the logo.
+- Product-name left edge should align with the logo left edge whenever visually appropriate.
+- Version aligns with the product-name left edge.
+- Keep breathable logo-to-title spacing.
+- Keep stable title-to-version spacing.
+- Long titles use at most two lines.
+- The text block must not invade the product's core display area.
+- After master selection, information-zone geometry is locked.
