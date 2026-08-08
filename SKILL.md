@@ -1,35 +1,42 @@
 ---
 name: md3-product-main-image
-version: 4.0
+version: 5.0
 description: >
-  GPT-image-only workflow for creating lively, modern MD3 e-commerce product main images.
-  Uses adaptive color logic based on the current product and composition, generates master
-  candidates as separate images, protects uploaded logos and product assets, and locks the
-  selected ORIGINAL MASTER for same-product SKU replacement.
+  GPT-image-only workflow for creating e-commerce product main images with Material Design 3
+  as the design-language reference. The skill constrains quality, asset fidelity, layout,
+  marketplace readability, and master/variant consistency while leaving palette and visual mood
+  adaptive to the current product and composition.
 ---
 
-# MD3 Product Main Image Skill v4.0
+# MD3 Product Main Image Skill v5.0
 
-## Purpose
+## 核心原则
 
-Create premium e-commerce product main images using GPT-image only.
+本 Skill 只限制：
 
-The workflow is optimized for marketplace card browsing such as Ozon:
+- 素材真实性
+- 画布规格
+- 信息层级
+- 电商缩略图可读性
+- 构图质量
+- MD3 设计语言
+- 母版与 SKU 的一致性
 
-- strong product recognition at thumbnail size;
-- clear title hierarchy;
-- lively, modern MD3 visual language;
-- protected uploaded logo and product assets;
-- stable same-product SKU consistency;
-- adaptive color selection without fixed color templates.
+本 Skill 不预设：
 
-The guiding color principle is:
+- 固定背景色
+- 固定色相家族
+- 固定视觉情绪
+- 固定构图模板
+- 固定 MD3 元素组合
 
-**Constrain the visual result, not the specific hue.**
+核心原则：
+
+**限制质量与功能，不限制具体色相，不限制固定视觉气质。**
 
 ---
 
-# Workflow States
+# 工作状态
 
 1. CREATE_MASTER_OPTIONS
 2. WAIT_FOR_MASTER_SELECTION
@@ -40,641 +47,726 @@ The guiding color principle is:
 
 # STATE 1 — CREATE_MASTER_OPTIONS
 
-Use when there is no approved master for the current product.
+适用于：
 
-Create five master candidates for the same product.
+- 新产品首次创建主图
+- 当前产品尚无正式母版
+- 用户要求重新生成一批母版候选
 
-## Separate Output Rule
+## 五个候选必须独立输出
 
-Five candidates means five separate image outputs.
+目标是 5 个母版候选。
 
-Never create:
+5 个候选 = 5 张完全独立的图片。
 
-- contact sheets;
-- collages;
-- grids;
-- mood boards;
-- comparison boards;
-- multi-panel layouts;
-- five designs inside one canvas.
+禁止：
 
-Each candidate is one complete standalone 3:4 main image.
+- Contact Sheet
+- Collage
+- Grid
+- Mood Board
+- Comparison Board
+- Multi-panel
+- 五宫格
+- 拼版
+- 一张图中同时出现多个候选
 
-Do not place candidate numbers inside the artwork.
+每个候选都必须是完整、独立的 3:4 主图。
 
-If the interface cannot reliably output five separate images in one response:
+图片内部不得出现：
 
-- generate Option 1 only;
-- stop;
-- wait for the user to request the next option.
+- 方案编号
+- 01 / 02 / 03 / 04 / 05
+- Option 1 / Option 2
 
-Never solve output limitations by combining candidates into one image.
+编号只用于聊天中区分图片。
 
-## Candidate Diversity
+如果当前界面无法可靠一次生成 5 张独立图片：
 
-The five candidates must differ meaningfully in composition.
+- 先生成方案 1
+- 停止
+- 等待用户继续生成下一个方案
 
-Candidate diversity should primarily come from:
+不得通过拼版解决输出限制。
 
-- product placement;
-- product visual scale;
-- negative-space distribution;
-- product-to-information-zone relationship;
-- MD3 geometry;
-- curves and arcs;
-- tonal-surface structure;
-- depth;
-- lighting balance;
-- overall visual rhythm.
+## 候选之间必须独立设计
 
-Do not create five near-identical compositions with only small positional or color changes.
+母版候选之间不是连续迭代关系。
 
-Color diversity is not a quota.
+方案 2 不是方案 1 的修改版。
+方案 3 不是方案 2 的修改版。
 
-Each candidate should independently evaluate the most suitable palette for its own composition.
+每个候选都必须从同一组原始输入重新开始设计：
 
-Do not mechanically copy the previous candidate's palette.
+BRAND LOGO + PRODUCT PNG + PRODUCT NAME + VERSION TEXT
+→ INDEPENDENT DESIGN
 
-Do not force a different hue merely to make candidates look different.
+生成新候选时，不要以前一个候选作为设计起点。
 
-Similar color families are acceptable if they are genuinely the best fit.
+不要默认继承前一个候选的：
 
-After all five standalone candidates exist:
+- 配色
+- 明度结构
+- 产品位置
+- 产品视觉尺寸
+- 背景几何
+- 空间节奏
+- 光影关系
+- 视觉气质
 
-STOP and wait for explicit user selection.
+每个候选都应根据当前产品重新判断最适合的设计方向。
+
+如果独立判断后出现相近结果，这是允许的。
+
+不得为了制造差异而强行使用不合适的颜色或构图。
+
+## 候选差异主要来自
+
+- 产品位置
+- 产品视觉尺寸
+- 信息区与产品关系
+- 留白
+- 背景几何
+- 曲线与圆弧
+- Tonal Surface 组织方式
+- 空间层次
+- 光影关系
+- 整体视觉节奏
+
+配色不设差异配额。
+
+生成完 5 个独立候选后：
+
+STOP
+
+等待用户明确选择母版。
 
 ---
 
 # STATE 2 — WAIT_FOR_MASTER_SELECTION
 
-Lock a master only after an explicit selection such as:
+只在用户明确选择后锁定母版。
+
+例如：
 
 - “方案3”
 - “第三张作为母版”
 - “选第3个”
 - “方案3，就用这个”
 
-Then set:
+然后设置：
 
 - MASTER_SELECTED = selected original candidate
 - MASTER_APPROVED = true
 
-The selected ORIGINAL image becomes the sole production master.
+选中的原始候选图成为唯一 ORIGINAL MASTER。
 
-Do not blend rejected candidates.
+不要：
 
-If the user asks for another batch of five candidates, return to CREATE_MASTER_OPTIONS.
+- 混合其他候选
+- 根据选中方案重新生成一个“类似母版”
+- 用其他候选作为后续 SKU 来源
+
+如果用户要求重新生成 5 个候选，返回 CREATE_MASTER_OPTIONS。
 
 ---
 
 # STATE 3 — REPLACE_VARIANT
 
-Use when:
+适用于：
 
 - Image A = ORIGINAL MASTER
-- Image B = new same-product SKU PNG
+- Image B = 当前同款新 SKU 产品 PNG
 
-This is a locked-master replacement, not a poster redesign.
+这是“锁定母版后的产品替换”。
 
-Every variant must be generated directly from:
+不是重新设计海报。
+
+每个 SKU 都必须直接从：
 
 ORIGINAL MASTER + CURRENT SKU
 
-Never use a previously generated variant as the source for the next variant.
+生成。
 
-Correct:
+正确：
 
 - ORIGINAL MASTER + SKU 2
 - ORIGINAL MASTER + SKU 3
 - ORIGINAL MASTER + SKU 4
 
-Incorrect:
+错误：
 
 - MASTER → SKU 2 → SKU 3 → SKU 4
+
+禁止使用前一个 SKU 变体作为下一个 SKU 的来源。
 
 ---
 
 # STATE 4 — BUILD_SKU_SET
 
-Use when multiple same-product color SKU PNGs are provided.
+适用于一次上传多个同款不同颜色 SKU。
 
-Workflow:
+流程：
 
-1. identify the master SKU;
-2. generate five standalone master candidates for that SKU;
-3. stop;
-4. wait for explicit master selection;
-5. lock the selected ORIGINAL MASTER;
-6. generate all remaining SKUs directly from that ORIGINAL MASTER.
+1. 指定母版 SKU
+2. 仅使用母版 SKU 生成 5 个独立候选
+3. 停止
+4. 等待用户选择 ORIGINAL MASTER
+5. 锁定 ORIGINAL MASTER
+6. 其他 SKU 全部直接从 ORIGINAL MASTER 生成
 
-Never generate remaining SKUs before the master is selected.
-
----
-
-# Canvas Rule
-
-Every generated image must use:
-
-- strict aspect ratio: 3:4
-- target size: 1200 × 1600 px
-
-Applies to:
-
-- master candidates;
-- selected master;
-- variant replacements;
-- batch SKU outputs.
-
-Do not generate another aspect ratio and crop afterward.
+在用户选择正式母版之前，不得提前生成其他 SKU。
 
 ---
 
-# Protected Source Asset Rule
+# 画布规则
 
-Uploaded brand logos and product PNGs are protected source assets.
+所有输出必须严格：
 
-The design must adapt around these assets.
+- 比例：3:4
+- 目标尺寸：1200 × 1600 px
 
-Do not alter the assets to make them fit the design.
+适用于：
 
----
+- 5 个母版候选
+- 正式母版
+- 单个 SKU 变体
+- 批量 SKU
 
-# Atomic Brand Logo Rule
-
-Treat the uploaded logo as one indivisible graphic.
-
-Everything visible inside the uploaded logo is protected logo artwork, including:
-
-- symbol;
-- emblem;
-- wordmark;
-- letters;
-- brand-name text;
-- spacing;
-- internal alignment;
-- colors;
-- transparency;
-- antialiased edges.
-
-Text embedded inside the logo is NOT editable text.
-
-Do not:
-
-- OCR the wordmark and re-typeset it;
-- regenerate logo letters;
-- replace the wordmark with ordinary text;
-- normalize or “correct” typography;
-- alter character shapes;
-- alter letter spacing or weight;
-- change symbol-to-wordmark spacing;
-- separate symbol and wordmark;
-- rebuild the logo from generated elements.
-
-Allowed complete-logo operations only:
-
-- proportional scaling;
-- positioning.
+不得先生成其他比例再裁切。
 
 ---
 
-# Logo Placement Rule
+# 上传素材保护
 
-Logo may appear only in the upper-left safe area.
+上传的品牌 Logo 和产品 PNG 是受保护源素材。
 
-For a 1200 × 1600 px canvas:
+设计必须适配素材。
 
-- minimum left clearance: 60 px
-- minimum top clearance: 80 px
-
-The complete logo must remain inside the canvas.
-
-Logo position is not a candidate-composition variable.
+不得为了构图方便而修改源素材本身。
 
 ---
 
-# Logo Size Rule
+# 品牌 Logo 原子化规则
 
-Maximum logo bounding box:
+上传 Logo 必须被视为一个不可拆分的完整图形。
 
-- width: 220 px
-- height: 100 px
+Logo 内所有内容均属于 Logo 本体，包括：
 
-Preserve the original aspect ratio.
+- 图形标
+- Symbol
+- Emblem
+- Wordmark
+- 品牌名称文字
+- 字母
+- 字形
+- 字距
+- 字重
+- 图形与文字之间的间距
+- 内部比例
+- 内部对齐
+- 颜色
+- 透明区域
+- 抗锯齿边缘
 
-Do not stretch, compress, crop, or distort.
+Logo 内嵌文字不是可编辑文字。
 
-Across master candidates:
+禁止：
 
-- keep logo visual size consistent.
+- OCR 后重新打字
+- 重新生成 Wordmark
+- 用普通文字替代 Logo 内文字
+- 修改字形
+- 修改字距
+- 修改字重
+- 拆分图形标与文字标
+- 重建 Logo
+- 使用相似 Logo 替代
 
-After master selection:
+只允许：
 
-- logo position is locked;
-- logo width is locked;
-- logo height is locked.
-
----
-
-# Information Zone Rule
-
-The logo, product name, and version text form one stable information zone.
-
-## Position
-
-- logo remains in the upper-left safe area;
-- product name appears below the logo;
-- product name and version text must stay in the upper half of the canvas;
-- the text block must not drift into the middle or lower half;
-- center and lower areas should remain primarily available for product presentation.
-
-## Alignment
-
-Preferred alignment:
-
-- product-name left edge aligns with the logo left edge whenever visually appropriate;
-- version-text left edge aligns with the product-name left edge;
-- logo, title, and version form one clear visual left axis.
-
-If the logo shape makes mechanical alignment visually awkward, preserve the same visual left axis and balance without moving the logo away from the upper-left safe area.
-
-## Spacing
-
-Logo-to-title spacing must:
-
-- provide clear breathing room;
-- not feel cramped;
-- not feel disconnected.
-
-Title-to-version spacing must:
-
-- remain visually stable;
-- maintain clear hierarchy;
-- keep both lines as one information group.
-
-The information zone must not invade the product's core display area.
-
-## Long Titles
-
-For long product names:
-
-- prefer one line;
-- allow at most two lines;
-- do not break words internally;
-- moderately reduce title size if needed;
-- keep the whole information zone in the upper half;
-- do not push the text block downward into the image center.
-
-## Master Lock
-
-After master selection, lock:
-
-- title position;
-- version position;
-- logo/title alignment relationship;
-- logo-to-title spacing;
-- title-to-version spacing;
-- complete information-zone geometry.
-
-All same-product variants must preserve these relationships.
+- 整体等比例缩放
+- 整体定位
 
 ---
 
-# Product Protection Rule
+# Logo 位置规则
 
-The uploaded product PNG is the authoritative visual source.
+Logo 只能位于左上安全区。
 
-Do not:
+1200 × 1600 px 画布：
 
-- redraw the product;
-- approximate the product with a similar model;
-- recolor the product;
-- alter the silhouette;
-- alter body/case/strap/earbud/charging-case shapes;
-- alter buttons, crown, ports, holes, or hardware details;
-- alter screen proportions;
-- alter materials or finish;
-- add nonexistent hardware;
-- remove real details.
+- 距左边缘至少 60 px
+- 距上边缘至少 80 px
+- Logo 必须完整位于画布内
 
-Allowed operations:
-
-- proportional scaling;
-- positioning;
-- composition;
-- natural contact shadow;
-- restrained ambient shadow;
-- subtle separation light.
+Logo 位置不是候选构图变量。
 
 ---
 
-# Visible Content Rule
+# Logo 尺寸规则
 
-Allowed visible content:
+Logo 最大包围框：
 
-1. uploaded brand logo;
-2. exact product name;
-3. exact version text;
-4. uploaded product PNG;
-5. MD3 background geometry;
-6. natural lighting and shadows.
+- 最大宽度：220 px
+- 最大高度：100 px
 
-Text naturally present on the uploaded product may remain.
+必须保持原始宽高比。
 
-Do not add:
+禁止：
 
-- feature descriptions;
-- specifications;
-- promotions;
-- discount labels;
-- certifications;
-- extra logos;
-- extra icons;
-- badges;
-- decorative English words;
-- marketplace stickers;
-- invented interface elements.
+- 拉伸
+- 压缩
+- 裁切
+- 变形
 
----
+5 个候选中：
 
-# Typography Rule
+- Logo 视觉尺寸保持一致
 
-Product name:
+母版选定后：
 
-- modern neutral sans-serif;
-- Google Sans / Roboto / Material-like visual language;
-- Bold 700;
-- prominent and readable;
-- prefer one line;
-- maximum two lines;
-- do not shrink excessively.
-
-Version:
-
-- Medium 500;
-- clearly readable;
-- visually secondary to the product name;
-- not tiny;
-- not faint fine print.
+- Logo 位置锁定
+- Logo 宽度锁定
+- Logo 高度锁定
 
 ---
 
-# Lively MD3 Visual Direction
+# 信息区规则
 
-Use Material Design 3 as a visual language, not as an Android app interface.
+品牌 Logo、产品名称、版本文字组成稳定的信息区。
 
-Target mood:
+## 位置
 
-- bright;
-- light;
-- lively;
-- youthful;
-- clean;
-- breathable;
-- modern;
-- e-commerce friendly;
-- premium without feeling heavy.
+- Logo 位于左上安全区
+- 产品名称位于 Logo 下方
+- 产品名称和版本文字必须位于主图上半部分
+- 不得下沉到画面中部或下半部分
+- 主图中部和下部主要用于产品展示
 
-Use:
+## 对齐
 
-- rounded geometry;
-- curves and partial circles;
-- tonal surfaces;
-- soft gradients;
-- restrained depth;
-- subtle elevation;
-- generous whitespace;
-- clear hierarchy.
+优先：
 
-Avoid:
+- 产品名称左起点与 Logo 左边缘形成同一视觉左轴
+- 版本文字左起点与产品名称左起点对齐
 
-- oppressive heavy-dark compositions;
-- dated commercial poster mood;
-- visually bulky pedestal scenes;
-- theatrical black-studio treatment;
-- excessive neon;
-- aggressive bloom;
-- movie fog;
-- lens flare;
-- unrealistic effects that alter the product.
+如果 Logo 形态导致机械对齐不自然：
 
----
+允许轻微视觉补偿。
 
-# Adaptive Color System
+但不得破坏整体左轴关系，也不得移动 Logo 离开左上安全区。
 
-Background color must be determined dynamically from the current product and the current composition.
+## 间距
 
-There is no fixed default hue family.
+Logo → 产品名称：
 
-Do not use a preset background-color table.
+- 必须有明显但合理的垂直留白
+- 不得拥挤
+- 不得远到失去信息组关系
 
-Every new product and every new master candidate should independently evaluate its own palette.
+产品名称 → 版本文字：
 
-Evaluate:
+- 保持稳定
+- 保持清晰层级
+- 仍然属于同一信息组
 
-- product luminance;
-- product saturation;
-- product material;
-- visual weight;
-- local accent colors visible on the product;
-- brand visual presence;
-- product/background separation;
-- current composition;
-- overall MD3 tonal balance;
-- marketplace thumbnail readability.
+文字区不得侵入产品核心展示区。
 
-Core principle:
+## 长标题
 
-**Use luminance and tonal separation to keep the product readable; allow hue to remain adaptive and free.**
+产品名称较长时：
 
-Do not mechanically derive a background hue from product color.
+- 优先一行
+- 必要时最多两行
+- 不得从单词中间断开
+- 可适度缩小字号
+- 整个信息区仍必须保持在上半部分
+- 不得为了容纳长标题把信息区推到画面中部
 
-Do not mechanically repeat a palette just because it worked for a previous product, candidate, or SKU.
+## 母版锁定
+
+选定 ORIGINAL MASTER 后锁定：
+
+- 标题位置
+- 版本位置
+- Logo / 标题左轴关系
+- Logo → 标题间距
+- 标题 → 版本间距
+- 整个信息区几何结构
+
+所有 SKU 必须保持一致。
 
 ---
 
-# Dark Product Rule
+# 产品保护规则
 
-If the product has low overall luminance:
+上传的产品 PNG 是产品真实外观的唯一权威来源。
 
-Prioritize enough luminance separation between the product and the background so the silhouette remains clear at marketplace-thumbnail size.
+禁止：
 
-Usually avoid making most of the canvas as dark as the product.
+- 重新绘制产品
+- 用相似型号替代
+- 修改产品颜色
+- 修改轮廓
+- 修改结构
+- 修改机身 / 表壳 / 表带 / 耳机 / 充电盒形状
+- 修改按钮 / 表冠 / 孔位 / 接口
+- 修改屏幕比例
+- 修改材质
+- 添加不存在的硬件
+- 删除真实细节
 
-However:
+只允许：
 
-- do not prescribe a specific background hue;
-- do not force a predefined cool, warm, neutral, or pastel family;
-- let the model choose the most suitable MD3 tonal palette for the current product and composition.
-
-The requirement is clear separation and a lively commercial result, not a specific color.
-
----
-
-# Light Product Rule
-
-If the product has high overall luminance:
-
-Ensure enough separation so the product does not visually disappear into the background.
-
-Do not prescribe a specific background hue.
-
-Let the model choose the most suitable MD3 tonal palette for the current product and composition.
-
-The requirement is clear silhouette separation, not a preset color family.
+- 等比例缩放
+- 调整位置
+- 构图摆放
+- 自然接触阴影
+- 柔和环境阴影
+- 必要的轻微轮廓分离光
 
 ---
 
-# Colored Product Rule
+# 画面内容规则
 
-For products with a clearly visible color:
+只允许出现：
 
-Do not mechanically match the product hue.
+1. 上传品牌 Logo
+2. 精确产品名称
+3. 精确版本文字
+4. 上传产品 PNG
+5. MD3 背景设计元素
+6. 自然光影
 
-Do not mechanically apply a complementary hue.
+产品本身真实存在的屏幕文字或印刷内容可以保留。
 
-Choose the background palette freely according to:
+禁止新增：
 
-- product appearance;
-- material;
-- visual weight;
-- current composition;
-- MD3 tonal balance;
-- thumbnail clarity.
-
-Hard requirements only:
-
-- product and background remain clearly separated;
-- the overall image remains modern, light, lively, and e-commerce friendly.
-
-No fixed background-color list is used.
-
----
-
-# Marketplace Thumbnail Rule
-
-Design for product-card browsing first, not only standalone poster aesthetics.
-
-At thumbnail size:
-
-- product should be immediately recognizable;
-- title should remain readable;
-- product/background separation should remain clear;
-- overall image should feel clean and clickable;
-- the design should work naturally on a bright marketplace interface.
-
-Do not sacrifice thumbnail clarity merely to create a dramatic poster effect.
+- 功能卖点
+- 参数
+- 促销信息
+- 折扣标签
+- 认证
+- 额外 Logo
+- 额外图标
+- 徽章
+- 装饰性英文
+- 平台贴纸
+- 虚构 UI 元素
 
 ---
 
-# Pedestal / Platform Rule
+# 文字规则
 
-A pedestal or platform is optional.
+产品名称：
 
-If used:
+- 现代中性无衬线视觉
+- Material / Google Sans / Roboto-like
+- Bold 700
+- 清晰醒目
+- 优先一行
+- 最多两行
+- 不得过度缩小
 
-- keep it visually light;
-- keep it subordinate to the product;
-- avoid excessive thickness;
-- avoid making it the visual weight center;
-- use it only when it improves the composition.
+版本文字：
 
-The design may omit a pedestal entirely.
-
----
-
-# Variant Color Adaptation
-
-In REPLACE_VARIANT:
-
-Keep the ORIGINAL MASTER geometry and layout locked.
-
-The following may adapt to the current SKU:
-
-- background main color;
-- MD3 geometry fill colors;
-- tonal-surface colors;
-- shadow intensity;
-- subtle separation light;
-- text light/dark value only when contrast requires it.
-
-Re-evaluate the palette for the CURRENT SKU.
-
-Do not inherit the previous SKU palette as a preference.
-
-Do not force all SKUs to share one background hue.
-
-The goal is:
-
-**same master structure, independently optimized MD3 palette for each SKU.**
+- Medium 500
+- 清晰可读
+- 视觉层级低于产品名称
+- 不得过小
+- 不得像脚注
 
 ---
 
-# Variant Layout Lock
+# MD3 设计语言
 
-In REPLACE_VARIANT strictly preserve from Image A:
+使用 Material Design 3 作为设计语言参考。
 
-- logo artwork;
-- logo size;
-- logo position;
-- product-name content;
-- product-name size;
-- product-name position;
-- version content;
-- version size;
-- version position;
-- title/version spacing;
-- information-zone alignment;
-- product display region;
-- product visual-size logic;
-- product visual center;
-- background geometry shape;
-- background geometry size;
-- background geometry position;
-- overall composition;
-- primary lighting direction.
+不是固定模板。
 
-Do not redesign the poster.
+不要要求每张图都同时出现：
+
+- 圆弧
+- 圆形
+- 渐变
+- 底座
+- Tonal Surface
+- 某种固定几何组合
+
+模型应根据当前产品和当前构图，自由选择适合的 MD3 设计元素。
+
+MD3 应体现为：
+
+- 清晰层级
+- 合理留白
+- 柔和空间关系
+- Tonal 组织
+- 现代几何语言
+- 适度层次
+
+不要做成 Android App UI。
+
+---
+
+# 视觉气质自由规则
+
+本 Skill 不预设固定视觉情绪。
+
+不要求所有图片必须是：
+
+- 某一种固定明度
+- 某一种固定冷暖
+- 某一种固定情绪
+- 某一种固定视觉性格
+
+具体视觉气质由：
+
+- 当前产品
+- 产品材质
+- 产品颜色
+- 当前构图
+- 品牌视觉
+- 电商展示需求
+
+共同决定。
+
+只要求最终结果：
+
+- 产品清晰
+- 层级合理
+- 构图完整
+- 符合 MD3 设计语言
+- 适合电商商品卡片展示
+
+---
+
+# 自适应配色系统
+
+不设置固定背景色。
+
+不设置“产品颜色 → 背景颜色”对照表。
+
+不设置候选色彩家族配额。
+
+每个新产品、每个母版候选、每个 SKU 都根据当前实际情况重新评估配色。
+
+综合考虑：
+
+- 产品整体明度
+- 产品饱和度
+- 产品材质
+- 产品视觉重量
+- 产品局部强调色
+- 品牌视觉
+- 产品与背景分离
+- 当前构图
+- MD3 Tonal Balance
+- 电商缩略图识别度
+
+核心原则：
+
+**通过明度、色调层级和轮廓分离保证产品清晰；具体色相自由。**
+
+不要机械沿用：
+
+- 前一个候选的背景色
+- 前一个 SKU 的背景色
+- 过去其他产品的背景色
+
+也不要为了“看起来不同”而强行改变色相。
+
+---
+
+# 深色产品
+
+如果产品整体明度较低：
+
+重点只检查：
+
+- 产品轮廓是否清楚
+- 产品与背景是否具有足够分离
+- 缩略图中是否容易识别
+
+通常避免让大部分背景与产品拥有过于接近的深暗明度。
+
+但：
+
+- 不限定具体背景色相
+- 不限定冷暖
+- 不限定色彩家族
+
+由模型自由判断。
+
+---
+
+# 浅色产品
+
+如果产品整体明度较高：
+
+重点检查产品是否会融入背景。
+
+必须保持足够：
+
+- 轮廓分离
+- 明度分离
+- Tonal 分层
+
+但不限定具体背景色相。
+
+---
+
+# 彩色产品
+
+如果产品具有明显颜色：
+
+不要机械：
+
+- 使用同色背景
+- 使用互补色背景
+- 根据颜色名称套用固定方案
+
+模型根据当前产品和构图自由判断背景配色。
+
+唯一硬性要求：
+
+- 产品与背景清晰分离
+- 商品缩略图中产品容易识别
+
+不设置固定背景颜色列表。
+
+---
+
+# 电商缩略图规则
+
+设计优先考虑 Ozon 等电商列表页商品卡片。
+
+缩略图状态下：
+
+- 产品应容易识别
+- 标题应保持可读
+- 产品与背景应清晰分离
+- 信息层级应明确
+- 构图应完整
+
+不要为了独立海报效果牺牲商品卡片中的识别度。
+
+---
+
+# 底座 / 平台
+
+底座不是必需元素。
+
+如果使用：
+
+- 必须服务产品展示
+- 不得喧宾夺主
+- 不得成为主要视觉重量中心
+
+如果不使用底座构图更好，可以完全取消。
+
+---
+
+# SKU 自适应配色
+
+REPLACE_VARIANT 时：
+
+锁定：
+
+- ORIGINAL MASTER 构图
+- Logo
+- 信息区
+- 产品展示区域
+- 产品视觉尺寸逻辑
+- 产品视觉中心
+- 背景几何形状
+- 背景几何大小
+- 背景几何位置
+
+允许当前 SKU 自适应：
+
+- 背景主色
+- MD3 几何填充色
+- Tonal Surface 配色
+- 阴影强弱
+- 必要的轻微轮廓分离光
+- 文字明暗（仅在可读性需要时）
+
+每个 SKU 都重新评估自己的配色。
+
+不要继承前一个 SKU 的色相偏好。
+
+目标：
+
+**锁定结构，自适应配色。**
+
+---
+
+# REPLACE_VARIANT 版式锁定
+
+严格保留 Image A：
+
+- Logo 样式
+- Logo 大小
+- Logo 位置
+- 产品名称内容
+- 产品名称大小
+- 产品名称位置
+- 版本文字内容
+- 版本文字大小
+- 版本文字位置
+- 信息区对齐
+- 信息区间距
+- 产品展示区域
+- 产品视觉尺寸逻辑
+- 产品视觉中心
+- 背景几何形状
+- 背景几何大小
+- 背景几何位置
+- 整体构图
+- 基本光源方向
+
+不得重新设计海报。
 
 ---
 
 # QA
 
-For every output verify:
+每张图检查：
 
-- strict 3:4 ratio;
-- target 1200 × 1600;
-- logo remains faithful to the uploaded logo;
-- logo wordmark was not re-typeset;
-- logo remains in upper-left safe area;
-- logo stays within the maximum bounding box;
-- product remains faithful to uploaded PNG;
-- product was not redesigned or recolored;
-- product name is exact;
-- version text is exact;
-- no extra text appears;
-- no extra icons or badges appear;
-- product name and version remain in the upper half;
-- title remains below the logo;
-- preferred left-alignment relationship is preserved;
-- text does not invade the product's core display area;
-- overall mood remains lively, modern, light, and marketplace friendly;
-- product/background separation is clear at thumbnail size;
-- background hue was selected adaptively rather than from a fixed preset.
+- 严格 3:4
+- 目标尺寸 1200 × 1600
+- Logo 与上传素材一致
+- Logo 内文字没有被重新排版
+- Logo 位于左上安全区
+- Logo 尺寸合规
+- 产品与上传 PNG 一致
+- 产品未被重绘或改色
+- 产品名称精确
+- 版本文字精确
+- 产品名称和版本位于上半部分
+- 信息区对齐与间距合理
+- 文字区未侵入产品核心展示区
+- 无额外文字、图标或徽章
+- 产品在缩略图中容易识别
+- 产品与背景分离清晰
+- MD3 是设计语言而不是固定模板
+- 配色不是来自固定颜色表
+- 视觉气质不是来自固定情绪模板
 
-For master candidates additionally verify:
+母版候选额外检查：
 
-- each candidate is a separate standalone image;
-- no collage or grid is used;
-- candidates differ meaningfully in composition;
-- color was independently evaluated for each candidate;
-- candidate palettes were not forced to differ merely for novelty.
+- 每个候选是独立图片
+- 没有拼版
+- 每个候选从原始输入重新独立设计
+- 没有把前一个候选当作设计起点
+- 差异不是仅靠换色产生
 
-For variants additionally verify:
+变体额外检查：
 
-- ORIGINAL MASTER is the source;
-- logo did not move or resize;
-- title/version did not move or resize;
-- information-zone geometry did not change;
-- product center and visual-size logic remain consistent;
-- background geometry did not move, resize, or change shape;
-- palette was re-evaluated for the current SKU rather than inherited from a previous variant.
+- 使用 ORIGINAL MASTER
+- Logo 未移动或缩放
+- 信息区未移动或重排
+- 产品视觉中心与尺寸逻辑保持一致
+- 背景几何形状、大小、位置未改变
+- 当前 SKU 配色被独立重新评估
