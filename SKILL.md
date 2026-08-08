@@ -5,21 +5,37 @@ description: Create 3:4 e-commerce product main images in Google Classic Materia
 
 # MD3 Product Image
 
-## Use the visual language
+## Pass the visual style unchanged
 
+Pass the Classic MD3 style instruction to the image generator unchanged:
+
+```text
 Use Google Classic Material Design 3 (MD3) as the sole visual style.
 
 Do not use Material 3 Expressive.
 
-Do not impose a fixed MD3 template. Independently determine the composition,
-palette, geometry, spatial relationships, lighting, and visual mood for the
-current product.
+Do not interpret Classic MD3 as a realistic room, studio set,
+architectural environment, or physical exhibition stage.
+```
+
+Do not expand it into prescribed colors, shapes, surfaces, elevation,
+lighting, materials, platforms, or scene descriptions.
+
+Add task facts and non-style constraints outside the block. Do not paraphrase
+or supplement the block with a fixed MD3 template or prose that translates
+Classic MD3 into visual attributes. Let the image generator independently
+determine composition, palette, geometry, spatial relationships, lighting, and
+visual mood for the current product.
 
 ## Follow the execution loop
 
 Use this loop for every output:
 
 `PREFLIGHT -> GENERATE -> VALIDATE`
+
+During `PREFLIGHT`, inspect the outbound generation prompt. If the Classic MD3
+style block was changed, paraphrased, or expanded, correct the prompt before
+calling the image generator.
 
 Generate the complete image in one pass from the original inputs. Do not repair
 a failed hard constraint by locally repainting, inpainting, or regenerating part
@@ -109,19 +125,37 @@ visible rectangular or square patch around it.
 Use the visible artwork bounds, not the transparent PNG canvas bounds, when
 judging placement and alignment.
 
+Enforce this visual hierarchy among the three main elements:
+
+1. product: first
+2. product name: second
+3. logo: third
+
+The logo must never become the first visual focus. This is a hard failure
+regardless of its pixel dimensions.
+
 Keep the logo in a comfortable upper-left safe area. For a 1200 x 1600 canvas,
 use these approximate visual references:
 
 - left safe margin: about 60 px or more
 - top safe margin: about 80 px or more
-- preferred maximum visible size: about 220 x 100 px
+- preferred visible height: 72-96 px
 
-These are visual guidelines, not pixel-perfect validation targets. Do not
-regenerate an otherwise valid image because of a minor numerical deviation.
+Use these hard maximums for the logo's visible artwork bounds:
+
+- visible height: 120 px
+- visible width: 200 px
+
+The safe margins and preferred height are visual guidelines, not pixel-perfect
+validation targets. The maximum height and width are mandatory.
 
 Keep the logo clearly recognizable at normal viewing size. It must not feel
-disproportionately small, overpower the information group, touch or visibly
-crowd an edge, or be cropped.
+disproportionately small, outrank the product name, touch or visibly crowd an
+edge, or be cropped.
+
+Keep the logo flat and source-faithful. Do not let scene lighting affect it,
+add a gradient, or apply any three-dimensional treatment. Preserve any such
+property only when it is already intrinsic to the supplied logo source.
 
 During master exploration, let logo scale adapt naturally to each independent
 composition. After the user selects the `ORIGINAL MASTER`, lock the logo's
@@ -225,10 +259,18 @@ Treat these as hard failures:
 - output count is not exactly one
 - final canvas is not exactly 1200 x 1600 portrait 3:4 or was cropped from another ratio
 - logo or product is recreated, altered, distorted, substituted, or cropped
-- logo is visibly unsafe, unrecognizably small, or overpoweringly large
+- product, product name, and logo do not read as first, second, and third in
+  the visual hierarchy
+- logo becomes the first visual focus, regardless of its pixel dimensions
+- logo visible artwork exceeds 120 px in height or 200 px in width
+- logo is visibly unsafe or unrecognizably small
+- scene lighting, an added gradient, or a three-dimensional treatment affects
+  the logo
 - a visible patch, backing rectangle, or local-repair seam appears around the logo
 - required text is incorrect, missing, invented, duplicated, or unreadable
 - forbidden text, icon, logo, badge, label, or UI appears
+- the result reads as a realistic room, studio set, architectural environment,
+  or physical exhibition stage
 - the information group lacks a clear visual left axis, leaves the upper half,
   or intrudes into the core product display area
 - the product is not clearly recognizable, prominent, and separated from the background
@@ -237,10 +279,11 @@ Treat these as hard failures:
 - an SKU variant derives from another generated variant
 - sibling SKU palettes are not clearly distinguishable at thumbnail size
 
-Treat approximate logo margins and size, optical alignment, spacing, font
-choice, font weight, and line breaking as visual judgments. Do not fail solely
-because a valid image differs by a few pixels while preserving the intended
-visual result.
+Treat approximate logo margins, the preferred 72-96 px logo height, optical
+alignment, spacing, font choice, font weight, and line breaking as visual
+judgments. The visual hierarchy and 120 px height and 200 px width maximums are
+not approximate. Do not fail solely because another guideline differs by a few
+pixels while preserving the intended visual result.
 
 If a hard failure occurs, invalidate the entire result and regenerate from the
 original inputs, subject to the three-attempt limit. For a master candidate,
