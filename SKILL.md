@@ -83,6 +83,11 @@ Use exactly one of these states:
 2. `WAIT_FOR_MASTER_SELECTION`
 3. `REPLACE_VARIANT`
 
+Allowed transitions are `CREATE_MASTER_OPTIONS -> WAIT_FOR_MASTER_SELECTION`,
+`WAIT_FOR_MASTER_SELECTION -> CREATE_MASTER_OPTIONS` for another candidate,
+`WAIT_FOR_MASTER_SELECTION -> REPLACE_VARIANT` after explicit selection, and
+`REPLACE_VARIANT -> REPLACE_VARIANT` with the exact same `ORIGINAL MASTER`.
+
 ### CREATE_MASTER_OPTIONS
 
 Generate one standalone candidate and stop. If the user requests another
@@ -90,27 +95,27 @@ candidate, begin again from the original product, original Logo, and exact
 text. Do not redesign a rejected candidate or automatically inherit its
 composition, palette, placement, geometry, lighting, or mood.
 
-Natural similarity is acceptable only when it follows from an independent
-design decision.
-
 ### WAIT_FOR_MASTER_SELECTION
 
-Wait for explicit selection. Only the selected final image becomes the
-`ORIGINAL MASTER`.
+Wait for explicit selection. Bind only the exact selected final asset as the
+immutable `ORIGINAL MASTER` for the current SKU set. Do not infer selection,
+blend rejected candidates, create a substitute master, or derive SKU variants
+from an unselected candidate.
 
-Do not blend rejected candidates, create a substitute master, or derive SKU
-variants from an unselected candidate.
+Only an explicit request to end this SKU set and start a new master-selection
+workflow may release this binding. A request for another SKU never does.
 
 ### REPLACE_VARIANT
 
-Use the `ORIGINAL MASTER` as the composition reference and the current SKU
-product reference as the authoritative product source. Treat this as locked
-master replacement, not a new poster design.
+Use the exact bound `ORIGINAL MASTER` as the composition reference and the
+current SKU product reference as the authoritative product source. Generate
+the SKU and its environmental response coherently; do not paste it onto the
+master. Derive every SKU directly from this `ORIGINAL MASTER` and `CURRENT SKU`,
+never from the latest output or another generated SKU.
 
-Generate the current SKU and its environmental response coherently. Do not
-paste the SKU onto the master. Derive every SKU directly from the
-`ORIGINAL MASTER` and `CURRENT SKU`; never derive one generated SKU from
-another.
+Every output is a `SKU_VARIANT`, never a candidate or master. Save it separately;
+never overwrite, rename, relabel, copy, or bind it as `ORIGINAL MASTER`. After
+delivery, remain in `REPLACE_VARIANT` with the same immutable master binding.
 
 Preserve the approved master:
 
@@ -282,6 +287,7 @@ Before generation, verify that the outbound prompt contains:
 - product/background silhouette separation
 - one product only
 - no generated information-group Logo or typography
+- in `REPLACE_VARIANT`, the exact bound `ORIGINAL MASTER`, not the latest output
 - for a visibly different SKU color, the mandatory SKU palette block and a
   thumbnail-visible background change rather than a product-only color change
 
@@ -477,6 +483,8 @@ Reject it if:
 - an SKU with a visibly different product color fails mandatory background
   palette adaptation
 - an SKU derives from another generated SKU
+- an SKU output is labeled, saved, treated, or rebound as `ORIGINAL MASTER`
+- the bound `ORIGINAL MASTER` changes or is overwritten after SKU generation
 
 If only the Logo or typography fails, preserve the accepted unified scene and
 rebuild the complete information group from the original Logo and exact text.
