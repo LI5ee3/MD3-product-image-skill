@@ -190,14 +190,12 @@ Keep the composition spacious, balanced, clean, and visually layered without
 becoming a realistic room, architectural interior, furniture scene, or physical
 exhibition environment.
 
-Derive the tonal palette from the current product. Do not prescribe specific
-colors. Use one neutral base and a small number of coordinated, low-saturation
-supporting tones.
-
-Place a contrasting tonal field behind the product so that its complete
-silhouette remains clearly separated from the environment. Do not allow a
-white, dark, or similarly colored product to blend into nearby background
-shapes.
+Derive the tonal palette from the current product without prescribing specific colors. Use one neutral base and a small number of coordinated, low-saturation supporting tones.
+Preserve the product's authentic source colors and use them as the fixed color reference; never recolor the product to create separation.
+Set only the hues and lightness of the platform and immediately adjacent background fields as needed for separation.
+Keep every major part of the complete product silhouette, including its lower body and platform contact area, clearly separated from every neighboring field at normal and thumbnail size.
+Do not rely on saturation differences or on a contrasting field behind only part of the product. When adjacent hues are similar, create a clear light-dark difference.
+The platform may coordinate with the palette, but its top surface must not merge with the product resting on it. Do not use outlines, halos, glows, or backing shapes to create separation.
 
 Render the product from Image 1 as the primary physical subject. Preserve its
 identity, geometry, proportions, construction, materials, controls, display
@@ -220,11 +218,10 @@ Use exactly one product. Do not generate additional products, SKU variants,
 floating copies, reflections resembling duplicate products, or incomplete
 product fragments.
 
-Reserve wide continuous negative space in the upper-left area for the later information group
-and its first one-line fit test. Size it from the rendered-title length before placing the product.
-
-The area must support the rendered title at a strong, clearly readable scale and extend far enough downward
-for the first title line to begin around 16%-20% of canvas height.
+Reserve wide continuous negative space in the upper-left area for the later information group and its first one-line fit test. Size it from the exact title's visible bounds at the preferred scale before placing the product or any internal background boundary.
+The area must support the rendered title at a strong, clearly readable scale and extend far enough downward for the first title line to begin around 16%-20% of canvas height.
+Treat the canvas edge, product edge, and every internal background-shape boundary as edges of the usable information area. Keep them outside the planned visible information group and its optical clearance.
+For the title's visible right edge, prefer a gap of approximately 0.75-1 visible title-letter height from the nearest internal boundary. This is visual guidance, but touching, crossing, or tangent contact is a hard fail.
 Do not pre-commit to two lines or create a narrow area that forces small text.
 
 Do not generate any card, panel, container, backing plane, pill, plaque,
@@ -288,8 +285,8 @@ Before generation, verify that the outbound prompt contains:
 - the complete unified-scene requirement
 - the no-background-only requirement
 - the unchanged Google Classic MD3 style block
-- upper-left continuous negative space without a panel
-- product/background silhouette separation
+- upper-left continuous negative space without a panel and with clearance from canvas, product, and internal background boundaries
+- product/platform/adjacent-background separation through hue and lightness
 - one product only
 - no generated information-group Logo or typography
 - the selected `TITLE_MODE` and exact `RENDERED_TITLE`
@@ -309,9 +306,10 @@ Before adding the Logo or typography, reject the scene if:
 - lighting, reflections, perspective, contact shadows, or ambient color do not
   match the environment
 - the product is not the clear first visual focus
-- the product blends into the background
+- any major part of the product, especially its lower body or platform contact area, blends into the platform or an adjacent background field at normal or thumbnail size
 - more than one product or a duplicate-like reflection appears
-- the upper-left continuous information area is too small for strong typography
+- the exact title at the required strength and optical clearance does not fit inside the upper-left continuous information area
+- a planned information-group visible bound touches, crosses, or forms a tangent with the canvas edge, product edge, or an internal background boundary
 - the information area contains a card, panel, frame, backing shape, or isolated
   color field
 - for an SKU whose dominant product color visibly differs from the master, the
@@ -340,6 +338,8 @@ Order the group vertically:
 Use the Logo's visible artwork left edge as the shared visual left axis. Ignore
 the transparent PNG canvas boundary. Keep the complete group in the upper half
 and outside the product's core display area.
+
+Measure actual visible Logo and glyph bounds, not nominal text boxes. Keep the complete group and its required optical clearance away from the canvas, product, and every internal background boundary reserved during scene generation.
 
 Treat the Logo and the title-plus-version text block as two coordinated units.
 Keep the Logo in its safe position. Prefer the first title line's visible top at
@@ -402,13 +402,10 @@ distorted, or disproportionately spaced lettering.
 
 ### Break the rendered title correctly
 
-Use no more than two lines. Always fit-test the exact `RENDERED_TITLE` as one line
-first at the preferred visible letter height. Measure it in the actual information
-area and validate hierarchy before creating separate text objects or a line break.
-
-Keep one line when it fits without shrinking, distortion, crowding, overlap, or loss of the second
-visual level. Use two lines only after that test fails; record which condition failed. Separate brand
-and remaining-name inputs are content fields, not permission to split by default.
+Use no more than two lines. Always fit-test the exact `RENDERED_TITLE` as one line first at the preferred visible letter height.
+Measure its actual visible bounds in the information area, including required boundary clearance, before creating separate text objects or a line break.
+Keep one line only when its visible bounds and clearance fit without shrinking, distortion, crowding, overlap, boundary contact, or loss of the second visual level.
+Use two lines only after that test fails; record which condition failed. Separate brand and remaining-name inputs are content fields, not permission to split by default.
 
 After a failed test:
 
@@ -479,8 +476,8 @@ Reject it if:
 - a two-line title violates its mode-specific line-break rule
 - the information group lacks one left axis, leaves the upper half, intrudes
   into the product area, or pins the title block too close to the Logo or top edge
-- the product is changed, cropped, duplicated, poorly integrated, or insufficiently
-  separated from the background
+- any visible Logo, title, or version bound touches, crosses, or forms a tangent with the canvas edge, product edge, or an internal background boundary
+- the product is changed, cropped, duplicated, poorly integrated, or insufficiently separated from the platform or adjacent background fields
 - forbidden visible content appears
 - a master candidate depends on a rejected candidate
 - an SKU changes locked master geometry, composition, or lighting structure
@@ -494,7 +491,7 @@ If only the Logo or typography fails, preserve the accepted unified scene and
 rebuild the complete information group from the original Logo and exact text.
 Do not locally repair part of a damaged Logo or word.
 
-If the required typography cannot fit, treat it as a scene failure and regenerate from the
-original inputs with more continuous space. Never shrink the title to preserve a failed composition.
+If the required typography and boundary clearance cannot fit, treat it as a scene failure and regenerate from the original inputs with more continuous space.
+Never move an individual glyph, shrink or condense the title, add an outline or backing shape, or preserve a failed composition.
 
 Deliver only after every applicable check passes.
