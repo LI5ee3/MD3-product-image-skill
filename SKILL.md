@@ -269,16 +269,25 @@ measured one-line title when it fits strongly. Only after a recorded failed test
 - `WORDMARK_BRAND`: wrap remaining name at a natural boundary; never repeat brand
 - `FULL_NAME`: brand alone on line 1, remaining name/model on line 2
 
+For a two-line title, measure the actual visible glyph bounds. Keep a clear gap
+between line 1's visible bottom and line 2's visible top, preferably about
+0.4-0.55 of one title line's visible letter height. Treat this as optical
+guidance, not fixed pixels. Reject touching, tangent, or compressed lines, or
+lines that lose clear separation in the `288 x 384` thumbnail.
+
 Use at most two lines; never split a word or turn a line into a subtitle. If it
 cannot fit strongly, regenerate more space rather than shrink or distort it.
 
 Place exact version text directly on the uninterrupted background inside
 `VERSION_TEXT_RECT`, using the same typography measured in preflight. Prefer
 visible height 2.75%-3.25% of canvas height and about 55%-65% of title height,
-bold weight, and a clearly separated title-to-version gap of about 1.0-1.4
-version-letter heights. Use one solid text color with sufficient contrast.
-Hierarchy must come from lower emphasis, not miniature type. Never abbreviate,
-outline, glow, shadow, or add a panel, bar, card, plaque, or backing.
+bold weight. Measure the title-to-version gap from the final title line's visible
+bottom to the version text's visible top. Use about 1.0-1.4 version-letter
+heights for a one-line title and a tighter 0.75-1.0 for a two-line title. Reject
+crowding or a version line that appears detached from the title block at full
+size or in the `288 x 384` thumbnail. Use one solid text color with sufficient
+contrast. Hierarchy must come from lower emphasis, not miniature type. Never
+abbreviate, outline, glow, shadow, or add a panel, bar, card, plaque, or backing.
 
 Mandatory order: product, title, Logo, version. After approval, lock all content,
 scale, position, spacing, and line breaks; only permitted SKU version-text
@@ -288,10 +297,10 @@ lightness adaptation may change.
 
 Validate the final 3:4 file at full size and an Ozon-like `288 x 384` thumbnail
 shown at 100% without zoom. Reject when exact hierarchy, source Logo, exact text,
-marketplace readability, planned rectangles, title mode, line breaking, shared
-axis, boundary clearance, direct version-text contrast, absence of information
-backings, product fidelity/separation, allowed content, master binding, or SKU
-adaptation fails.
+marketplace readability, planned rectangles, title mode, line breaking and
+spacing, title-to-version gap, shared axis, boundary clearance, direct
+version-text contrast, absence of information backings, product
+fidelity/separation, allowed content, master binding, or SKU adaptation fails.
 
 If only Logo or typography fails, preserve the accepted scene and rebuild the
 complete information group from original assets. If information clear-zone
