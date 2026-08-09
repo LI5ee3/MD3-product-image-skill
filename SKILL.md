@@ -53,16 +53,22 @@ Before the first generation call:
    bounds at the target title and version scales. Fit-test the title as one line
    first.
 6. At the planned Logo scale, measure its visible artwork. Calculate concrete
-   normalized `x/y/w/h` rectangles for `INFORMATION_GROUP_RECT`, `LOGO_RECT`,
-   `TITLE_RECT`, and `VERSION_TEXT_RECT`; use `INFORMATION_GROUP_RECT` as the
-   single `INFORMATION_CLEAR_ZONE` sent to scene generation. Keep the title's
-   first visible line around 16%-20% of canvas height with deliberate space
-   below the Logo.
-7. Size `VERSION_TEXT_RECT` from the measured version glyphs plus comfortable
-   clearance, reserving the required title-to-version gap before it; set it to
-   `NONE` when absent. Verify all internal rectangles fit inside the clear zone
-   without touching product or internal boundaries.
-8. Resolve every bracketed prompt field to concrete values before generation.
+   normalized `x/y/w/h` rectangles for `LOGO_RECT` and each `TITLE_LINE_RECT`.
+   Keep the title's first visible line around 16%-20% of canvas height with
+   deliberate space below the Logo.
+7. Size `VERSION_TEXT_RECT` from the measured version glyphs, reserving the
+   required title-to-version gap before it; set it to `NONE` when absent.
+8. Expand each visible rectangle only by small optical clearance, normally about
+   2%-3% of canvas width horizontally and 1%-2% of canvas height vertically.
+   Join successive rows with the narrowest left-aligned connector needed to keep
+   one continuous base field. Use this connected stepped set as
+   `INFORMATION_CLEAR_ZONES`. Never replace it with its outer bounding rectangle
+   or reserve unused upper-right space. Treat padding as visual guidance, not a
+   pixel-perfect failure threshold.
+9. Verify the content rectangles and connectors fit inside the canvas and avoid
+   the planned product region. Validate actual background boundaries after scene
+   generation.
+10. Resolve every bracketed prompt field to concrete values before generation.
    Keep exact future Logo, title, and version content out of the scene prompt;
    stop rather than send any unresolved template token.
 
@@ -123,13 +129,16 @@ Input role: [MASTER: Image 1 is authoritative product / SKU: ORIGINAL MASTER is
 composition reference and CURRENT SKU is authoritative product]. The original
 Logo PNG is excluded. Do not render or approximate information-group Logo or text.
 
-Future information is excluded from this call. Protect only this normalized
-canvas area; never infer or render its future content:
-- invisible information clear zone: [INFORMATION_CLEAR_ZONE as x/y/w/h]
+Future information is excluded from this call. Protect only these normalized
+canvas zones; never infer or render their future content:
+- invisible stepped information clear zones:
+  [INFORMATION_CLEAR_ZONES as a resolved labeled x/y/w/h list]
 
-The clear zone is uninterrupted base-field negative space, not a rectangle or
-scene object. Do not show its bounds or place any panel, bar, card, plaque,
-backing, edge, shadow, platform, or separate surface inside it.
+Together these zones form one compact connected stepped area on the same
+uninterrupted base field, not their outer bounding rectangle or a scene object.
+Do not show their bounds or place any panel, bar, card, plaque, backing, edge,
+shadow, platform, or separate surface inside them. Do not reserve unused space
+outside the zones merely because it falls inside their overall outer bounds.
 
 Generate the complete product scene now. Product, environment, platform,
 lighting, shadows, reflections, ambient response, perspective, scale, and
@@ -145,11 +154,21 @@ follows the primary light direction. Keep the depth restrained and graphic;
 do not turn these fields into walls, architecture, or a deep 3D set.
 
 Derive the palette from the current product without prescribing colors.
-Preserve authentic product colors. Adjust platform and adjacent-field hue and
-lightness so the entire silhouette, lower body, and contact area remain clear
-at normal and thumbnail size. When hues are similar, create a clear light-dark
-difference. Do not rely on saturation, partial contrast, outlines, halos,
-glows, or product backing. The platform top must not merge with the product.
+Preserve authentic product colors. Do not let the major panels and geometric
+fields collapse into one repeatedly used near-identical hue family. At thumbnail
+size, use a product-informed dominant palette family plus one clearly
+distinguishable controlled contrast hue family. Use the contrast family in one
+major field and, when useful, no more than one smaller supporting field. Keep its
+perceived saturation or chroma consistent with the scene's chromatic palette;
+for a neutral product, keep it restrained. Avoid a sudden vivid accent, and never
+let it become a focal point or disturb the mandatory hierarchy. Keep it outside
+the protected information zones.
+
+Adjust platform and adjacent-field hue and lightness so the entire silhouette,
+lower body, and contact area remain clear at normal and thumbnail size. When
+hues are similar, create a clear light-dark difference. Do not rely on
+saturation, partial contrast, outlines, halos, glows, or product backing. The
+platform top must not merge with the product.
 
 Render exactly one faithful product. Preserve identity, geometry, proportions,
 construction, materials, controls, display content, colors, and details. Do not
@@ -157,10 +176,12 @@ redesign, deform, simplify, recolor, replace, duplicate, or invent components.
 Match lighting, perspective, reflections, contact shadows, and ambient occlusion;
 reject floating or pasted-on appearance.
 
-Keep the declared information clear zone as wide continuous upper-left negative
-space. Do not let the product, a background boundary, or any visible information
-backing enter it. Treat canvas, product, and internal shape boundaries as
-usable-area edges. Touching, crossing, or tangent contact fails.
+Keep the declared information clear zones as compact connected upper-left
+negative space on one continuous base field. Do not let the product, a
+background boundary, or any visible information backing enter a protected
+content zone or connector. A background boundary may occupy unused space outside
+the zones, including unused space inside their overall outer bounds, when it
+does not visually fragment or reduce the legibility of the information group.
 
 Keep product first in focus, future title second, Logo third, and version fourth.
 Use clean high-key studio lighting from a large upper-front soft source, gentle
@@ -185,16 +206,19 @@ CURRENT SKU as the only authoritative product; do not show the master product.
 Do not lock master hues. When CURRENT SKU visibly differs in dominant color,
 re-derive the background base and secondary colors from CURRENT SKU. At least
 one large field and one secondary field must change visibly at thumbnail size;
-a product-only change does not count. Preserve separation from every adjacent field.
+a product-only change does not count. Re-establish the controlled contrast
+family instead of collapsing the adapted fields into one near-identical hue
+family. Preserve separation from every adjacent field.
 
 Lock version-text size, position, and typography. Its solid lightness may adapt
 only for legibility against the SKU-adaptive background; never add a backing.
 ```
 
 Before generation, confirm 3:4, unified scene, one faithful product, separation,
-visibly shallow 2.5D major fields, one resolved invisible information clear zone,
-no future Logo/text content or backing, and the unchanged style block. For an
-SKU, also confirm the exact bound master and palette rule.
+visibly shallow 2.5D major fields, controlled hue-family contrast with matched
+perceived saturation, one resolved connected stepped information clear area, no
+future Logo/text content or backing, and the unchanged style block. For an SKU,
+also confirm the exact bound master and palette rule.
 
 ## Retry without prompt expansion
 
@@ -223,20 +247,30 @@ Reject when any apply:
 - product is not the first focus
 - any major background panel or organic geometric field reads only as a flat
   fill or gradient, lacks visible shallow depth, or breaks the light direction
-- the information clear zone is interrupted, reveals a visible boundary or
-  backing, or cannot fit the planned information group with required clearance
+- major panels and fields collapse into one repeated near-identical hue family,
+  or the contrast family is excessively saturated, widely repeated, or becomes
+  a focal point that breaks the mandatory visual hierarchy
+- a protected information content zone or connector is interrupted, reveals a
+  visible boundary or backing, or cannot fit the planned information with
+  required clearance
 - an SKU violates the bound master, direct derivation, palette adaptation, or
   product separation
 - forbidden content appears
+
+A boundary outside every protected zone is not a failure merely because it lies
+inside their overall outer bounds. Reject only when it enters protected geometry
+or visibly fragments the information group at full or thumbnail size. Minor
+deviation in optional outer padding is not a hard failure when optical clearance
+and readability remain sound.
 
 ## Add the exact information group
 
 After scene acceptance, add only original Logo and exact typography in this
 vertical order: Logo, rendered title, version directly on the uninterrupted
 background. Use the Logo artwork's visible left edge as the shared text axis;
-ignore transparent PNG bounds. Compose within the planned internal rectangles,
-in the upper half and outside the product region and all boundaries. Never move
-the title upward, shrink it, or shift one element alone to rescue a failed scene;
+ignore transparent PNG bounds. Compose within the planned content rectangles,
+in the upper half, inside the stepped clear area, and outside the product region.
+Never move the title upward, shrink it, or shift one element alone to rescue a failed scene;
 regenerate the scene instead. Move title and version together; move Logo and the
 text unit together globally.
 
@@ -297,13 +331,14 @@ lightness adaptation may change.
 
 Validate the final 3:4 file at full size and an Ozon-like `288 x 384` thumbnail
 shown at 100% without zoom. Reject when exact hierarchy, source Logo, exact text,
-marketplace readability, planned rectangles, title mode, line breaking and
-spacing, title-to-version gap, shared axis, boundary clearance, direct
+marketplace readability, planned content rectangles and stepped clear zones,
+title mode, line breaking and spacing, title-to-version gap, shared axis,
+boundary clearance, direct
 version-text contrast, absence of information backings, product
 fidelity/separation, allowed content, master binding, or SKU adaptation fails.
 
 If only Logo or typography fails, preserve the accepted scene and rebuild the
-complete information group from original assets. If information clear-zone
-geometry, placement, or clearance fails, regenerate the complete scene. Never
-repair an individual glyph or Logo fragment. Deliver only after every applicable
+complete information group from original assets. If protected content-zone or
+connector geometry, placement, or clearance fails, regenerate the complete
+scene. Never repair an individual glyph or Logo fragment. Deliver only after every applicable
 check passes.
