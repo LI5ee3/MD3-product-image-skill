@@ -19,8 +19,15 @@ For a master candidate, require:
 Confirm that the brand followed by the remaining product-name text preserves the
 complete product name exactly. Never render placeholder labels or brackets.
 
-For an SKU variant, also require the user-approved `ORIGINAL MASTER` and the
-current SKU product reference.
+Before prompting, inspect the Logo's visible artwork and set one `TITLE_MODE`:
+
+- `WORDMARK_BRAND`: only when the Logo clearly spells the same complete brand name at its planned final size, regardless of case or styling, and contains no product-name words
+- `FULL_NAME`: for a symbol, abbreviation, unreadable or ambiguous wordmark, any uncertain case, or an explicit requirement to repeat the brand as text
+
+Set `RENDERED_TITLE` to the remaining product name in `WORDMARK_BRAND`, otherwise to the complete product name.
+Treat Logo plus title as the complete product identity; never repeat the brand in `WORDMARK_BRAND`. Lock both values after master approval.
+
+For an SKU variant, also require the user-approved `ORIGINAL MASTER` and current SKU product reference.
 
 ## Run generation preflight
 
@@ -120,7 +127,7 @@ delivery, remain in `REPLACE_VARIANT` with the same immutable master binding.
 Preserve the approved master:
 
 - Logo artwork, visible scale, and position
-- product-name and version typography
+- title mode, rendered-title and version typography
 - information-group geometry
 - product display region and visual-scale logic
 - background structure and geometry
@@ -158,10 +165,10 @@ The original Logo PNG is intentionally excluded from this scene-generation
 call. Do not render or approximate the information-group Logo; the exact source
 Logo will be added after the unified scene passes validation.
 
-The later exact information text is:
-- Complete product name: "[FULL PRODUCT NAME]"
-- Brand: "[BRAND]"
-- Remaining product name or model: "[PRODUCT NAME OR MODEL WITHOUT BRAND]"
+The exact product identity and later information text are:
+- Complete product identity: "[FULL PRODUCT NAME]"
+- Rendered product title: "[RENDERED TITLE]"
+- Title mode: "[WORDMARK_BRAND or FULL_NAME]"
 - Version text: "[VERSION TEXT]"
 
 Generate the complete unified product scene now. The first generated image must
@@ -213,21 +220,18 @@ Use exactly one product. Do not generate additional products, SKU variants,
 floating copies, reflections resembling duplicate products, or incomplete
 product fragments.
 
-Reserve comfortable continuous negative space in the upper-left area for the
-later information group. Determine its required size from the actual complete
-product-name length before finalizing product placement.
+Reserve wide continuous negative space in the upper-left area for the later information group
+and its first one-line fit test. Size it from the rendered-title length before placing the product.
 
-The reserved area must support the complete product name at a strong, clearly
-readable scale. Do not create a narrow information area that would force the
-title to become small.
+The area must support the rendered title at a strong, clearly readable scale.
+Do not pre-commit to two lines or create a narrow area that forces small text.
 
 Do not generate any card, panel, container, backing plane, pill, plaque,
 rectangle, border, frame, isolated color field, or local repair area behind the
 information group.
 
-Keep the product as the first visual focus. Reserve enough space for the
-complete product name to become the second visual focus, followed by the Logo
-and version text.
+Keep the product as the first visual focus. Reserve enough space for the rendered product title
+to become the second visual focus, followed by the Logo and version text.
 
 Use clean high-key studio lighting from a large upper-front soft source, gentle
 fill light, restrained separation light, soft natural contact shadows, and
@@ -287,6 +291,7 @@ Before generation, verify that the outbound prompt contains:
 - product/background silhouette separation
 - one product only
 - no generated information-group Logo or typography
+- the selected `TITLE_MODE` and exact `RENDERED_TITLE`
 - in `REPLACE_VARIANT`, the exact bound `ORIGINAL MASTER`, not the latest output
 - for a visibly different SKU color, the mandatory SKU palette block and a
   thumbnail-visible background change rather than a product-only color change
@@ -328,7 +333,7 @@ the continuous upper-left negative space.
 Order the group vertically:
 
 1. Logo
-2. complete product name
+2. rendered product title
 3. version text, when supplied
 
 Use the Logo's visible artwork left edge as the shared visual left axis. Ignore
@@ -343,13 +348,13 @@ while leaving the text behind.
 The mandatory viewing order is:
 
 1. product
-2. complete product name
+2. rendered product title
 3. Logo
 4. version text
 
-The order must remain obvious at normal and thumbnail size. The complete
-product name must attract attention before the Logo. A Logo within its suggested
-size range still fails if it becomes more prominent than the product name.
+The order must remain obvious at normal and thumbnail size. The rendered title
+must attract attention before the Logo. A correctly sized Logo still fails if
+it becomes more prominent than the title.
 
 ## Protect the Logo
 
@@ -366,63 +371,58 @@ gradient, three-dimensional treatment, scene color contamination, or local
 repair seam. Environmental lighting must not affect the Logo. Preserve an
 effect only when it is intrinsic to the supplied source.
 
-Do not crop, crowd an edge, make the Logo unrecognizably small, or use its
-transparent canvas as the measurement boundary.
+Do not crop, crowd an edge, make the Logo unrecognizably small, or measure its transparent canvas.
+Size from visible artwork bounds on both axes, never height alone. Apply these rules:
 
-Use these visual recommendations:
-
-- visible Logo height: 4.5%-6% of canvas height
+- preferred visible height: 4.5%-6% of canvas height when width stays compliant
+- visible width: no more than 30% of canvas width; exceeding this is a hard fail
 - left safe margin: approximately 5% of canvas width or more
 - top safe margin: approximately 5% of canvas height or more
 
-These are not pixel-perfect failure thresholds. Minor deviation alone is not a
-failure when the Logo remains recognizable and correctly occupies the third
-visual level.
+For an extra-wide wordmark, the width cap and third-level hierarchy override the height recommendation.
+Preserve proportions and allow a recognizable height below 4.5%; passing the height range never excuses excessive width or prominence.
 
 During independent master exploration, let Logo scale adapt naturally. After
 selection, lock the Logo artwork, visible scale, and position for every SKU.
 
 ## Set typography by hierarchy
 
-Render the supplied complete product name and version text exactly. Preserve
-all characters, capitalization, punctuation, spacing, language, and word order.
-Do not translate, rewrite, abbreviate, invent, or duplicate text.
+Render the exact `RENDERED_TITLE` and version text. Preserve all characters,
+capitalization, punctuation, spacing, language, and word order. Do not translate,
+rewrite, abbreviate, invent, or duplicate text.
 
 Use clean, restrained Google Classic MD3 sans-serif typography with enough
 weight for clear recognition. Avoid thin, light, condensed, stretched,
 distorted, or disproportionately spaced lettering.
 
-### Break the product name correctly
+### Break the rendered title correctly
 
-Use no more than two lines.
+Use no more than two lines. Always fit-test the exact `RENDERED_TITLE` as one line
+first at the preferred visible letter height. Measure it in the actual information
+area and validate hierarchy before creating separate text objects or a line break.
 
-Use one line only when the complete name remains large, strong, readable, and
-unmistakably the second visual focus. Never choose a small size merely to keep
-the name on one line.
+Keep one line when it fits without shrinking, distortion, crowding, overlap, or loss of the second
+visual level. Use two lines only after that test fails; record which condition failed. Separate brand
+and remaining-name inputs are content fields, not permission to split by default.
 
-When two lines are required, use exactly:
+After a failed test:
 
-```text
-[BRAND]
-[PRODUCT NAME OR MODEL WITHOUT BRAND]
-```
+- `WORDMARK_BRAND`: wrap only the remaining product name at a natural word boundary; never repeat the brand
+- `FULL_NAME`: put `[BRAND]` alone on line 1 and `[PRODUCT NAME OR MODEL WITHOUT BRAND]` on line 2
 
-Keep the brand alone on line 1 and all remaining product-name or model text on
-line 2. Never split a word, add a third line, reorder text, or make the brand
-line resemble a small label or subtitle. Both lines must read as one complete
-product-name group.
+Never split a word, add a third line, reorder text, or make either line resemble
+a label or subtitle. Both lines must read as one title group.
 
-### Keep the product name strong
+### Keep the rendered title strong
 
-Prefer a visible letter height of approximately 4%-5% of canvas height for each
-product-name line. Measure visible letters, not nominal point size or invisible
-font metrics.
+Prefer a visible letter height of approximately 4%-5% of canvas height for each title line.
+Measure visible letters, not nominal point size or invisible font metrics.
 
 This range is visual guidance, not a pixel-perfect threshold. Regardless of the
 measured percentage, fail typography that appears small at normal size, becomes
 difficult to read at thumbnail size, or attracts less attention than the Logo.
 
-If the name cannot fit within two lines at the required strength, enlarge the
+If the rendered title cannot fit within two lines at the required strength, enlarge the
 reserved information area or regenerate the scene with a better composition.
 Do not compensate by shrinking the title, adding a third line, splitting words,
 distorting letters, compressing spacing excessively, overlapping the product,
@@ -430,22 +430,20 @@ or leaving the information group.
 
 ### Keep the version subordinate
 
-Place the exact version text below the product name. Prefer a visible letter
-height of approximately 2%-2.5% of canvas height. Keep it clearly legible but
-subordinate to the product name and Logo.
+Place the exact version text below the rendered title. Prefer a visible letter height of
+approximately 2%-2.5% of canvas height; keep it legible but subordinate to the title and Logo.
 
-If no version text is supplied, omit the version line without inventing a
-replacement.
+If no version text is supplied, omit the version line without inventing a replacement.
 
-After master approval, lock the complete product name, version content, visible
-scale, placement, line breaks, spacing, and hierarchy for every SKU.
+After master approval, lock `TITLE_MODE`, rendered-title and version content,
+visible scale, placement, line breaks, spacing, and hierarchy for every SKU.
 
 ## Limit visible content
 
 Allow only:
 
 1. the source Logo
-2. the exact complete product name
+2. the exact `RENDERED_TITLE`
 3. the exact version text, when supplied
 4. the single source product
 5. visual elements belonging to the Google Classic MD3 composition
@@ -462,17 +460,18 @@ Validate only the final exported 3:4 file at normal and thumbnail size.
 Reject it if:
 
 - the final canvas is not exact portrait 3:4
-- the product, product name, Logo, and version do not read in the required order
-- the product name is small, weak, or difficult to read
-- the Logo attracts attention before the product name
+- the product, rendered title, Logo, and version do not read in the required order
+- the rendered title is small, weak, or difficult to read
+- the Logo attracts attention before the rendered title or exceeds 30% visible canvas width
 - the Logo differs from its source or receives an added color, background,
   gradient, lighting effect, or dimensional treatment
 - the information group sits on a card, frame, panel, backing shape, or isolated
   color field
 - required text is missing, changed, misspelled, reordered, duplicated, or
   unreadable
-- a one-line title was made weak merely to avoid the required two-line structure
-- a two-line title does not place the brand first and the remaining name second
+- title content does not match `TITLE_MODE`, or `WORDMARK_BRAND` repeats the brand
+- a two-line title lacks a recorded failed one-line fit-and-hierarchy test
+- a two-line title violates its mode-specific line-break rule
 - the information group lacks one left axis, leaves the upper half, or intrudes
   into the product's core display area
 - the product is changed, cropped, duplicated, poorly integrated, or insufficiently
@@ -490,9 +489,7 @@ If only the Logo or typography fails, preserve the accepted unified scene and
 rebuild the complete information group from the original Logo and exact text.
 Do not locally repair part of a damaged Logo or word.
 
-If the required typography cannot fit because the information area is too
-small, treat it as a scene failure and regenerate the unified scene from the
-original inputs with more continuous space. Never shrink the title to preserve
-a failed composition.
+If the required typography cannot fit, treat it as a scene failure and regenerate from the
+original inputs with more continuous space. Never shrink the title to preserve a failed composition.
 
 Deliver only after every applicable check passes.
