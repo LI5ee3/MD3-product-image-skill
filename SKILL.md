@@ -183,7 +183,7 @@ Do not generate or save a background-only image. Do not leave product placement
 for later compositing.
 
 Create a graphic-first Google Classic MD3 product showcase using large
-overlapping rounded panels, 2.5D organic geometric fields, restrained
+overlapping rounded panels, soft 2.5D organic geometric fields, restrained
 physical depth, matte surfaces, soft elevation, and a low product platform.
 
 Keep the composition spacious, balanced, clean, and visually layered without
@@ -223,7 +223,8 @@ product fragments.
 Reserve wide continuous negative space in the upper-left area for the later information group
 and its first one-line fit test. Size it from the rendered-title length before placing the product.
 
-The area must support the rendered title at a strong, clearly readable scale.
+The area must support the rendered title at a strong, clearly readable scale and extend far enough downward
+for the first title line to begin around 16%-20% of canvas height.
 Do not pre-commit to two lines or create a narrow area that forces small text.
 
 Do not generate any card, panel, container, backing plane, pill, plaque,
@@ -340,8 +341,12 @@ Use the Logo's visible artwork left edge as the shared visual left axis. Ignore
 the transparent PNG canvas boundary. Keep the complete group in the upper half
 and outside the product's core display area.
 
-Move the three elements as one group. Do not resize or reposition only the Logo
-while leaving the text behind.
+Treat the Logo and the title-plus-version text block as two coordinated units.
+Keep the Logo in its safe position. Prefer the first title line's visible top at
+approximately 16%-20% of canvas height, with deliberate breathing room below the
+Logo; do not pull the text upward merely to compact the group. Treat this as
+visual guidance, not a pixel-perfect threshold. Move title and version together.
+For global repositioning move both units together; lock both positions and their spacing after master approval.
 
 ## Enforce the visual hierarchy
 
@@ -472,8 +477,8 @@ Reject it if:
 - title content does not match `TITLE_MODE`, or `WORDMARK_BRAND` repeats the brand
 - a two-line title lacks a recorded failed one-line fit-and-hierarchy test
 - a two-line title violates its mode-specific line-break rule
-- the information group lacks one left axis, leaves the upper half, or intrudes
-  into the product's core display area
+- the information group lacks one left axis, leaves the upper half, intrudes
+  into the product area, or pins the title block too close to the Logo or top edge
 - the product is changed, cropped, duplicated, poorly integrated, or insufficiently
   separated from the background
 - forbidden visible content appears
