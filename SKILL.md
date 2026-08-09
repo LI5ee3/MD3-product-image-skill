@@ -183,7 +183,7 @@ Do not generate or save a background-only image. Do not leave product placement
 for later compositing.
 
 Create a graphic-first Google Classic MD3 product showcase using large
-overlapping rounded panels, soft 2.5D organic geometric fields, restrained
+overlapping rounded panels, 2.5D organic geometric fields, restrained
 physical depth, matte surfaces, soft elevation, and a low product platform.
 
 Keep the composition spacious, balanced, clean, and visually layered without
