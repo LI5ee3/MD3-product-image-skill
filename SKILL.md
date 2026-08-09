@@ -1,6 +1,6 @@
 ---
 name: md3-product-image
-description: Create portrait 3:4 Google Classic MD3 e-commerce product images with one coherent scene, visibly shallow 2.5D background geometry and platform, an exact source Logo, strong exact typography, a scene-integrated 2.5D version-text support, independent master candidates, and locked-layout SKU variants with SKU-adaptive palettes. Use for product main images, master exploration, master selection, or another SKU derived from an approved ORIGINAL MASTER.
+description: Create portrait 3:4 Google Classic MD3 e-commerce product images with one coherent scene, visibly shallow 2.5D background geometry and platform, an exact source Logo, strong exact typography with unbacked version text, independent master candidates, and locked-layout SKU variants with SKU-adaptive palettes. Use for product main images, master exploration, master selection, or another SKU derived from an approved ORIGINAL MASTER.
 ---
 
 # MD3 Product Image
@@ -30,30 +30,44 @@ and current SKU product reference.
 
 ## Run preflight and measure text
 
+Use these exact local font files for every task:
+
+- `TITLE_FONT_PATH=/System/Library/Fonts/Supplemental/Arial Bold.ttf`
+- `VERSION_FONT_PATH=/System/Library/Fonts/Supplemental/Arial Bold.ttf`
+
+Call these paths directly. Do not search for, select, or silently substitute
+another font. Stop and report if either file is unavailable or any required
+character cannot be rendered.
+
 Before the first generation call:
 
 1. Confirm generation can receive every scene reference, exact portrait 3:4,
    and the highest practical quality. Keep the Logo out of scene generation.
 2. Confirm the exact source Logo and typography can be added afterward. Stop if
-   required inputs, exact 3:4, or exact composition cannot be supported.
+   required inputs, exact 3:4, or exact composition is unavailable.
 3. Use GPT Image 2 only when explicit model selection confirms it; otherwise
    use the available generator without claiming a model.
-4. Select the actual sans-serif font, weight, and renderer that will compose the
-   final title and version. Do not fix one font for every product.
-5. With that same renderer, measure actual visible glyph bounds at the target
-   title and version scales. Fit-test the title as one line first.
+4. Load `TITLE_FONT_PATH` and `VERSION_FONT_PATH` with the renderer that will
+   compose the final image.
+5. With that same renderer and those exact files, measure actual visible glyph
+   bounds at the target title and version scales. Fit-test the title as one line
+   first.
 6. At the planned Logo scale, measure its visible artwork. Calculate concrete
    normalized `x/y/w/h` rectangles for `INFORMATION_GROUP_RECT`, `LOGO_RECT`,
-   `TITLE_RECT`, and `VERSION_SUPPORT_RECT`. Keep the title's first visible line
-   around 16%-20% of canvas height with deliberate space below the Logo.
-7. Size `VERSION_SUPPORT_RECT` from the measured version glyphs plus comfortable
-   optical inset and shallow visible depth; set it to `NONE` when absent. Verify
-   all rectangles fit together without touching product or internal boundaries.
+   `TITLE_RECT`, and `VERSION_TEXT_RECT`; use `INFORMATION_GROUP_RECT` as the
+   single `INFORMATION_CLEAR_ZONE` sent to scene generation. Keep the title's
+   first visible line around 16%-20% of canvas height with deliberate space
+   below the Logo.
+7. Size `VERSION_TEXT_RECT` from the measured version glyphs plus comfortable
+   clearance, reserving the required title-to-version gap before it; set it to
+   `NONE` when absent. Verify all internal rectangles fit inside the clear zone
+   without touching product or internal boundaries.
 8. Resolve every bracketed prompt field to concrete values before generation.
    Keep exact future Logo, title, and version content out of the scene prompt;
    stop rather than send any unresolved template token.
 
-Do not invent unsupported parameters or require a fixed pixel resolution.
+Do not invent parameters the generator does not expose or require a fixed pixel
+resolution.
 
 ## Pass the style unchanged
 
@@ -74,8 +88,8 @@ Use:
 Generate product, environment, platform, lighting, shadows, reflections,
 ambient response, perspective, scale, and spatial relationships together.
 Never create a background-only image and later paste in the product. Only the
-original Logo and exact typography may be added after scene acceptance; the
-version support must already belong to the generated scene.
+original Logo and exact typography may be added after scene acceptance. Never
+generate or add a backing for Logo, title, or version text.
 
 Use one state:
 
@@ -90,10 +104,12 @@ Save every SKU separately as `SKU_VARIANT`; never overwrite, relabel, copy, or
 bind it as master. Only an explicit request to end the SKU set and start a new
 master workflow releases the binding.
 
+Treat any earlier master containing an information backing as incompatible.
+Never remove or ignore its locked geometry for an SKU; start a new master workflow.
+
 After approval, lock Logo, title mode, exact text, typography, line breaks,
-information-group geometry, version-support geometry/depth/position, product
-display logic, background structure/material roles, composition, relative
-light-dark hierarchy, and primary light direction.
+information-group geometry, product display logic, background structure/material
+roles, composition, relative light-dark hierarchy, and primary light direction.
 
 ## Build the canonical scene prompt
 
@@ -107,13 +123,13 @@ Input role: [MASTER: Image 1 is authoritative product / SKU: ORIGINAL MASTER is
 composition reference and CURRENT SKU is authoritative product]. The original
 Logo PNG is excluded. Do not render or approximate information-group Logo or text.
 
-Future information is excluded from this call. Use only these concrete layout
-rectangles, expressed as normalized canvas percentages; never infer or render
-their future content:
-- complete information group: [INFORMATION_GROUP_RECT as x/y/w/h]
-- empty Logo clear region: [LOGO_RECT as x/y/w/h]
-- empty title clear region: [TITLE_RECT as x/y/w/h and line count]
-- version-support surface to generate: [VERSION_SUPPORT_RECT as x/y/w/h or NONE]
+Future information is excluded from this call. Protect only this normalized
+canvas area; never infer or render its future content:
+- invisible information clear zone: [INFORMATION_CLEAR_ZONE as x/y/w/h]
+
+The clear zone is uninterrupted base-field negative space, not a rectangle or
+scene object. Do not show its bounds or place any panel, bar, card, plaque,
+backing, edge, shadow, platform, or separate surface inside it.
 
 Generate the complete product scene now. Product, environment, platform,
 lighting, shadows, reflections, ambient response, perspective, scale, and
@@ -141,25 +157,10 @@ redesign, deform, simplify, recolor, replace, duplicate, or invent components.
 Match lighting, perspective, reflections, contact shadows, and ambient occlusion;
 reject floating or pasted-on appearance.
 
-Keep the declared Logo and title rectangles as wide continuous upper-left
-negative space. Do not let the product or any background boundary enter them.
-Treat canvas, product, and internal shape boundaries as usable-area edges.
-Prefer 0.75-1 visible title-letter height between the title's right edge and
-the nearest internal boundary. Touching, crossing, or tangent contact fails.
-
-When version text exists, generate exactly one empty, compact, shallow 2.5D
-rounded support surface inside the concrete version-support rectangle stated
-above. Do not move or enlarge it. Integrate it with the same light direction
-and softness, visible shallow depth, controlled highlight, and short elevation
-shadow. It serves only the future version line and must not extend behind Logo
-or title.
-
-A rounded, elongated, or capsule-like silhouette is allowed when required by
-the measured text width. Judge it by visual role, not outline alone: it must
-read as physical Google Classic MD3 scene geometry, not a UI button, chip,
-badge, label, promotional tag, or general information card. Keep it quieter
-than product, title, and Logo. Add no second information backing. When version
-text is absent, generate no support.
+Keep the declared information clear zone as wide continuous upper-left negative
+space. Do not let the product, a background boundary, or any visible information
+backing enter it. Treat canvas, product, and internal shape boundaries as
+usable-area edges. Touching, crossing, or tangent contact fails.
 
 Keep product first in focus, future title second, Logo third, and version fourth.
 Use clean high-key studio lighting from a large upper-front soft source, gentle
@@ -182,19 +183,18 @@ relative light-dark hierarchy, composition, and primary light direction. Use
 CURRENT SKU as the only authoritative product; do not show the master product.
 
 Do not lock master hues. When CURRENT SKU visibly differs in dominant color,
-re-derive the background base and supporting colors from CURRENT SKU. At least
-one large field and one supporting field must change visibly at thumbnail size;
+re-derive the background base and secondary colors from CURRENT SKU. At least
+one large field and one secondary field must change visibly at thumbnail size;
 a product-only change does not count. Preserve separation from every adjacent field.
 
-Lock version-support geometry, size, depth, position, and light direction. Its
-hue, lightness, and version-text lightness may adapt for legibility, but this
-small support does not count as a required background-field change.
+Lock version-text size, position, and typography. Its solid lightness may adapt
+only for legibility against the SKU-adaptive background; never add a backing.
 ```
 
 Before generation, confirm 3:4, unified scene, one faithful product, separation,
-visibly shallow 2.5D major fields, resolved layout rectangles, conditional
-support, no future Logo/text content, and the unchanged style block. For an SKU,
-also confirm the exact bound master and palette rule.
+visibly shallow 2.5D major fields, one resolved invisible information clear zone,
+no future Logo/text content or backing, and the unchanged style block. For an
+SKU, also confirm the exact bound master and palette rule.
 
 ## Retry without prompt expansion
 
@@ -223,29 +223,22 @@ Reject when any apply:
 - product is not the first focus
 - any major background panel or organic geometric field reads only as a flat
   fill or gradient, lacks visible shallow depth, or breaks the light direction
-- the information group cannot fit inside its declared rectangles with clearance
-  from canvas, product, and internal boundaries, or a general card appears
-- required support is missing, cannot contain measured text plus inset, lacks
-  coherent depth/light, exceeds its declared rectangle beyond minor optical
-  deviation, forces Logo/title outside their rectangles, dominates, or reads as
-  UI/promotion rather than scene geometry; support appears when version is absent
+- the information clear zone is interrupted, reveals a visible boundary or
+  backing, or cannot fit the planned information group with required clearance
 - an SKU violates the bound master, direct derivation, palette adaptation, or
   product separation
 - forbidden content appears
 
-Do not fail a support merely because its required long-text silhouette is
-rounded or capsule-like.
-
 ## Add the exact information group
 
 After scene acceptance, add only original Logo and exact typography in this
-vertical order: Logo, rendered title, version on its generated support. Use the
-Logo artwork's visible left edge as the shared text axis; ignore transparent
-PNG bounds. The support may extend past that axis only by its measured inset.
-Compose within the same planned rectangles, in the upper half and outside the
-product region and all boundaries. Never move the title upward, shrink it, or
-shift one element alone to rescue a failed scene; regenerate the scene instead.
-Move title and version together; move Logo and the text unit together globally.
+vertical order: Logo, rendered title, version directly on the uninterrupted
+background. Use the Logo artwork's visible left edge as the shared text axis;
+ignore transparent PNG bounds. Compose within the planned internal rectangles,
+in the upper half and outside the product region and all boundaries. Never move
+the title upward, shrink it, or shift one element alone to rescue a failed scene;
+regenerate the scene instead. Move title and version together; move Logo and the
+text unit together globally.
 
 ### Preserve the Logo
 
@@ -266,8 +259,9 @@ override height guidance. Any Logo that attracts attention before title fails.
 ### Set exact typography
 
 Preserve every character, case, punctuation mark, space, language, and word
-order. Use the preflight-selected restrained sans-serif with enough weight for
-recognition; avoid thin, condensed, stretched, or distorted lettering.
+order. Render the title only with `TITLE_FONT_PATH` and the version only with
+`VERSION_FONT_PATH`. Never synthesize weight, condense, stretch, distort, or
+substitute either font.
 
 Prefer title visible letter height around 4%-5% of canvas height. Keep the
 measured one-line title when it fits strongly. Only after a recorded failed test:
@@ -278,26 +272,29 @@ measured one-line title when it fits strongly. Only after a recorded failed test
 Use at most two lines; never split a word or turn a line into a subtitle. If it
 cannot fit strongly, regenerate more space rather than shrink or distort it.
 
-Place exact version text on the support using the same typography measured in
-preflight. Prefer visible height 2.75%-3.25% of canvas height and about 55%-65%
-of title height, normal-to-medium weight, and title-to-support gap of about
-0.5-0.8 version-letter height. Keep sufficient contrast and comfortable inset.
+Place exact version text directly on the uninterrupted background inside
+`VERSION_TEXT_RECT`, using the same typography measured in preflight. Prefer
+visible height 2.75%-3.25% of canvas height and about 55%-65% of title height,
+bold weight, and a clearly separated title-to-version gap of about 1.0-1.4
+version-letter heights. Use one solid text color with sufficient contrast.
 Hierarchy must come from lower emphasis, not miniature type. Never abbreviate,
-outline, glow, or add a second backing.
+outline, glow, shadow, or add a panel, bar, card, plaque, or backing.
 
-Mandatory order: product, title, Logo, version. The support is not an independent
-focus. After approval, lock all content, scale, position, spacing, line breaks,
-and support geometry; only permitted SKU contrast adaptation may change.
+Mandatory order: product, title, Logo, version. After approval, lock all content,
+scale, position, spacing, and line breaks; only permitted SKU version-text
+lightness adaptation may change.
 
 ## Validate and deliver
 
 Validate the final 3:4 file at full size and an Ozon-like `288 x 384` thumbnail
 shown at 100% without zoom. Reject when exact hierarchy, source Logo, exact text,
 marketplace readability, planned rectangles, title mode, line breaking, shared
-axis, boundary clearance, support role/integration, product fidelity/separation,
-allowed content, master binding, or SKU adaptation fails.
+axis, boundary clearance, direct version-text contrast, absence of information
+backings, product fidelity/separation, allowed content, master binding, or SKU
+adaptation fails.
 
 If only Logo or typography fails, preserve the accepted scene and rebuild the
-complete information group from original assets. If support geometry, lighting,
-placement, or clearance fails, regenerate the complete scene. Never repair an
-individual glyph or Logo fragment. Deliver only after every applicable check passes.
+complete information group from original assets. If information clear-zone
+geometry, placement, or clearance fails, regenerate the complete scene. Never
+repair an individual glyph or Logo fragment. Deliver only after every applicable
+check passes.
