@@ -1,6 +1,6 @@
 ---
 name: md3-product-image
-description: Create portrait 3:4 Google Classic MD3 e-commerce product images with one coherent scene, visibly shallow 2.5D background geometry and platform, an exact source Logo, strong exact typography with unbacked version text, independent master candidates, and locked-layout SKU variants with SKU-adaptive palettes. Use for product main images, master exploration, master selection, or another SKU derived from an approved ORIGINAL MASTER.
+description: Create portrait 3:4 Google Classic MD3 e-commerce product images: one coherent scene with shallow 2.5D geometry, an exact source Logo, exact typography, independent master candidates, and locked-layout SKU variants with SKU-adaptive palettes. Use for product main images, master exploration, master selection, or SKUs derived from an approved ORIGINAL MASTER.
 ---
 
 # MD3 Product Image
@@ -10,6 +10,11 @@ description: Create portrait 3:4 Google Classic MD3 e-commerce product images wi
 Read this file once per task turn. Do not reread it unless the file changes.
 Reuse already resolved inputs from the current context; do not reopen a complete
 prior task or image payload merely to rediscover known paths or text.
+
+Never read from historical memory, prior sessions, or earlier outputs of any
+kind. Derive everything only from current uploads and the explicitly bound
+`ORIGINAL MASTER` of this session; do not recall, reconstruct, or reuse any
+prior candidate, SKU, palette, text, or composition from memory.
 
 For a master candidate, require product reference as Image 1, original Logo PNG
 as Image 2, exact complete product name, brand, remaining name/model after the
@@ -30,14 +35,14 @@ and current SKU product reference.
 
 ## Run preflight and measure text
 
-Use these exact local font files for every task:
+Use these exact font files bundled with this skill for every task:
 
-- `TITLE_FONT_PATH=/System/Library/Fonts/Supplemental/Arial Bold.ttf`
-- `VERSION_FONT_PATH=/System/Library/Fonts/Supplemental/Arial Bold.ttf`
+- `TITLE_FONT_PATH=assets/Roboto-Bold.ttf`
+- `VERSION_FONT_PATH=assets/Roboto-Bold.ttf`
 
-Call these paths directly. Do not search for, select, or silently substitute
-another font. Stop and report if either file is unavailable or any required
-character cannot be rendered.
+Call these paths directly relative to the skill folder; never substitute
+another font. Stop and report if a file is unavailable or a character cannot
+render.
 
 Before the first generation call:
 
@@ -45,29 +50,22 @@ Before the first generation call:
    and the highest practical quality. Keep the Logo out of scene generation.
 2. Confirm the exact source Logo and typography can be added afterward. Stop if
    required inputs, exact 3:4, or exact composition is unavailable.
-3. Use GPT Image 2 only when explicit model selection confirms it; otherwise
-   use the available generator without claiming a model.
-4. Load `TITLE_FONT_PATH` and `VERSION_FONT_PATH` with the renderer that will
-   compose the final image.
-5. With that same renderer and those exact files, measure actual visible glyph
-   bounds at the target title and version scales. Fit-test the title as one line
-   first.
-6. At the planned Logo scale, measure its visible artwork. Calculate concrete
-   normalized `x/y/w/h` rectangles for `LOGO_RECT` and each `TITLE_LINE_RECT`.
-   Keep the title's first visible line around 16%-20% of canvas height with
-   deliberate space below the Logo.
-7. Size `VERSION_TEXT_RECT` from the measured version glyphs, reserving the
-   required title-to-version gap before it; set it to `NONE` when absent.
-8. Expand each visible rectangle only by small optical clearance, normally about
-   2%-3% of canvas width horizontally and 1%-2% of canvas height vertically.
-   Join successive rows with the narrowest left-aligned connector needed to keep
-   one continuous base field. Use this connected stepped set as
-   `INFORMATION_CLEAR_ZONES`. Never replace it with its outer bounding rectangle
-   or reserve unused upper-right space. Treat padding as visual guidance, not a
-   pixel-perfect failure threshold.
-9. Verify the content rectangles and connectors fit inside the canvas and avoid
-   the planned product region. Validate actual background boundaries after scene
-   generation.
+3. Call the Image Gen tool to output the image.
+4. Run `scripts/measure_text.py` with the resolved title, optional version, and
+   Logo to measure exact visible glyph and artwork bounds using
+   `TITLE_FONT_PATH` and `VERSION_FONT_PATH`.
+5. Use its `TITLE_FIT_TEST` for the one-line fit test. Keep the title's first
+   visible line around 16%-20% of canvas height with deliberate space below the
+   Logo.
+6. From the script output, collect the concrete normalized `x/y/w/h` rectangles
+   for `LOGO_RECT` and each `TITLE_LINE_RECT`.
+7. From the script output, size `VERSION_TEXT_RECT` with the measured version
+   glyphs and the title-to-version gap; set it to `NONE` when absent.
+8. Use the script's connected stepped zones as `INFORMATION_CLEAR_ZONES`; never
+   replace them with the outer bounding rectangle. Treat padding as optical
+   guidance, not a pixel-perfect threshold.
+9. Verify the zones fit the canvas and avoid the product region; validate
+   background boundaries after scene generation.
 10. Resolve every bracketed prompt field to concrete values before generation.
    Keep exact future Logo, title, and version content out of the scene prompt;
    stop rather than send any unresolved template token.
@@ -75,15 +73,19 @@ Before the first generation call:
 Do not invent parameters the generator does not expose or require a fixed pixel
 resolution.
 
-## Pass the style unchanged
+## Build the canonical scene prompt
 
-Append this block to every scene prompt without changing any word:
+Read `references/core-scene-block.md`. Append its `CORE_SCENE_BLOCK` unchanged
+to every scene call, replacing only brackets and adapting the declared input
+role; append its style block unchanged. For an SKU (`REPLACE_VARIANT`), also
+read `references/replace-variant-block.md` and append its block unchanged.
+Never rewrite, paraphrase, or expand them.
 
-```text
-Use Google Classic Material Design 3 (MD3) as the sole visual style.
-
-Do not use Material 3 Expressive.
-```
+Before generation, confirm 3:4, unified scene, one faithful product, separation,
+visibly shallow 2.5D major fields, controlled hue-family contrast with matched
+perceived saturation, one resolved connected stepped information clear area, no
+future Logo/text content or backing, and the unchanged style block. For an SKU,
+also confirm the exact bound master and palette rule.
 
 ## Use the fixed workflow and state
 
@@ -110,121 +112,18 @@ Save every SKU separately as `SKU_VARIANT`; never overwrite, relabel, copy, or
 bind it as master. Only an explicit request to end the SKU set and start a new
 master workflow releases the binding.
 
-Treat any earlier master containing an information backing as incompatible.
-Never remove or ignore its locked geometry for an SKU; start a new master workflow.
+A master containing an information backing is incompatible; start a new master
+workflow, never reuse its geometry for an SKU.
 
 After approval, lock Logo, title mode, exact text, typography, line breaks,
 information-group geometry, product display logic, background structure/material
 roles, composition, relative light-dark hierarchy, and primary light direction.
 
-## Build the canonical scene prompt
-
-Include this `CORE_SCENE_BLOCK` in every call. Replace only brackets, adapt the
-declared input role, and append the unchanged style block.
-
-```text
-Create one portrait 3:4 e-commerce product image using the supplied inputs.
-
-Input role: [MASTER: Image 1 is authoritative product / SKU: ORIGINAL MASTER is
-composition reference and CURRENT SKU is authoritative product]. The original
-Logo PNG is excluded. Do not render or approximate information-group Logo or text.
-
-Future information is excluded from this call. Protect only these normalized
-canvas zones; never infer or render their future content:
-- invisible stepped information clear zones:
-  [INFORMATION_CLEAR_ZONES as a resolved labeled x/y/w/h list]
-
-Together these zones form one compact connected stepped area on the same
-uninterrupted base field, not their outer bounding rectangle or a scene object.
-Do not show their bounds or place any panel, bar, card, plaque, backing, edge,
-shadow, platform, or separate surface inside them. Do not reserve unused space
-outside the zones merely because it falls inside their overall outer bounds.
-
-Generate the complete product scene now. Product, environment, platform,
-lighting, shadows, reflections, ambient response, perspective, scale, and
-spatial relationships must form one coherent image. Do not generate a
-background-only image or leave product placement for later compositing.
-
-Create a graphic-first Google Classic MD3 product showcase with large overlapping 2.5D rounded panels, 2.5D organic geometric fields, restrained physical depth, matte surfaces, soft elevation, and a low 2.5D product platform. Keep it spacious and layered, not a realistic room, architectural interior, furniture scene, or physical exhibition environment.
-
-Make every major background rounded panel and organic geometric field visibly
-shallow 2.5D scene geometry, never a flat filled region. Show visible shallow
-edge thickness plus overlap, occlusion, or a short soft elevation shadow that
-follows the primary light direction. Keep the depth restrained and graphic;
-do not turn these fields into walls, architecture, or a deep 3D set.
-
-Derive the palette from the current product without prescribing colors.
-Preserve authentic product colors. Do not let the major panels and geometric
-fields collapse into one repeatedly used near-identical hue family. At thumbnail
-size, use a product-informed dominant palette family plus one clearly
-distinguishable controlled contrast hue family. Use the contrast family in one
-major field and, when useful, no more than one smaller supporting field. Keep its
-perceived saturation or chroma consistent with the scene's chromatic palette;
-for a neutral product, keep it restrained. Avoid a sudden vivid accent, and never
-let it become a focal point or disturb the mandatory hierarchy. Keep it outside
-the protected information zones.
-
-Adjust platform and adjacent-field hue and lightness so the entire silhouette,
-lower body, and contact area remain clear at normal and thumbnail size. When
-hues are similar, create a clear light-dark difference. Do not rely on
-saturation, partial contrast, outlines, halos, glows, or product backing. The
-platform top must not merge with the product.
-
-Render exactly one faithful product. Preserve identity, geometry, proportions,
-construction, materials, controls, display content, colors, and details. Do not
-redesign, deform, simplify, recolor, replace, duplicate, or invent components.
-Match lighting, perspective, reflections, contact shadows, and ambient occlusion;
-reject floating or pasted-on appearance.
-
-Keep the declared information clear zones as compact connected upper-left
-negative space on one continuous base field. Do not let the product, a
-background boundary, or any visible information backing enter a protected
-content zone or connector. A background boundary may occupy unused space outside
-the zones, including unused space inside their overall outer bounds, when it
-does not visually fragment or reduce the legibility of the information group.
-
-Keep product first in focus, future title second, Logo third, and version fourth.
-Use clean high-key studio lighting from a large upper-front soft source, gentle
-fill, restrained separation light, short diffused contact shadows, and
-controlled reflections.
-
-Outside authentic product markings, generate no text, Logo, letters, numbers,
-icons, labels, badges, prices, specifications, slogans, promotions, or
-watermarks. Avoid information cards, extra backing shapes, multiple products,
-duplicate-like reflections, rooms, furniture, shelves, props, boxes, detailed
-scenery, busy patterns, neon, glassmorphism, excessive gradients, deep
-perspective, product deformation, extra text, and marketplace graphics.
-```
-
-For `REPLACE_VARIANT`, append:
-
-```text
-Lock ORIGINAL MASTER geometry, shape placement, depth, material roles,
-relative light-dark hierarchy, composition, and primary light direction. Use
-CURRENT SKU as the only authoritative product; do not show the master product.
-
-Do not lock master hues. When CURRENT SKU visibly differs in dominant color,
-re-derive the background base and secondary colors from CURRENT SKU. At least
-one large field and one secondary field must change visibly at thumbnail size;
-a product-only change does not count. Re-establish the controlled contrast
-family instead of collapsing the adapted fields into one near-identical hue
-family. Preserve separation from every adjacent field.
-
-Lock version-text size, position, and typography. Its solid lightness may adapt
-only for legibility against the SKU-adaptive background; never add a backing.
-```
-
-Before generation, confirm 3:4, unified scene, one faithful product, separation,
-visibly shallow 2.5D major fields, controlled hue-family contrast with matched
-perceived saturation, one resolved connected stepped information clear area, no
-future Logo/text content or backing, and the unchanged style block. For an SKU,
-also confirm the exact bound master and palette rule.
-
 ## Retry without prompt expansion
 
 If the scene fails, discard it and regenerate from original inputs. Reuse the
-same `CORE_SCENE_BLOCK`, style block, bracket values, and applicable SKU block
-unchanged. Append only:
+same `references/core-scene-block.md` and `references/replace-variant-block.md`
+blocks and bracket values unchanged. Append only:
 
 ```text
 RETRY_CORRECTION:
@@ -267,7 +166,11 @@ and readability remain sound.
 
 After scene acceptance, add only original Logo and exact typography in this
 vertical order: Logo, rendered title, version directly on the uninterrupted
-background. Use the Logo artwork's visible left edge as the shared text axis;
+background. Run `scripts/compose_image.py` on the accepted scene with the
+resolved title, optional version, and Logo; it renders the exact typography
+from `TITLE_FONT_PATH`/`VERSION_FONT_PATH` and pastes the Logo at the planned
+content rectangles, so the composite matches the measured clear zones exactly.
+Use the Logo artwork's visible left edge as the shared text axis;
 ignore transparent PNG bounds. Compose within the planned content rectangles,
 in the upper half, inside the stepped clear area, and outside the product region.
 Never move the title upward, shrink it, or shift one element alone to rescue a failed scene;
@@ -320,17 +223,18 @@ bottom to the version text's visible top. Use about 1.0-1.4 version-letter
 heights for a one-line title and a tighter 0.75-1.0 for a two-line title. Reject
 crowding or a version line that appears detached from the title block at full
 size or in the `288 x 384` thumbnail. Use one solid text color with sufficient
-contrast. Hierarchy must come from lower emphasis, not miniature type. Never
-abbreviate, outline, glow, shadow, or add a panel, bar, card, plaque, or backing.
+contrast. Hierarchy must come from lower emphasis, not miniature type. Never abbreviate, outline, glow, shadow, or add any backing.
 
-Mandatory order: product, title, Logo, version. After approval, lock all content,
-scale, position, spacing, and line breaks; only permitted SKU version-text
-lightness adaptation may change.
+Mandatory order: product, title, Logo, version. After approval, lock content,
+scale, position, spacing, and line breaks per the lock list; only SKU
+version-text lightness may adapt.
 
 ## Validate and deliver
 
-Validate the final 3:4 file at full size and an Ozon-like `288 x 384` thumbnail
-shown at 100% without zoom. Reject when exact hierarchy, source Logo, exact text,
+Run `scripts/validate_final.py` on the final file; it rejects any canvas that is
+not an exact portrait 3:4 and writes the `288 x 384` thumbnail. Then validate
+the full-size file and that thumbnail shown at 100% without zoom. Reject when
+exact hierarchy, source Logo, exact text,
 marketplace readability, planned content rectangles and stepped clear zones,
 title mode, line breaking and spacing, title-to-version gap, shared axis,
 boundary clearance, direct
