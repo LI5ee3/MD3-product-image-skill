@@ -1,6 +1,6 @@
 ---
 name: md3-product-image
-description: Create portrait 3:4 Google Classic MD3 e-commerce product images: one coherent scene with shallow 2.5D geometry, an exact source Logo, exact typography, independent master candidates, and locked-layout SKU variants with SKU-adaptive palettes. Use for product main images, master exploration, master selection, or SKUs derived from an approved ORIGINAL MASTER.
+description: "Create portrait 3:4 Google Classic MD3 e-commerce product images: one coherent scene with shallow 2.5D geometry, an exact source Logo, exact typography, independent master candidates, and locked-layout SKU variants with SKU-adaptive palettes. Use for product main images, master exploration, master selection, or SKUs derived from an approved ORIGINAL MASTER."
 ---
 
 # MD3 Product Image
