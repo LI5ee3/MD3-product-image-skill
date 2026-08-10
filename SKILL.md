@@ -44,6 +44,8 @@ Call these paths directly relative to the skill folder; never substitute
 another font. Stop and report if a file is unavailable or a character cannot
 render.
 
+The scripts require Python 3.10+ with `pillow` and `fonttools` installed.
+
 Before the first generation call:
 
 1. Confirm generation can receive every scene reference, exact portrait 3:4,
@@ -82,10 +84,11 @@ read `references/replace-variant-block.md` and append its block unchanged.
 Never rewrite, paraphrase, or expand them.
 
 Before generation, confirm 3:4, unified scene, one faithful product, separation,
-visibly shallow 2.5D major fields, controlled hue-family contrast with matched
-perceived saturation, one resolved connected stepped information clear area, no
-future Logo/text content or backing, and the unchanged style block. For an SKU,
-also confirm the exact bound master and palette rule.
+visibly shallow 2.5D panels and geometric fields, controlled hue-family
+contrast with matched perceived saturation, one resolved connected stepped
+information clear area, no future Logo/text content or backing, and the
+unchanged style block. For an SKU, also confirm the exact bound master and
+palette rule.
 
 ## Use the fixed workflow and state
 
@@ -93,7 +96,7 @@ Use:
 
 `PREFLIGHT -> MEASURE_TEXT -> BUILD_PROMPT -> GENERATE_SCENE -> VALIDATE_SCENE -> ADD_INFORMATION_GROUP -> VALIDATE_FINAL -> DELIVER`
 
-Generate product, environment, platform, lighting, shadows, reflections,
+Generate product, environment, lighting, shadows, reflections,
 ambient response, perspective, scale, and spatial relationships together.
 Never create a background-only image and later paste in the product. Only the
 original Logo and exact typography may be added after scene acceptance. Never
@@ -144,7 +147,7 @@ Reject when any apply:
 - product fidelity, single-product count, integration, lighting, perspective,
   contact shadow, or adjacent-field separation fails
 - product is not the first focus
-- any major background panel or organic geometric field reads only as a flat
+- any major background panel or geometric field reads only as a flat
   fill or gradient, lacks visible shallow depth, or breaks the light direction
 - major panels and fields collapse into one repeated near-identical hue family,
   or the contrast family is excessively saturated, widely repeated, or becomes
@@ -232,7 +235,7 @@ version-text lightness may adapt.
 ## Validate and deliver
 
 Run `scripts/validate_final.py` on the final file; it rejects any canvas that is
-not an exact portrait 3:4 and writes the `288 x 384` thumbnail. Then validate
+not an exact portrait 3:4 and can write the `288 x 384` thumbnail. Then validate
 the full-size file and that thumbnail shown at 100% without zoom. Reject when
 exact hierarchy, source Logo, exact text,
 marketplace readability, planned content rectangles and stepped clear zones,

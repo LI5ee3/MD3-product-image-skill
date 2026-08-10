@@ -22,10 +22,8 @@ append the style block above:
 ```text
 Create one portrait 3:4 e-commerce product image using the supplied inputs.
 
-Input role: [MASTER: Image 1 is authoritative product / SKU: ORIGINAL MASTER is
-composition reference and CURRENT SKU is authoritative product]. The original
+Input role: [MASTER: Image 1 is authoritative product / SKU: ORIGINAL MASTER is composition reference and CURRENT SKU is authoritative product]. The original
 Logo PNG is excluded. Do not render or approximate information-group Logo or text.
-
 Future information is excluded from this call. Protect only these normalized
 canvas zones; never infer or render their future content:
 - invisible stepped information clear zones:
@@ -34,21 +32,24 @@ canvas zones; never infer or render their future content:
 Together these zones form one compact connected stepped area on the same
 uninterrupted base field, not their outer bounding rectangle or a scene object.
 Do not show their bounds or place any panel, bar, card, plaque, backing, edge,
-shadow, platform, or separate surface inside them. Do not reserve unused space
+shadow, or separate surface inside them. Do not reserve unused space
 outside the zones merely because it falls inside their overall outer bounds.
 
-Generate the complete product scene now. Product, environment, platform,
+Generate the complete product scene now. Product, environment,
 lighting, shadows, reflections, ambient response, perspective, scale, and
 spatial relationships must form one coherent image. Do not generate a
 background-only image or leave product placement for later compositing.
 
-Create a graphic-first Google Classic MD3 product showcase with large overlapping 2.5D rounded panels, 2.5D organic geometric fields, restrained physical depth, matte surfaces, soft elevation, and a low 2.5D product platform. Keep it spacious and layered, not a realistic room, architectural interior, furniture scene, or physical exhibition environment.
-
-Make every major background rounded panel and organic geometric field visibly
-shallow 2.5D scene geometry, never a flat filled region. Show visible shallow
-edge thickness plus overlap, occlusion, or a short soft elevation shadow that
-follows the primary light direction. Keep the depth restrained and graphic;
-do not turn these fields into walls, architecture, or a deep 3D set.
+Create a graphic-first Google Classic MD3 product showcase from rounded
+rectangles, capsules, circles, and curved geometric panels with Tonal Surface
+layering, soft restrained 3D depth, and clean negative space. Every major
+background panel and geometric field must be visibly shallow 2.5D scene
+geometry, never a flat filled region: show visible shallow edge thickness plus
+overlap, occlusion, or a short soft elevation shadow that follows the primary
+light direction. Keep the depth restrained and graphic; keep the scene spacious
+and layered, not a realistic room, architectural interior, furniture scene, or
+physical exhibition environment, and do not turn the fields into walls,
+architecture, or a deep 3D set.
 
 Analyze the current product's actual colors, brightness, saturation, material,
 finish, visual weight, and local accent colors; derive the palette from the
@@ -62,11 +63,11 @@ for a neutral product, keep it restrained. Avoid a sudden vivid accent, and neve
 let it become a focal point or disturb the mandatory hierarchy. Keep it outside
 the protected information zones.
 
-Adjust platform and adjacent-field hue and lightness so the entire silhouette,
-lower body, and contact area remain clear at normal and thumbnail size. When
-hues are similar, create a clear light-dark difference. Do not rely on
-saturation, partial contrast, outlines, halos, glows, or product backing. The
-platform top must not merge with the product.
+Adjust adjacent-field hue and lightness so the entire silhouette, lower body,
+and contact area remain clear at normal and thumbnail size. When hues are
+similar, create a clear light-dark difference. Do not rely on saturation,
+partial contrast, outlines, halos, glows, or product backing. The product must
+not merge into the background.
 
 Render exactly one faithful product. Preserve identity, geometry, proportions,
 construction, materials, controls, display content, colors, and details. Do not
@@ -88,8 +89,13 @@ controlled reflections.
 
 Outside authentic product markings, generate no text, Logo, letters, numbers,
 icons, labels, badges, prices, specifications, slogans, promotions, or
-watermarks. Avoid information cards, extra backing shapes, multiple products,
-duplicate-like reflections, rooms, furniture, shelves, props, boxes, detailed
-scenery, busy patterns, neon, glassmorphism, excessive gradients, deep
-perspective, product deformation, extra text, and marketplace graphics.
+watermarks. Avoid extra selling points, feature claims, promotional labels,
+certification marks, platform stickers, decorative English, extra logos, extra
+icons, information cards, extra backing shapes, borders, collage panels,
+Android app UI, multiple products, duplicate-like reflections, people, hands,
+packaging, charging docks, rooms, furniture, shelves, props, boxes, detailed
+scenery, heavy black studio backgrounds, dramatic dark stages, excessive
+gradients, neon colors, cinematic haze, lens flare, glassmorphism, busy
+patterns, deep perspective, product deformation, marketplace graphics, or any
+unrequested text.
 ```

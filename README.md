@@ -2,6 +2,10 @@
 
 生成Google Classic MD3风格的3:4电商产品主图<br>产品与场景统一生成，原始Logo和指定文字保持准确，并支持母版确认后的同款SKU替换
 
+## 环境
+
+Python 3.10+，安装脚本依赖：`pip install pillow fonttools`
+
 ## 使用
 
 上传产品图作为Image 1、原始Logo PNG作为Image 2，然后发送：

@@ -15,7 +15,7 @@ Usage:
 
 Optional overrides (defaults follow SKILL.md guidance):
   --title-height-frac 0.045   visible title letter height as canvas-height fraction
-  --version-height-frac 0.03  visible version letter height as canvas-height fraction
+  --version-height-frac 0.0285  visible version letter height as canvas-height fraction
   --logo-height-frac 0.05     visible Logo height as canvas-height fraction
   --logo-width-cap-frac 0.30  maximum visible Logo width as canvas-width fraction
   --left-margin-frac 0.05     text axis / Logo left margin
@@ -70,13 +70,17 @@ def visible_text_bounds(font: ImageFont.FreeTypeFont, text: str) -> tuple[int, i
     return bbox[2] - bbox[0], bbox[3] - bbox[1]
 
 
-def font_for_height(font_path: Path, target_h: int) -> ImageFont.FreeTypeFont:
-    """Return the font at a point size whose visible ink height hits target_h."""
+def font_for_text_height(
+    font_path: Path, text: str, target_h: int
+) -> ImageFont.FreeTypeFont:
+    """Return the font at a point size whose visible ink height of `text` hits
+    target_h exactly. Calibrating on the actual text (not a proxy string) keeps
+    measured heights honest across texts with different descender usage."""
     size = max(1, int(target_h * 1.5))
     font = ImageFont.truetype(str(font_path), size)
-    _, ink_h = visible_text_bounds(font, "AgH")
+    _, ink_h = visible_text_bounds(font, text)
     if ink_h > 0:
-        size = max(1, int(size * target_h / ink_h))
+        size = max(1, round(size * target_h / ink_h))
     return ImageFont.truetype(str(font_path), size)
 
 
@@ -92,7 +96,7 @@ def visible_logo_bbox(logo_path: Path) -> tuple[int, int, int, int]:
 @dataclass
 class LayoutOptions:
     title_height_frac: float = 0.045
-    version_height_frac: float = 0.03
+    version_height_frac: float = 0.0285
     logo_height_frac: float = 0.05
     logo_width_cap_frac: float = 0.30
     left_margin_frac: float = 0.05
@@ -121,10 +125,6 @@ class Layout:
     version_font: ImageFont.FreeTypeFont | None
     fits_one_line: bool | None
 
-    @property
-    def title_last_rect(self) -> tuple[float, float, float, float]:
-        return self.title_line_rects[-1][0]
-
 
 def compute_layout(
     canvas_height: int,
@@ -138,6 +138,10 @@ def compute_layout(
     font_path = opts.font_path
     if not font_path.is_file():
         raise FileNotFoundError(f"FONT_UNAVAILABLE: {font_path}")
+    if canvas_height <= 0:
+        raise ValueError(f"CANVAS_HEIGHT_INVALID: {canvas_height}")
+    if not title_lines or any(line == "" for line in title_lines):
+        raise ValueError("TITLE_EMPTY: title lines must be non-empty")
     check_glyph_coverage(font_path, *title_lines, version or "")
 
     H = canvas_height
@@ -162,7 +166,7 @@ def compute_layout(
         logo_y = opts.top_margin_frac * H
         logo_rect = (x0, logo_y, x0 + logo_w, logo_y + target_h)
 
-    title_font = font_for_height(font_path, round(opts.title_height_frac * H))
+    title_font = font_for_text_height(font_path, title_lines[0], round(opts.title_height_frac * H))
     title_line_rects: list[tuple[tuple[float, float, float, float], str]] = []
     line_top = max(opts.title_top_frac * H, (logo_rect[3] + 0.02 * H) if logo_rect else 0)
     for line in title_lines:
@@ -180,7 +184,7 @@ def compute_layout(
     version_rect = None
     version_font = None
     if version:
-        version_font = font_for_height(font_path, round(opts.version_height_frac * H))
+        version_font = font_for_text_height(font_path, version, round(opts.version_height_frac * H))
         ink_w, ink_h = visible_text_bounds(version_font, version)
         gap_factor = opts.title_gap_factor if len(title_lines) == 1 else opts.two_line_title_gap
         version_top = title_line_rects[-1][0][3] + gap_factor * ink_h
