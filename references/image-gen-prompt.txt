@@ -1,11 +1,13 @@
 A 3:4 professional e-commerce product hero background plate in the official Google Material Design 3 (MD3) style.
 
-Generate only the empty background plate. Use the supplied product reference only to derive the harmonious color palette. Do not generate, redraw, or include the product itself.
+Generate only the empty background plate. Use the supplied product reference only as a palette reference. Do not generate, redraw, or include the product itself.
 
-Background: The background is composed of clean, layered 2.5D geometric cards, smooth rounded rectangles, and soft capsule shapes in a harmonious color palette derived directly from the product. It forms a flat, graphic, papercraft-like surface.
+Background: Create a refined neumorphic soft-UI composition with smooth rounded forms, softly raised and recessed surfaces, subtle ambient occlusion, diffused highlights, and gentle same-material shadows. Avoid flat papercraft styling, hard graphic borders, sharp outlines, high-contrast edges, and realistic physical environments.
 
-Layout & Composition: There is no physical floor, table, or display stand; the scene relies entirely on flat background paneling.
+Adaptive palette: Translate the dominant colors of the supplied product into a classic macaron palette. Preserve the product’s hue relationships while increasing lightness and reducing saturation. Use soft pastel colors such as powder blue, baby blue, mint, pale lavender, blush pink, soft peach, buttercream, and light slate pastel. Do not use literal near-black, deep navy, burgundy, saturated red, or strong orange as background colors.
 
-Lighting & Style: Keep the background under neutral, even, high-key studio illumination. Use restrained MD3 elevation shadows belonging to the background cards. Keep the overall image bright, clean, minimal, and graphic-first.
+Layout & Composition: Use clean layered neumorphic panels, rounded capsules, soft discs, and gently recessed or elevated shapes. Keep the composition minimal and balanced. There is no physical floor, table, display stand, or studio set; the scene relies entirely on soft neumorphic surfaces.
 
-Do not generate any elements that do not conform to the MD3 concept.
+Lighting & Style: Use bright, neutral, high-key illumination with broad diffused highlights and very soft low-contrast shadows. Keep the background airy, calm, premium, and clearly macaron-colored while preserving the MD3 visual language.
+
+Generate only background geometry and color. Do not generate any product, product shadow, Logo, text, watermark, floor, table, or display stand.
