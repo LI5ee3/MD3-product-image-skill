@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build prompts and record bounded scene or uncounted delivery failures."""
+"""Build one prompt at a time and record explicit user decisions."""
 
 import argparse
 import hashlib
@@ -12,8 +12,8 @@ from pathlib import Path
 SKILL_DIR = Path(__file__).resolve().parent.parent
 IMAGE_PROMPT_REFERENCE = SKILL_DIR / "references" / "image-gen-prompt.txt"
 VARIANT_REFERENCE = SKILL_DIR / "references" / "replace-variant-block.md"
-MAX_ATTEMPTS = 3
 ATTEMPT_STATE_NAME = "scene-attempts.json"
+PROMPT_ADDITIONS_NAME = "prompt-additions.json"
 SKU_TARGET_PATTERN = re.compile(r"SKU_VARIANT-([A-Z]+)")
 FINAL_SAFE_ZONE_MARGIN = 0.05
 PRODUCT_AREA_POLICY = """Product and shadow placement policy:
@@ -109,7 +109,7 @@ def information_safe_zone_block(layout: dict) -> str:
     )
 
 
-def verify_information_assets(layout: dict, product_dir: Path) -> None:
+def verify_information_assets(layout: dict, reusable_dir: Path) -> None:
     elements = layout.get("elements")
     assets = layout.get("information_assets")
     if not isinstance(elements, dict) or not isinstance(assets, dict):
@@ -127,12 +127,12 @@ def verify_information_assets(layout: dict, product_dir: Path) -> None:
     for label, asset_name in expected.items():
         try:
             entry = assets[label]
-            path = (product_dir / entry["path"]).resolve()
+            path = (reusable_dir / entry["path"]).resolve()
             expected_hash = entry["sha256"]
-            expected_path = (product_dir / asset_name).resolve()
+            expected_path = (reusable_dir / asset_name).resolve()
         except (KeyError, TypeError) as exc:
             raise ValueError(f"INFORMATION_ASSET_INVALID: {label}") from exc
-        if path != expected_path or path.parent != product_dir:
+        if path != expected_path or path.parent != reusable_dir:
             raise ValueError(f"INFORMATION_ASSET_PATH_MISMATCH: {label}")
         if not path.is_file() or sha256_file(path) != expected_hash:
             raise ValueError(f"INFORMATION_ASSET_HASH_MISMATCH: {label}")
@@ -143,53 +143,36 @@ def load_layout(path: Path) -> tuple[dict, Path]:
     if layout_path.name != "layout.json":
         raise ValueError("LAYOUT_PATH_INVALID")
     layout = read_json(layout_path)
-    product_dir = layout_path.parent
+    reusable_dir = layout_path.parent
+    if reusable_dir.name != "reusable":
+        raise ValueError("LAYOUT_PATH_INVALID: expected <product>/reusable/layout.json")
+    product_dir = reusable_dir.parent
     if layout.get("product_directory") != str(product_dir):
         raise ValueError("PRODUCT_DIRECTORY_MISMATCH")
-    verify_information_assets(layout, product_dir)
+    verify_information_assets(layout, reusable_dir)
     zones = layout.get("clear_zones")
     if not isinstance(zones, list) or not zones:
         raise ValueError("CLEAR_ZONES_MISSING")
     return layout, product_dir
 
 
-def failures_from(path: Path) -> list[dict]:
+def additions_from(path: Path) -> list[str]:
     if not path.exists():
         return []
     data = read_json(path)
-    if isinstance(data, list):
-        entries = data
-    elif isinstance(data, dict) and isinstance(data.get("failures"), list):
-        entries = data["failures"]
-    else:
-        raise ValueError("FAILURE_LOG_INVALID")
-    if not all(isinstance(entry, dict) for entry in entries):
-        raise ValueError("FAILURE_LOG_ENTRY_INVALID")
-    return entries
+    if not isinstance(data, list) or not all(
+        isinstance(entry, str) and entry.strip() for entry in data
+    ):
+        raise ValueError("PROMPT_ADDITIONS_INVALID")
+    return [entry.strip() for entry in data]
 
 
-def failure_increment(entries: list[dict]) -> str | None:
-    lines = ["Temporary corrections accumulated for this product:"]
-    number = 0
-    for entry in entries:
-        checks = entry.get("checks")
-        if not isinstance(checks, list):
-            raise ValueError("FAILURE_LOG_ENTRY_INVALID")
-        for check in checks:
-            if not isinstance(check, dict):
-                raise ValueError("FAILURE_LOG_ENTRY_INVALID")
-            failed = str(check.get("failed_check", "")).strip()
-            correction = str(check.get("correction", "")).strip()
-            if not failed or not correction:
-                raise ValueError("FAILURE_LOG_ENTRY_INVALID")
-            number += 1
-            lines.extend(
-                (
-                    f"{number}. Previous failed check: {failed}",
-                    f"   Required correction: {correction}",
-                )
-            )
-    return "\n".join(lines) if number else None
+def additions_block(entries: list[str]) -> str | None:
+    if not entries:
+        return None
+    lines = ["User-requested prompt additions accumulated for this product:"]
+    lines.extend(f"{index}. {entry}" for index, entry in enumerate(entries, 1))
+    return "\n".join(lines)
 
 
 def attempt_state_path(product_dir: Path) -> Path:
@@ -239,12 +222,6 @@ def start_run(state: dict, mode: str, target: str) -> dict:
     return run
 
 
-def scene_attempts_used(attempts: list[dict]) -> int:
-    return sum(
-        attempt.get("status") != "DELIVERY_FAILED" for attempt in attempts
-    )
-
-
 def prepare_run(
     state: dict, mode: str, target: str, new_candidate: bool
 ) -> dict:
@@ -263,12 +240,10 @@ def prepare_run(
     attempts = run.get("attempts")
     if not isinstance(attempts, list):
         raise ValueError("ATTEMPT_STATE_INVALID")
-    if scene_attempts_used(attempts) >= MAX_ATTEMPTS:
-        raise ValueError(f"ATTEMPT_LIMIT_REACHED: {mode}/{target}")
     if run.get("status") != "ACTIVE":
         raise ValueError("NEW_CANDIDATE_REQUIRED: active scene is closed")
     if attempts and attempts[-1].get("status") == "PENDING":
-        raise ValueError("FAILURE_RECORD_REQUIRED: record the last scene failure first")
+        raise ValueError("USER_DECISION_REQUIRED: accept or reject the current preview")
     return run
 
 
@@ -284,8 +259,8 @@ def prompt_file_path(
 
 def verify_master(manifest_path: Path, layout_path: Path) -> None:
     manifest_path = manifest_path.expanduser().resolve()
-    product_dir = layout_path.parent
-    if manifest_path != product_dir / "master.json":
+    product_dir = layout_path.parent.parent
+    if manifest_path != product_dir / "reusable" / "master.json":
         raise ValueError("MASTER_MANIFEST_PATH_INVALID")
     manifest = read_json(manifest_path)
     if manifest.get("state") != "BOUND":
@@ -295,12 +270,11 @@ def verify_master(manifest_path: Path, layout_path: Path) -> None:
         raise ValueError("MASTER_MANIFEST_INVALID")
     expected_paths = {
         "layout": layout_path,
-        "background": product_dir / "ORIGINAL_MASTER_BACKGROUND.png",
-        "product": product_dir / "ORIGINAL_MASTER_PRODUCT.png",
-        "shadow": product_dir / "ORIGINAL_MASTER_SHADOW.png",
-        "scene": product_dir / "ORIGINAL_MASTER_SCENE.png",
         "final": product_dir / "output" / "ORIGINAL_MASTER_FINAL.png",
-        "thumbnail": product_dir / "ORIGINAL_MASTER_FINAL-thumb.png",
+        "background": product_dir / "reusable" / "ORIGINAL_MASTER_BACKGROUND.png",
+        "product": product_dir / "reusable" / "ORIGINAL_MASTER_PRODUCT.png",
+        "shadow": product_dir / "reusable" / "ORIGINAL_MASTER_SHADOW.png",
+        "scene": product_dir / "reusable" / "ORIGINAL_MASTER_SCENE.png",
     }
     for key, expected_path in expected_paths.items():
         try:
@@ -385,10 +359,13 @@ def build_prompt(args: argparse.Namespace) -> None:
     run = prepare_run(state, args.mode, target, args.new_candidate)
     attempts = run["attempts"]
     attempt_number = len(attempts) + 1
-    parts = [image_prompt(), information_safe_zone_block(layout)]
+    parts = [image_prompt()]
     if args.mode == "SKU":
         parts.append(fenced_block(VARIANT_REFERENCE, "SKU edit block"))
-    increment = failure_increment(failures_from(product_dir / "scene-failures.json"))
+    parts.append(information_safe_zone_block(layout))
+    increment = additions_block(
+        additions_from(product_dir / "reusable" / PROMPT_ADDITIONS_NAME)
+    )
     if increment:
         parts.append(increment)
     parts.append(PRODUCT_AREA_POLICY)
@@ -438,26 +415,13 @@ def atomic_write_text(path: Path, data: str) -> None:
         raise
 
 
-def record_failure(args: argparse.Namespace) -> None:
-    log_path = Path(args.log).expanduser().resolve()
-    if log_path.name != "scene-failures.json":
-        raise ValueError("FAILURE_LOG_FILENAME_INVALID")
-    _, product_dir = load_layout(log_path.parent / "layout.json")
-    if log_path != product_dir / "scene-failures.json":
-        raise ValueError("FAILURE_LOG_PATH_INVALID")
-    failed_checks = [value.strip() for value in args.failed_check]
-    corrections = [value.strip() for value in args.correction]
-    if len(failed_checks) != len(corrections) or not failed_checks:
-        raise ValueError("FAILURE_CORRECTION_COUNT_MISMATCH")
-    if not all(failed_checks) or not all(corrections):
-        raise ValueError("FAILURE_CORRECTION_EMPTY")
-
-    entries = failures_from(log_path)
+def record_rejection(args: argparse.Namespace) -> None:
+    _, product_dir = load_layout(Path(args.layout))
     state = load_attempt_state(product_dir)
     target = resolve_active_target(args, state)
     run = active_run(state)
     if run is None:
-        raise ValueError("FAILURE_RECORD_WITHOUT_SCENE_ATTEMPT")
+        raise ValueError("REJECTION_WITHOUT_SCENE_ATTEMPT")
     if run.get("mode") != args.mode or run.get("target") != target:
         raise ValueError(
             "NEW_CANDIDATE_REQUIRED: active scene is "
@@ -465,35 +429,27 @@ def record_failure(args: argparse.Namespace) -> None:
         )
     attempts = run.get("attempts")
     if not isinstance(attempts, list) or not attempts:
-        raise ValueError("FAILURE_RECORD_WITHOUT_SCENE_ATTEMPT")
-    if scene_attempts_used(attempts) > MAX_ATTEMPTS:
-        raise ValueError(f"ATTEMPT_LIMIT_REACHED: {args.mode}/{target}")
+        raise ValueError("REJECTION_WITHOUT_SCENE_ATTEMPT")
     current = attempts[-1]
     if current.get("status") != "PENDING":
-        raise ValueError("FAILURE_ALREADY_RECORDED: build the next scene first")
-    attempt = int(current["attempt"])
-    record = {
-        "mode": args.mode,
-        "target": target,
-        "run_id": run["run_id"],
-        "attempt": attempt,
-        "checks": [
-            {"failed_check": failed, "correction": correction}
-            for failed, correction in zip(failed_checks, corrections)
-        ],
-    }
-    entries.append(record)
-    current["status"] = "FAILED"
-    current["checks"] = record["checks"]
-    attempts_used = scene_attempts_used(attempts)
+        raise ValueError("REJECTION_ALREADY_RECORDED")
+    addition = (args.additional_prompt or "").strip()
+    additions_path = product_dir / "reusable" / PROMPT_ADDITIONS_NAME
+    additions = additions_from(additions_path)
+    if addition:
+        additions.append(addition)
+        atomic_write(additions_path, additions)
+    current["status"] = "USER_REJECTED"
+    current["additional_prompt"] = addition or None
     atomic_write(attempt_state_path(product_dir), state)
-    atomic_write(log_path, entries)
     json.dump(
         {
-            "recorded": record,
-            "retry_allowed": attempts_used < MAX_ATTEMPTS,
-            "attempts_used": attempts_used,
-            "attempts_max": MAX_ATTEMPTS,
+            "mode": args.mode,
+            "target": target,
+            "attempt": int(current["attempt"]),
+            "status": "USER_REJECTED",
+            "additional_prompt": addition or None,
+            "accumulated_additions": len(additions),
         },
         sys.stdout,
         ensure_ascii=False,
@@ -531,9 +487,6 @@ def record_delivery_failure(args: argparse.Namespace) -> None:
                 "status": "DELIVERY_FAILED",
                 "reason": reason,
             },
-            "retry_allowed": True,
-            "attempts_used": scene_attempts_used(attempts),
-            "attempts_max": MAX_ATTEMPTS,
         },
         sys.stdout,
         ensure_ascii=False,
@@ -558,13 +511,12 @@ def main() -> None:
     )
     build.set_defaults(handler=build_prompt)
 
-    record = subparsers.add_parser("record-failure")
-    record.add_argument("--log", required=True)
+    record = subparsers.add_parser("reject")
+    record.add_argument("--layout", required=True)
     record.add_argument("--mode", required=True, choices=("MASTER", "SKU"))
     record.add_argument("--target")
-    record.add_argument("--failed-check", action="append", required=True)
-    record.add_argument("--correction", action="append", required=True)
-    record.set_defaults(handler=record_failure)
+    record.add_argument("--additional-prompt")
+    record.set_defaults(handler=record_rejection)
 
     delivery = subparsers.add_parser("record-delivery-failure")
     delivery.add_argument("--layout", required=True)
