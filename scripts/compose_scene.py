@@ -87,6 +87,7 @@ def main() -> None:
     parser.add_argument("--output", required=True)
     parser.add_argument("--product-layer", required=True)
     parser.add_argument("--shadow-mask", required=True)
+    parser.add_argument("--reuse-layers", action="store_true")
     args = parser.parse_args()
 
     background_path = Path(args.background).expanduser().resolve()
@@ -97,45 +98,61 @@ def main() -> None:
 
     try:
         background = load(background_path, "RGBA")
-        product = clean_product(load(product_path, "RGBA"))
-        source_aspect = product.width / product.height
-        profile, max_width_frac, bottom_margin_frac = placement_profile(source_aspect)
-        product = fit_product(product, *background.size, max_width_frac)
         width, height = background.size
         if width * 4 != height * 3:
             raise ValueError(f"BACKGROUND_NOT_3_4: got {width}x{height}")
-
-        right = width - round(width * PRODUCT_RIGHT_MARGIN_FRAC)
-        bottom = height - round(height * bottom_margin_frac)
-        left = right - product.width
-        top = bottom - product.height
-        if left < 0 or top < 0:
-            raise ValueError("PRODUCT_PLACEMENT_OUTSIDE_CANVAS")
-
-        product_layer = Image.new("RGBA", background.size, (0, 0, 0, 0))
-        product_layer.alpha_composite(product, (left, top))
-        product_mask = product_layer.getchannel("A")
-
-        distance = product.height * SHADOW_DISTANCE_FRAC
-        radians = math.radians(ANGLE_DEGREES)
-        offset_x = round(distance * math.cos(radians))
-        offset_y = round(distance * math.sin(radians))
-        shadow = Image.new("L", background.size, 0)
-        shadow.paste(product_mask, (offset_x, offset_y))
-        blur = max(1, round(height * SHADOW_BLUR_FRAC))
-        shadow = shadow.filter(ImageFilter.GaussianBlur(blur))
-        shadow = shadow.point(lambda value: round(value * SHADOW_OPACITY))
+        if args.reuse_layers:
+            product_layer = load(product_layer_path, "RGBA")
+            shadow = load(shadow_mask_path, "L")
+            if product_layer.size != background.size or shadow.size != background.size:
+                raise ValueError("CACHED_LAYER_SIZE_MISMATCH")
+            bbox = product_layer.getchannel("A").getbbox()
+            if bbox is None:
+                raise ValueError("CACHED_PRODUCT_LAYER_EMPTY")
+            left, top, right, bottom = bbox
+            source_aspect = (right - left) / (bottom - top)
+            profile, max_width_frac, bottom_margin_frac = placement_profile(source_aspect)
+            distance = (bottom - top) * SHADOW_DISTANCE_FRAC
+            radians = math.radians(ANGLE_DEGREES)
+            offset_x = round(distance * math.cos(radians))
+            offset_y = round(distance * math.sin(radians))
+            blur = max(1, round(height * SHADOW_BLUR_FRAC))
+        else:
+            product = clean_product(load(product_path, "RGBA"))
+            source_aspect = product.width / product.height
+            profile, max_width_frac, bottom_margin_frac = placement_profile(source_aspect)
+            product = fit_product(product, *background.size, max_width_frac)
+            right = width - round(width * PRODUCT_RIGHT_MARGIN_FRAC)
+            bottom = height - round(height * bottom_margin_frac)
+            left = right - product.width
+            top = bottom - product.height
+            if left < 0 or top < 0:
+                raise ValueError("PRODUCT_PLACEMENT_OUTSIDE_CANVAS")
+            product_layer = Image.new("RGBA", background.size, (0, 0, 0, 0))
+            product_layer.alpha_composite(product, (left, top))
+            product_mask = product_layer.getchannel("A")
+            distance = product.height * SHADOW_DISTANCE_FRAC
+            radians = math.radians(ANGLE_DEGREES)
+            offset_x = round(distance * math.cos(radians))
+            offset_y = round(distance * math.sin(radians))
+            shadow = Image.new("L", background.size, 0)
+            shadow.paste(product_mask, (offset_x, offset_y))
+            blur = max(1, round(height * SHADOW_BLUR_FRAC))
+            shadow = shadow.filter(ImageFilter.GaussianBlur(blur))
+            shadow = shadow.point(lambda value: round(value * SHADOW_OPACITY))
 
         shadow_layer = Image.new("RGBA", background.size, (0, 0, 0, 0))
         shadow_layer.putalpha(shadow)
         scene = Image.alpha_composite(background, shadow_layer)
         scene = Image.alpha_composite(scene, product_layer).convert("RGB")
 
-        for path in (output_path, product_layer_path, shadow_mask_path):
-            new_output(path)
+        new_output(output_path)
         scene.save(output_path, "PNG")
-        product_layer.save(product_layer_path, "PNG")
-        shadow.save(shadow_mask_path, "PNG")
+        if not args.reuse_layers:
+            for path in (product_layer_path, shadow_mask_path):
+                new_output(path)
+            product_layer.save(product_layer_path, "PNG")
+            shadow.save(shadow_mask_path, "PNG")
     except ValueError as exc:
         sys.exit(str(exc))
 
