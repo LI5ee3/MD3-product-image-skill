@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Small end-to-end functional check for the local workflow scripts."""
+"""End-to-end self-check for the user-controlled MD3 workflow."""
 
 import hashlib
 import json
@@ -10,16 +10,13 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
-from compose_scene import placement_profile
-from scene_prompt import PRODUCT_AREA_POLICY, information_safe_zone_block
-
 
 SCRIPTS = Path(__file__).resolve().parent
 
 
-def run(script: str, *arguments: str) -> str:
+def run(script: str, *args: str) -> str:
     completed = subprocess.run(
-        [sys.executable, str(SCRIPTS / script), *arguments],
+        [sys.executable, str(SCRIPTS / script), *args],
         text=True,
         capture_output=True,
         check=False,
@@ -29,15 +26,14 @@ def run(script: str, *arguments: str) -> str:
     return completed.stdout
 
 
-def must_fail(script: str, *arguments: str) -> str:
+def must_fail(script: str, *args: str) -> str:
     completed = subprocess.run(
-        [sys.executable, str(SCRIPTS / script), *arguments],
+        [sys.executable, str(SCRIPTS / script), *args],
         text=True,
         capture_output=True,
         check=False,
     )
-    if not completed.returncode:
-        raise AssertionError(f"expected failure: {script}")
+    assert completed.returncode
     return completed.stderr or completed.stdout
 
 
@@ -46,375 +42,164 @@ def sha256(path: Path) -> str:
 
 
 def main() -> None:
-    assert placement_profile(1.50) == ("WIDE", 0.68, 0.18)
-    assert placement_profile(0.80) == ("TALL", 0.52, 0.12)
-    assert placement_profile(1.00) == ("STANDARD", 0.52, 0.18)
-
     with tempfile.TemporaryDirectory(prefix="md3-product-image-") as temp:
         root = Path(temp)
-        output_root = root / "products"
-        reference = root / "product.png"
-        logo = root / "logo.png"
-        master_background = root / "generated-master-background.png"
-        sku_background = root / "generated-sku-background.png"
-        sku_product = root / "sku-product.png"
-
+        product = root / "product.png"
+        sku_product = root / "sku.png"
+        logo = root / "source-logo.png"
+        background = root / "background.png"
+        second_background = root / "background-2.png"
         product_image = Image.new("RGBA", (300, 400), (0, 0, 0, 0))
         ImageDraw.Draw(product_image).rounded_rectangle(
-            (120, 80, 270, 330), radius=55, fill="#EA4335"
+            (110, 60, 280, 350), radius=45, fill="#EA4335"
         )
-        product_image.save(reference)
-        sku_product_image = Image.new("RGBA", (300, 400), (0, 0, 0, 0))
-        ImageDraw.Draw(sku_product_image).rounded_rectangle(
-            (120, 80, 270, 330), radius=55, fill="#4285F4"
+        product_image.save(product)
+        sku_image = Image.new("RGBA", (300, 400), (0, 0, 0, 0))
+        ImageDraw.Draw(sku_image).rounded_rectangle(
+            (110, 60, 280, 350), radius=45, fill="#4285F4"
         )
-        sku_product_image.save(sku_product)
-        logo_image = Image.new("RGBA", (180, 80), (0, 0, 0, 0))
-        ImageDraw.Draw(logo_image).rounded_rectangle(
-            (20, 15, 150, 60), radius=10, fill="#202124"
-        )
+        sku_image.save(sku_product)
+        logo_image = Image.new("RGBA", (240, 80), (0, 0, 0, 0))
+        ImageDraw.Draw(logo_image).rectangle((10, 10, 230, 70), fill="#202124")
         logo_image.save(logo)
-        Image.new("RGB", (300, 400), "#F4F6F8").save(master_background)
-        Image.new("RGB", (300, 400), "#EDF3FA").save(sku_background)
+        Image.new("RGB", (300, 400), "#F4F6F8").save(background)
+        Image.new("RGB", (300, 400), "#EEF3F8").save(second_background)
 
-        layout_report = json.loads(
-            run(
-                "measure_text.py",
-                "--complete-name",
-                "Acme Watch",
-                "--brand",
-                "Acme",
-                "--remaining-name",
-                "Watch",
-                "--logo-type",
-                "GRAPHIC",
-                "--title-lines",
-                "1",
-                "--version",
-                "Global",
-                "--product-reference",
-                str(reference),
-                "--logo",
-                str(logo),
-                "--output-root",
-                str(output_root),
-                "--canvas-height",
-                "400",
-            )
-        )
-        product_dir = output_root / "Acme Watch"
-        layout = product_dir / "layout.json"
-        assert layout_report["product_reference"]["ratio_exact_3_4"] is True
-        assert layout_report["product_reference"]["visible_bbox"] == {
-            "left": 120,
-            "top": 80,
-            "right": 271,
-            "bottom": 331,
-        }
-        assert layout_report["logo"]["visible_bbox"] == {
-            "left": 20,
-            "top": 15,
-            "right": 151,
-            "bottom": 61,
-        }
-        assert layout_report["rendered_title"] == "Acme Watch"
-
-        text_logo_report = json.loads(
-            run(
-                "measure_text.py",
-                "--complete-name",
-                "Garmin Forerunner 965",
-                "--brand",
-                "Garmin",
-                "--remaining-name",
-                "Forerunner 965",
-                "--logo-type",
-                "TEXT",
-                "--title-lines",
-                "1",
-                "--product-reference",
-                str(reference),
-                "--logo",
-                str(logo),
-                "--output-root",
-                str(root / "text-logo-products"),
-                "--canvas-height",
-                "400",
-            )
-        )
-        assert text_logo_report["rendered_title"] == "Forerunner 965"
-        assert text_logo_report["title_lines"] == ["Forerunner 965"]
-        text_logo_dir = root / "text-logo-products" / "Garmin Forerunner 965"
-        assert "FAILURE_RECORD_WITHOUT_SCENE_ATTEMPT" in must_fail(
-            "scene_prompt.py",
-            "record-failure",
-            "--log",
-            str(text_logo_dir / "scene-failures.json"),
-            "--mode",
-            "MASTER",
-            "--target",
-            "legacy",
-            "--failed-check",
-            "Legacy failure",
-            "--correction",
-            "Legacy correction",
-        )
-        text_logo_state = json.loads(
-            (text_logo_dir / "scene-attempts.json").read_text(encoding="utf-8")
-        )
-        assert text_logo_state["active_run_id"] is None
-        assert not (text_logo_dir / "scene-failures.json").exists()
+        report = json.loads(run(
+            "measure_text.py",
+            "--complete-name", "Google Pixel",
+            "--brand", "Google",
+            "--remaining-name", "Pixel",
+            "--logo-type", "GRAPHIC",
+            "--title-lines", "1",
+            "--version", "Pro",
+            "--product-reference", str(product),
+            "--logo", str(logo),
+            "--output-root", str(root / "products"),
+            "--canvas-height", "400",
+        ))
+        product_dir = Path(report["product_directory"])
+        reusable = product_dir / "reusable"
+        layout = reusable / "layout.json"
+        assert layout.is_file() and (reusable / "logo.png").is_file()
 
         prompt = run(
-            "scene_prompt.py",
-            "build",
-            "--mode",
-            "MASTER",
-            "--layout",
-            str(layout),
-            "--target",
-            "01",
+            "scene_prompt.py", "build", "--mode", "MASTER",
+            "--layout", str(layout), "--target", "01",
         )
-        expected_prompt = (
-            SCRIPTS.parent / "references" / "image-gen-prompt.txt"
-        ).read_text(encoding="utf-8").rstrip("\n")
-        safe_zone_block = information_safe_zone_block(layout_report)
-        assert prompt == (
-            f"{expected_prompt}\n\n{safe_zone_block}\n\n{PRODUCT_AREA_POLICY}"
+        assert "FINAL_INFORMATION_SAFE_ZONE" in prompt
+        assert "USER_DECISION_REQUIRED" in must_fail(
+            "scene_prompt.py", "build", "--mode", "MASTER",
+            "--layout", str(layout), "--target", "01",
         )
-        assert "FINAL_INFORMATION_SAFE_ZONE" in safe_zone_block
-        assert "x 0.0%" in safe_zone_block
-        assert "y 0.0%" in safe_zone_block
-        assert "expands the union by 5.0%" in safe_zone_block
-        assert "TITLE_LINE_RECT_1" not in safe_zone_block
-        assert "CONNECTOR" not in safe_zone_block
-        assert "continue the geometric background" not in safe_zone_block
-        assert "Do not merge" not in safe_zone_block
-
-        failure_log = product_dir / "scene-failures.json"
+        preview = json.loads(run(
+            "artifact_flow.py", "preview",
+            "--generated-background", str(background),
+            "--product", str(product),
+            "--product-dir", str(product_dir),
+            "--candidate-id", "01",
+        ))
+        assert preview["information"] == {
+            "title_color": "2C2C2C",
+            "version_color": "5A5A5A",
+        }
+        cached_product = reusable / "master-candidate-01-product.png"
+        cached_shadow = reusable / "master-candidate-01-shadow.png"
+        cached_hashes = (sha256(cached_product), sha256(cached_shadow))
         run(
-            "scene_prompt.py",
-            "record-failure",
-            "--log",
-            str(failure_log),
-            "--mode",
-            "MASTER",
-            "--target",
-            "01",
-            "--failed-check",
-            "A card edge crosses the final information safe zone",
-            "--correction",
-            "Move the card edge outside the final information safe zone",
+            "artifact_flow.py", "discard-preview",
+            "--product-dir", str(product_dir), "--candidate-id", "01",
         )
-        retry_prompt = run(
-            "scene_prompt.py",
-            "build",
-            "--mode",
-            "MASTER",
-            "--layout",
-            str(layout),
-            "--target",
-            "01",
+        run(
+            "scene_prompt.py", "reject", "--layout", str(layout),
+            "--mode", "MASTER", "--target", "01",
+            "--additional-prompt", "Keep the left side quieter",
         )
-        assert retry_prompt.startswith(
-            f"{expected_prompt}\n\n{safe_zone_block}\n\nTemporary corrections accumulated for this product:"
-        )
-        assert retry_prompt.count(
-            "A card edge crosses the final information safe zone"
-        ) == 1
-        assert retry_prompt.count(
-            "Move the card edge outside the final information safe zone"
-        ) == 1
-        assert retry_prompt.endswith(PRODUCT_AREA_POLICY)
 
-        limit_product_dir = root / "text-logo-products" / "Garmin Forerunner 965"
-        limit_layout = limit_product_dir / "layout.json"
-        limit_failure_log = limit_product_dir / "scene-failures.json"
-        for attempt in range(3):
-            limit_prompt = run(
-                "scene_prompt.py",
-                "build",
-                "--mode",
-                "MASTER",
-                "--layout",
-                str(limit_layout),
-                "--target",
-                "limit",
+        for index in range(4):
+            retry_prompt = run(
+                "scene_prompt.py", "build", "--mode", "MASTER",
+                "--layout", str(layout), "--target", "01",
             )
-            for previous in range(attempt):
-                assert limit_prompt.count(f"Failure {previous + 1}") == 1
-                assert limit_prompt.count(f"Correction {previous + 1}") == 1
-            run(
-                "scene_prompt.py",
-                "record-failure",
-                "--log",
-                str(limit_failure_log),
-                "--mode",
-                "MASTER",
-                "--target",
-                "limit",
-                "--failed-check",
-                f"Failure {attempt + 1}",
-                "--correction",
-                f"Correction {attempt + 1}",
-            )
-        assert "ATTEMPT_LIMIT_REACHED" in must_fail(
-            "scene_prompt.py",
-            "build",
-            "--mode",
-            "MASTER",
-            "--layout",
-            str(limit_layout),
-            "--target",
-            "limit",
-        )
-
-        bad_color_error = must_fail(
-            "artifact_flow.py",
-            "preview",
-            "--generated-background",
-            str(master_background),
-            "--product",
-            str(reference),
-            "--product-dir",
-            str(product_dir),
-            "--candidate-id",
-            "01",
-            "--text-color",
-            "202124",
-            "--version-color",
-            "202124",
-        )
-        assert "VERSION_COLOR_TOO_PROMINENT" in bad_color_error, bad_color_error
-        assert not list(product_dir.glob("master-candidate-01*"))
+            assert retry_prompt.count("Keep the left side quieter") == 1
+            if index < 3:
+                run(
+                    "scene_prompt.py", "reject", "--layout", str(layout),
+                    "--mode", "MASTER", "--target", "01",
+                )
 
         run(
-            "artifact_flow.py",
-            "preview",
-            "--generated-background",
-            str(master_background),
-            "--product",
-            str(reference),
-            "--product-dir",
-            str(product_dir),
-            "--candidate-id",
-            "01",
-            "--text-color",
-            "202124",
-            "--version-color",
-            "5F6368",
+            "artifact_flow.py", "preview",
+            "--generated-background", str(second_background),
+            "--product", str(product),
+            "--product-dir", str(product_dir),
+            "--candidate-id", "01",
+        )
+        assert cached_hashes == (sha256(cached_product), sha256(cached_shadow))
+        run(
+            "artifact_flow.py", "candidate",
+            "--product-dir", str(product_dir), "--candidate-id", "01",
         )
         run(
-            "artifact_flow.py",
-            "candidate",
-            "--product-dir",
-            str(product_dir),
-            "--candidate-id",
-            "01",
+            "artifact_flow.py", "bind",
+            "--product-dir", str(product_dir), "--candidate-id", "01",
         )
-        assert not any((product_dir / "output").iterdir())
-        assert (product_dir / "master-candidate-01.png").is_file()
-        assert (product_dir / "master-candidate-01-thumb.png").is_file()
-        assert (product_dir / "master-candidate-01-background.png").is_file()
-        assert (product_dir / "master-candidate-01-product.png").is_file()
-        assert (product_dir / "master-candidate-01-shadow.png").is_file()
-
-        run(
-            "artifact_flow.py",
-            "bind",
-            "--product-dir",
-            str(product_dir),
-            "--candidate-id",
-            "01",
-        )
-        assert not list(product_dir.glob("master-candidate-01*"))
+        master = reusable / "master.json"
+        assert master.is_file()
         assert {path.name for path in (product_dir / "output").iterdir()} == {
             "ORIGINAL_MASTER_FINAL.png"
         }
-        assert (product_dir / "ORIGINAL_MASTER_BACKGROUND.png").is_file()
-        assert (product_dir / "ORIGINAL_MASTER_PRODUCT.png").is_file()
-        assert (product_dir / "ORIGINAL_MASTER_SHADOW.png").is_file()
-        master_manifest = json.loads((product_dir / "master.json").read_text())
-        assert master_manifest["scene_composite"]["shadow"]["angle_degrees"] == 50
-        assert master_manifest["scene_composite"]["shadow"]["opacity"] == 0.28
-        assert set(master_manifest["scene_composite"]) == {"product_box", "shadow"}
-        master_hash = sha256(product_dir / "master.json")
 
         sku_prompt = run(
-            "scene_prompt.py",
-            "build",
-            "--mode",
-            "SKU",
-            "--layout",
-            str(layout),
-            "--master",
-            str(product_dir / "master.json"),
+            "scene_prompt.py", "build", "--mode", "SKU",
+            "--layout", str(layout), "--master", str(master),
         )
-        variant_reference = (
-            SCRIPTS.parent / "references" / "replace-variant-block.md"
-        ).read_text(encoding="utf-8")
-        variant_prompt = variant_reference.split("```text\n", 1)[1].split(
-            "\n```", 1
-        )[0]
-        assert sku_prompt.startswith(
-            f"{expected_prompt}\n\n{safe_zone_block}\n\n{variant_prompt}\n\n"
-        )
-        assert sku_prompt.count(
-            "A card edge crosses the final information safe zone"
-        ) == 1
-        assert sku_prompt.count(
-            "Move the card edge outside the final information safe zone"
-        ) == 1
-        assert sku_prompt.endswith(PRODUCT_AREA_POLICY)
-
-        run(
-            "artifact_flow.py",
-            "sku",
-            "--generated-background",
-            str(sku_background),
-            "--product",
-            str(sku_product),
-            "--product-dir",
-            str(product_dir),
-        )
-        assert {path.name for path in (product_dir / "output").iterdir()} == {
-            "ORIGINAL_MASTER_FINAL.png",
-            "SKU_VARIANT-A.png",
+        assert "Keep the left side quieter" in sku_prompt
+        sku_preview_report = json.loads(run(
+            "artifact_flow.py", "sku-preview",
+            "--generated-background", str(background),
+            "--product", str(sku_product),
+            "--product-dir", str(product_dir),
+        ))
+        assert sku_preview_report["information"] == {
+            "title_color": "2C2C2C",
+            "version_color": "5A5A5A",
         }
-        assert (product_dir / "SKU_VARIANT-A-thumb.png").is_file()
-        assert (product_dir / "SKU_VARIANT-A-background.png").is_file()
-        assert (product_dir / "SKU_VARIANT-A-product.png").is_file()
-        assert (product_dir / "SKU_VARIANT-A-shadow.png").is_file()
-        assert sha256(product_dir / "master.json") == master_hash
-
-        cached_logo = product_dir / "logo.png"
-        cached_logo_bytes = cached_logo.read_bytes()
-        cached_logo.write_bytes(b"tampered")
-        assert "INFORMATION_ASSET_HASH_MISMATCH" in must_fail(
-            "scene_prompt.py",
-            "build",
-            "--mode",
-            "SKU",
-            "--layout",
-            str(layout),
-            "--master",
-            str(product_dir / "master.json"),
+        sku_layers = (
+            reusable / "SKU_VARIANT-A-product.png",
+            reusable / "SKU_VARIANT-A-shadow.png",
         )
-        cached_logo.write_bytes(cached_logo_bytes)
-
-        (product_dir / "ORIGINAL_MASTER_SCENE.png").write_bytes(b"tampered")
-        assert "MASTER_HASH_MISMATCH" in must_fail(
-            "scene_prompt.py",
-            "build",
-            "--mode",
-            "SKU",
-            "--layout",
-            str(layout),
-            "--master",
-            str(product_dir / "master.json"),
+        sku_layer_hashes = tuple(sha256(path) for path in sku_layers)
+        assert not (product_dir / "output" / "SKU_VARIANT-A.png").exists()
+        run("artifact_flow.py", "discard-sku-preview", "--product-dir", str(product_dir))
+        run(
+            "scene_prompt.py", "reject", "--layout", str(layout),
+            "--mode", "SKU", "--additional-prompt", "Use warmer accent cards",
         )
+        sku_retry_prompt = run(
+            "scene_prompt.py", "build", "--mode", "SKU",
+            "--layout", str(layout), "--master", str(master),
+        )
+        assert "Keep the left side quieter" in sku_retry_prompt
+        assert "Use warmer accent cards" in sku_retry_prompt
+        run(
+            "artifact_flow.py", "sku-preview",
+            "--generated-background", str(second_background),
+            "--product", str(sku_product),
+            "--product-dir", str(product_dir),
+        )
+        assert sku_layer_hashes == tuple(sha256(path) for path in sku_layers)
+        sku_preview = product_dir / "SKU_VARIANT-A-preview.png"
+        sku_preview_hash = sha256(sku_preview)
+        run("artifact_flow.py", "confirm-sku", "--product-dir", str(product_dir))
+        assert sha256(product_dir / "output" / "SKU_VARIANT-A.png") == sku_preview_hash
 
-    print("md3-product-image workflow self-check passed")
+        assert json.loads((reusable / "prompt-additions.json").read_text()) == [
+            "Keep the left side quieter",
+            "Use warmer accent cards",
+        ]
+        assert not list(product_dir.rglob("*thumb*"))
+        print("md3-product-image workflow self-check passed")
 
 
 if __name__ == "__main__":
