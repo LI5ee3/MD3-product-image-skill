@@ -9,21 +9,10 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageFilter, ImageStat
 
 
-MIN_TEXT_BACKGROUND_CONTRAST = 3.0
 MIN_LOGO_BACKGROUND_CONTRAST = 1.5
-VERSION_CONTRAST_FACTOR = 0.95
-AUTO_COLOR_LEVELS = (0, 16, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 255)
-OUTPUT_KINDS = ("CANDIDATE", "ORIGINAL_MASTER_FINAL", "SKU_VARIANT")
-
-
-def parse_color(value: str) -> tuple[int, int, int]:
-    raw = value.lstrip("#")
-    if len(raw) != 6:
-        raise ValueError(f"INVALID_COLOR: {value!r} must be RRGGBB")
-    try:
-        return tuple(int(raw[index : index + 2], 16) for index in (0, 2, 4))
-    except ValueError as exc:
-        raise ValueError(f"INVALID_COLOR: {value!r} must be RRGGBB") from exc
+TITLE_COLOR = (44, 44, 44)
+VERSION_COLOR = (90, 90, 90)
+OUTPUT_KINDS = ("CANDIDATE", "ORIGINAL_MASTER_FINAL", "SKU_PREVIEW", "SKU_VARIANT")
 
 
 def load_image(path: Path, mode: str) -> Image.Image:
@@ -62,53 +51,6 @@ def color_hex(color: tuple[int, int, int]) -> str:
     return "".join(f"{channel:02X}" for channel in color)
 
 
-def minimum_contrast(
-    color: tuple[int, int, int], backgrounds: list[tuple[int, int, int]]
-) -> float:
-    return min(contrast_ratio(color, background) for background in backgrounds)
-
-
-def choose_neutral_color(
-    backgrounds: list[tuple[int, int, int]],
-    target_contrast: float,
-    minimum: float,
-    upper_contrast: float | None = None,
-) -> tuple[int, int, int]:
-    choices = []
-    for level in AUTO_COLOR_LEVELS:
-        color = (level, level, level)
-        contrast = minimum_contrast(color, backgrounds)
-        if contrast < minimum:
-            continue
-        if upper_contrast is not None and contrast >= upper_contrast:
-            continue
-        choices.append((abs(contrast - target_contrast), -contrast, color))
-    if not choices:
-        raise ValueError("NO_READABLE_INFORMATION_COLOR")
-    return min(choices, key=lambda item: (item[0], item[1]))[2]
-
-
-def background_color_under_mask(
-    scene: Image.Image,
-    asset_path: Path,
-    rect: dict,
-    width: int,
-    height: int,
-) -> tuple[int, int, int]:
-    left, top, target_width, target_height = target_box(rect, width, height)
-    if left < 0 or top < 0 or left + target_width > width or top + target_height > height:
-        raise ValueError("VERSION_TEXT_RECT_OUTSIDE_CANVAS")
-    mask = load_image(asset_path, "L").resize(
-        (target_width, target_height), Image.Resampling.LANCZOS
-    )
-    if mask.getbbox() is None:
-        raise ValueError("VERSION_MASK_EMPTY")
-    background = scene.crop(
-        (left, top, left + target_width, top + target_height)
-    ).convert("RGB")
-    return tuple(int(value) for value in ImageStat.Stat(background, mask).median)
-
-
 def logo_background_contrast(
     scene: Image.Image,
     asset_path: Path,
@@ -140,65 +82,6 @@ def logo_background_contrast(
         int(value) for value in ImageStat.Stat(background, edge).median
     )
     return contrast_ratio(logo_color, background_color)
-
-
-def resolve_information_colors(
-    scene: Image.Image,
-    base: Path,
-    title_rects: list[dict],
-    version_rect: dict | None,
-    width: int,
-    height: int,
-    supplied_title: tuple[int, int, int] | None,
-    supplied_version: tuple[int, int, int] | None,
-) -> tuple[tuple[int, int, int], tuple[int, int, int] | None]:
-    title_backgrounds = [
-        background_color_under_mask(
-            scene, base / rect["asset"], rect, width, height
-        )
-        for rect in title_rects
-    ]
-    title_color = supplied_title or choose_neutral_color(
-        title_backgrounds, target_contrast=7.0, minimum=MIN_TEXT_BACKGROUND_CONTRAST
-    )
-    title_contrast = minimum_contrast(title_color, title_backgrounds)
-    if title_contrast < MIN_TEXT_BACKGROUND_CONTRAST:
-        raise ValueError(
-            f"TITLE_COLOR_BACKGROUND_CONTRAST_TOO_LOW: {title_contrast:.2f} "
-            f"< {MIN_TEXT_BACKGROUND_CONTRAST:.2f}"
-        )
-
-    if version_rect is None:
-        if supplied_version is not None:
-            raise ValueError("VERSION_COLOR_NOT_APPLICABLE")
-        return title_color, None
-
-    version_backgrounds = [
-        background_color_under_mask(
-            scene,
-            base / version_rect["asset"],
-            version_rect,
-            width,
-            height,
-        )
-    ]
-    version_color = supplied_version or choose_neutral_color(
-        version_backgrounds,
-        target_contrast=max(MIN_TEXT_BACKGROUND_CONTRAST, title_contrast * 0.72),
-        minimum=MIN_TEXT_BACKGROUND_CONTRAST,
-        upper_contrast=title_contrast * VERSION_CONTRAST_FACTOR,
-    )
-    version_contrast = minimum_contrast(version_color, version_backgrounds)
-    if version_contrast < MIN_TEXT_BACKGROUND_CONTRAST:
-        raise ValueError(
-            f"VERSION_COLOR_BACKGROUND_CONTRAST_TOO_LOW: {version_contrast:.2f} "
-            f"< {MIN_TEXT_BACKGROUND_CONTRAST:.2f}"
-        )
-    if version_contrast >= title_contrast:
-        raise ValueError(
-            "VERSION_COLOR_TOO_PROMINENT: version contrast must be lower than title"
-        )
-    return title_color, version_color
 
 
 def paste_logo(
@@ -235,7 +118,7 @@ def validate_output_path(kind: str, output: Path, product_dir: Path) -> None:
             or not output.name.startswith("master-candidate-")
             or output.name == "master-candidate-.png"
             or output.suffix.lower() != ".png"
-            or output.name.endswith(("-scene.png", "-thumb.png"))
+            or output.name.endswith("-scene.png")
         ):
             raise ValueError(
                 "CANDIDATE_PATH_INVALID: expected product/master-candidate-<id>.png"
@@ -248,6 +131,15 @@ def validate_output_path(kind: str, output: Path, product_dir: Path) -> None:
         expected = output_dir / "ORIGINAL_MASTER_FINAL.png"
         if output != expected:
             raise ValueError(f"MASTER_FINAL_PATH_INVALID: expected {expected}")
+        return
+
+    if kind == "SKU_PREVIEW":
+        if (
+            output.parent != product_dir
+            or not output.name.startswith("SKU_VARIANT-")
+            or not output.name.endswith("-preview.png")
+        ):
+            raise ValueError("SKU_PREVIEW_PATH_INVALID")
         return
 
     if (
@@ -267,8 +159,6 @@ def main() -> None:
     parser.add_argument("--layout", required=True)
     parser.add_argument("--output", required=True)
     parser.add_argument("--output-kind", required=True, choices=OUTPUT_KINDS)
-    parser.add_argument("--text-color", default=None)
-    parser.add_argument("--version-color", default=None)
     args = parser.parse_args()
 
     scene_path = Path(args.scene).expanduser().resolve()
@@ -286,9 +176,10 @@ def main() -> None:
     if layout.get("canvas", {}).get("ratio") != "3:4":
         sys.exit("LAYOUT_NOT_3_4")
 
-    product_dir = layout_path.parent
-    if layout_path.name != "layout.json":
-        sys.exit("LAYOUT_PATH_INVALID: expected <complete product name>/layout.json")
+    reusable_dir = layout_path.parent
+    product_dir = reusable_dir.parent
+    if layout_path != product_dir / "reusable" / "layout.json":
+        sys.exit("LAYOUT_PATH_INVALID: expected <product>/reusable/layout.json")
     if layout.get("product_directory") != str(product_dir):
         sys.exit("PRODUCT_DIRECTORY_MISMATCH")
     if scene_path.parent != product_dir:
@@ -301,7 +192,7 @@ def main() -> None:
     if output.exists():
         sys.exit(f"REFUSE_OVERWRITE: {output}")
 
-    base = layout_path.parent
+    base = reusable_dir
     try:
         elements = layout["elements"]
         logo_rect = elements["LOGO_RECT"]
@@ -314,25 +205,8 @@ def main() -> None:
         logo_contrast = logo_background_contrast(
             scene, base / logo_rect["asset"], logo_rect, width, height
         )
-        if logo_contrast < MIN_LOGO_BACKGROUND_CONTRAST:
-            raise ValueError(
-                f"LOGO_BACKGROUND_CONTRAST_TOO_LOW: {logo_contrast:.2f} "
-                f"< {MIN_LOGO_BACKGROUND_CONTRAST:.2f}"
-            )
-        supplied_title = parse_color(args.text_color) if args.text_color else None
-        supplied_version = (
-            parse_color(args.version_color) if args.version_color else None
-        )
-        title_color, version_color = resolve_information_colors(
-            scene,
-            base,
-            title_rects,
-            version_rect,
-            width,
-            height,
-            supplied_title,
-            supplied_version,
-        )
+        title_color = TITLE_COLOR
+        version_color = VERSION_COLOR if version_rect else None
     except (KeyError, TypeError) as exc:
         sys.exit(f"LAYOUT_INVALID: {exc}")
     except ValueError as exc:
@@ -371,6 +245,7 @@ def main() -> None:
             "rendered_title": layout.get("rendered_title"),
             "title_lines": layout.get("title_lines"),
             "logo_background_contrast": round(logo_contrast, 3),
+            "logo_contrast_warning": logo_contrast < MIN_LOGO_BACKGROUND_CONTRAST,
             "title_color": color_hex(title_color),
             "version_color": color_hex(version_color) if version_color else None,
         },
