@@ -1,0 +1,11 @@
+A 3:4 professional e-commerce product hero background plate in the official Google Material Design 3 (MD3) style.
+
+Generate only the empty background plate. Use the supplied product reference only to derive the harmonious color palette. Do not generate, redraw, or include the product itself.
+
+Background: The background is composed of clean, layered 2.5D geometric cards, smooth rounded rectangles, and soft capsule shapes in a harmonious color palette derived directly from the product. It forms a flat, graphic, papercraft-like surface.
+
+Layout & Composition: There is no physical floor, table, or display stand; the scene relies entirely on flat background paneling.
+
+Lighting & Style: Keep the background under neutral, even, high-key studio illumination. Use restrained MD3 elevation shadows belonging to the background cards. Keep the overall image bright, clean, minimal, and graphic-first.
+
+Do not generate any elements that do not conform to the MD3 concept.

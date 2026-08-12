@@ -1,251 +1,308 @@
 ---
 name: md3-product-image
-description: "Create portrait 3:4 Google Classic MD3 e-commerce product images: one coherent scene with shallow 2.5D geometry, an exact source Logo, exact typography, independent master candidates, and locked-layout SKU variants with SKU-adaptive palettes. Use for product main images, master exploration, master selection, or SKUs derived from an approved ORIGINAL MASTER."
+description: "Create portrait 3:4 Google Classic MD3 e-commerce product images with Image Gen backgrounds and exact locally composited transparent products, fixed 2D shadows, Logo, and Roboto Bold text. Use for product main images, master selection, or locked-layout SKU variants."
 ---
 
 # MD3 Product Image
 
-## Load once and resolve inputs
+## Resolve inputs once
 
-Read this file once per task turn. Do not reread it unless the file changes.
-Reuse already resolved inputs from the current context; do not reopen a complete
-prior task or image payload merely to rediscover known paths or text.
+Reuse paths and values already known in the current task. Do not access historical
+memory, prior sessions, or earlier product outputs. Use only current uploads and
+the explicitly bound master in the current product directory.
 
-Never read from historical memory, prior sessions, or earlier outputs of any
-kind. Derive everything only from current uploads and the explicitly bound
-`ORIGINAL MASTER` of this session; do not recall, reconstruct, or reuse any
-prior candidate, SKU, palette, text, or composition from memory.
+For the first master request, require:
 
-For a master candidate, require product reference as Image 1, original Logo PNG
-as Image 2, exact complete product name, brand, remaining name/model after the
-brand, and optional exact version text. Confirm that brand plus remaining name
-reproduces the complete name. Never render placeholders.
+- authoritative transparent product PNG
+- original transparent Logo PNG
+- complete product name, brand, remaining name/model, and optional version
+- `TITLE_LINES`: `1` (`一行`) or `2` (`两行`)
+- `LOGO_TYPE`: `GRAPHIC` (`图形`) or `TEXT` (`文字`)
 
-Inspect the Logo at planned size and set one `TITLE_MODE`:
+Never infer `TITLE_LINES` or `LOGO_TYPE`. If either is absent, stop and request:
 
-- `WORDMARK_BRAND`: only when the Logo clearly spells the complete brand,
-  contains no product-name words, and remains readable at final size
-- `FULL_NAME`: for a symbol, abbreviation, ambiguous or unreadable wordmark,
-  any uncertainty, or an explicit request to repeat the brand
+```text
+产品名称显示行数：[一行/两行]
+品牌 Logo 类型：[图形/文字]
+```
 
-Set `RENDERED_TITLE` to the remaining name in `WORDMARK_BRAND`; otherwise use
-the complete name. Logo plus title must reproduce the identity without brand
-duplication. For an SKU, also require the explicitly approved `ORIGINAL MASTER`
-and current SKU product reference.
+Require `完整产品名称 == 品牌 + 一个空格 + 其余名称`. For `TEXT`, render only
+the remaining name; for `GRAPHIC`, render the complete name. Never repeat a
+text Logo brand in the title.
 
-## Run preflight and measure text
+## Keep one product in one directory
 
-Use these exact font files bundled with this skill for every task:
+Use `<output root>/<exact complete product name>` as `PRODUCT_DIRECTORY`.
+Never abbreviate or slugify it. Write every workflow artifact for that product
+inside this directory.
 
-- `TITLE_FONT_PATH=assets/Roboto-Bold.ttf`
-- `VERSION_FONT_PATH=assets/Roboto-Bold.ttf`
+- Keep `layout.json`, `master.json`, cached Logo/text assets, scenes, prompt and
+  attempt records, failure records, candidate files, and thumbnails in
+  `PRODUCT_DIRECTORY`.
+- Keep only `output/ORIGINAL_MASTER_FINAL.png` and
+  sequential `output/SKU_VARIANT-A.png`, `SKU_VARIANT-B.png`, and so on in
+  `output`.
+- Never put a thumbnail, candidate, scene, manifest, or temporary file in
+  `output`.
 
-Call these paths directly relative to the skill folder; never substitute
-another font. Stop and report if a file is unavailable or a character cannot
-render.
-
-The scripts require Python 3.10+ with `pillow` and `fonttools` installed.
-
-Before the first generation call:
-
-1. Confirm generation can receive every scene reference, exact portrait 3:4,
-   and the highest practical quality. Keep the Logo out of scene generation.
-2. Confirm the exact source Logo and typography can be added afterward. Stop if
-   required inputs, exact 3:4, or exact composition is unavailable.
-3. Call the Image Gen tool to output the image.
-4. Run `scripts/measure_text.py` with the resolved title, optional version, and
-   Logo to measure exact visible glyph and artwork bounds using
-   `TITLE_FONT_PATH` and `VERSION_FONT_PATH`.
-5. Use its `TITLE_FIT_TEST` for the one-line fit test. Keep the title's first
-   visible line around 16%-20% of canvas height with deliberate space below the
-   Logo.
-6. From the script output, collect the concrete normalized `x/y/w/h` rectangles
-   for `LOGO_RECT` and each `TITLE_LINE_RECT`.
-7. From the script output, size `VERSION_TEXT_RECT` with the measured version
-   glyphs and the title-to-version gap; set it to `NONE` when absent.
-8. Use the script's connected stepped zones as `INFORMATION_CLEAR_ZONES`; never
-   replace them with the outer bounding rectangle. Treat padding as optical
-   guidance, not a pixel-perfect threshold.
-9. Verify the zones fit the canvas and avoid the product region; validate
-   background boundaries after scene generation.
-10. Resolve every bracketed prompt field to concrete values before generation.
-   Keep exact future Logo, title, and version content out of the scene prompt;
-   stop rather than send any unresolved template token.
-
-Do not invent parameters the generator does not expose or require a fixed pixel
-resolution.
-
-## Build the canonical scene prompt
-
-Read `references/core-scene-block.md`. Append its `CORE_SCENE_BLOCK` unchanged
-to every scene call, replacing only brackets and adapting the declared input
-role; append its style block unchanged. For an SKU (`REPLACE_VARIANT`), also
-read `references/replace-variant-block.md` and append its block unchanged.
-Never rewrite, paraphrase, or expand them.
-
-Before generation, confirm 3:4, unified scene, one faithful product, separation,
-visibly shallow 2.5D panels and geometric fields, controlled hue-family
-contrast with matched perceived saturation, one resolved connected stepped
-information clear area, no future Logo/text content or backing, and the
-unchanged style block. For an SKU, also confirm the exact bound master and
-palette rule.
-
-## Use the fixed workflow and state
+## Run the fixed workflow
 
 Use:
 
-`PREFLIGHT -> MEASURE_TEXT -> BUILD_PROMPT -> GENERATE_SCENE -> VALIDATE_SCENE -> ADD_INFORMATION_GROUP -> VALIDATE_FINAL -> DELIVER`
+`MEASURE -> BUILD_PROMPT -> IMAGE_GEN_BACKGROUND -> BACKGROUND_CHECK -> LOCAL_SCENE_COMPOSITE -> COMPOSITE_CHECK -> CANDIDATE -> USER_APPROVAL -> BIND -> SKU`
 
-Generate product, environment, lighting, shadows, reflections,
-ambient response, perspective, scale, and spatial relationships together.
-Never create a background-only image and later paste in the product. Only the
-original Logo and exact typography may be added after scene acceptance. Never
-generate or add a backing for Logo, title, or version text.
+Image Gen creates only the empty MD3 background. Locally add the exact
+transparent product, deterministic 2D shadow, Logo, and text in that order.
 
-Use one state:
+### 1. Measure once
 
-- `CREATE_MASTER_OPTIONS`: generate one independent candidate and stop. Another
-  candidate restarts from original inputs and inherits nothing rejected.
-- `WAIT_FOR_MASTER_SELECTION`: bind only an explicitly selected final asset as
-  immutable `ORIGINAL MASTER`; never infer selection.
-- `REPLACE_VARIANT`: derive every SKU directly from that same master plus
-  `CURRENT SKU`, never from another SKU or the latest output.
+Run `scripts/measure_text.py` with the authoritative transparent product PNG as
+`--product-reference`, `--logo`, exact names,
+`--logo-type`, `--title-lines`, optional `--version`, and `--output-root`.
+Always use bundled `assets/Roboto-Bold.ttf`; never substitute a font.
 
-Save every SKU separately as `SKU_VARIANT`; never overwrite, relabel, copy, or
-bind it as master. Only an explicit request to end the SKU set and start a new
-master workflow releases the binding.
+The script creates the product directory, `layout.json`, the alpha-cropped Logo,
+and title/version masks. It rejects a product without a usable transparent PNG
+alpha channel and records source product and Logo measurements.
+Reuse them without remeasurement, recropping, or rerendering for every retry and
+SKU. Stop if the selected title line count cannot fit or any glyph is missing.
 
-A master containing an information backing is incompatible; start a new master
-workflow, never reuse its geometry for an SKU.
+### 2. Build the background prompt and call Image Gen
 
-After approval, lock Logo, title mode, exact text, typography, line breaks,
-information-group geometry, product display logic, background structure/material
-roles, composition, relative light-dark hierarchy, and primary light direction.
-
-## Retry without prompt expansion
-
-If the scene fails, discard it and regenerate from original inputs. Reuse the
-same `references/core-scene-block.md` and `references/replace-variant-block.md`
-blocks and bracket values unchanged. Append only:
+Run:
 
 ```text
-RETRY_CORRECTION:
-- [observed failed check] -> [one concrete required correction]
+python scripts/scene_prompt.py build --mode MASTER --layout <layout.json> --target <candidate-id>
 ```
 
-Record validation failures before retrying. Every recorded failure must appear
-once in the correction block; omit satisfied rules and generic restatements.
-Do not rewrite, paraphrase, or expand the base prompt. Make at most three
-complete-scene attempts; after the third failure, stop and report them. Never
-repair, inpaint, extend, locally erase, or use a failed scene as reference.
+Use stdout unchanged as the Image Gen prompt. Keep
+`references/image-gen-prompt.txt` unchanged. The script appends a layout-only
+block that merges the measured Logo, every title-line, and optional version safe
+rectangles into one outer rectangle, expands it by `5%` of the canvas on every
+side, and clips it to the canvas.
+If the same product has failure records, the script then appends their
+accumulated temporary correction block. It always appends the canonical product
+and shadow placement policy last, so that policy overrides any earlier temporary
+correction that requested an empty product or shadow area.
 
-## Validate the scene
+For a master, send only the authoritative transparent product PNG as a palette
+reference. Image Gen must not reproduce the product. Do not send the Logo or
+text assets. Request portrait 3:4 at the highest practical quality; do not
+invent unsupported generator parameters.
 
-Reject when any apply:
+When calling Image Gen through `functions.exec`, always forward its return value
+with `generatedImage(result)`:
 
-- canvas is not exact portrait 3:4 or is cropped from another ratio
-- product fidelity, single-product count, integration, lighting, perspective,
-  contact shadow, or adjacent-field separation fails
-- product is not the first focus
-- any major background panel or geometric field reads only as a flat
-  fill or gradient, lacks visible shallow depth, or breaks the light direction
-- major panels and fields collapse into one repeated near-identical hue family,
-  or the contrast family is excessively saturated, widely repeated, or becomes
-  a focal point that breaks the mandatory visual hierarchy
-- a protected information content zone or connector is interrupted, reveals a
-  visible boundary or backing, or cannot fit the planned information with
-  required clearance
-- an SKU violates the bound master, direct derivation, palette adaptation, or
-  product separation
-- forbidden content appears
+```javascript
+const result = await tools.image_gen__imagegen({ ... });
+generatedImage(result);
+```
 
-A boundary outside every protected zone is not a failure merely because it lies
-inside their overall outer bounds. Reject only when it enters protected geometry
-or visibly fragments the information group at full or thumbnail size. Minor
-deviation in optional outer padding is not a hard failure when optical clearance
-and readability remain sound.
+Never iterate or forward `result.content`; that can discard a successfully
+generated raster. Continue only after the call exposes an accessible saved
+background raster.
 
-## Add the exact information group
+If generation completes without an accessible raster, record a delivery
+failure, then rebuild the same target and call Image Gen again with the unchanged
+prompt:
 
-After scene acceptance, add only original Logo and exact typography in this
-vertical order: Logo, rendered title, version directly on the uninterrupted
-background. Run `scripts/compose_image.py` on the accepted scene with the
-resolved title, optional version, and Logo; it renders the exact typography
-from `TITLE_FONT_PATH`/`VERSION_FONT_PATH` and pastes the Logo at the planned
-content rectangles, so the composite matches the measured clear zones exactly.
-Use the Logo artwork's visible left edge as the shared text axis;
-ignore transparent PNG bounds. Compose within the planned content rectangles,
-in the upper half, inside the stepped clear area, and outside the product region.
-Never move the title upward, shrink it, or shift one element alone to rescue a failed scene;
-regenerate the scene instead. Move title and version together; move Logo and the
-text unit together globally.
+```text
+python scripts/scene_prompt.py record-delivery-failure --layout <layout.json> --mode <MASTER|SKU> [--target <candidate-id>] --reason <reason>
+```
 
-### Preserve the Logo
+Use `--target` only for `MASTER`; `SKU` reads its automatic name from the active
+run.
 
-Use Image 2 as one exact flat asset. Allow only proportional scaling and
-positioning. Preserve artwork, color, transparency, letterforms, spacing,
-proportions, and edges. Never redraw, retype, split, rearrange, recolor, deform,
-simplify, relight, texture, reflect, replace, or add a backing/effect.
+A `DELIVERY_FAILED` call is recorded in `scene-attempts.json` but does not use
+one of the three complete-background attempts. Never record it with
+`record-failure`.
 
-Measure visible artwork, not transparent canvas:
+The first build opens one active background run and writes its prompt and attempt
+state in `PRODUCT_DIRECTORY`. Reuse the same target for retries. A changed target
+requires `--new-candidate`, and that flag is allowed only after the user
+explicitly requests another independent candidate. A new candidate inherits
+the accumulated corrections for the same complete product name only.
 
-- preferred height: 4.5%-6% of canvas height when width remains valid
-- maximum visible width: 30% of canvas width; exceeding it is a hard fail
-- preferred left and top margins: about 5% of canvas width and height
+Use `--new-candidate` only for the explicit README request `再创建一个独立母版候选`.
 
-Never crop, crowd, or make it unrecognizable. Width cap and third-level hierarchy
-override height guidance. Any Logo that attracts attention before title fails.
+For an SKU, build with:
 
-### Set exact typography
+```text
+python scripts/scene_prompt.py build --mode SKU --layout <layout.json> --master <master.json>
+```
 
-Preserve every character, case, punctuation mark, space, language, and word
-order. Render the title only with `TITLE_FONT_PATH` and the version only with
-`VERSION_FONT_PATH`. Never synthesize weight, condense, stretch, distort, or
-substitute either font.
+The script assigns the next unused sequential name (`SKU_VARIANT-A`,
+`SKU_VARIANT-B`, and so on), verifies the bound master, appends the same final
+merged information safe-zone block, then the minimal SKU edit block from
+`references/replace-variant-block.md`, followed by the same product's accumulated
+temporary corrections when present, and finally the same canonical product and
+shadow placement policy. Send exactly two Image Gen references:
+`ORIGINAL_MASTER_BACKGROUND.png` as composition reference and the current
+transparent SKU PNG only as palette reference. Image Gen must return an empty
+background. Never send `ORIGINAL_MASTER_SCENE.png`,
+`ORIGINAL_MASTER_FINAL.png`, Logo, text, masks, or another SKU to Image Gen.
 
-Prefer title visible letter height around 4%-5% of canvas height. Keep the
-measured one-line title when it fits strongly. Only after a recorded failed test:
+### 3. Reject or accept the background
 
-- `WORDMARK_BRAND`: wrap remaining name at a natural boundary; never repeat brand
-- `FULL_NAME`: brand alone on line 1, remaining name/model on line 2
+Reject a generated background when any apply:
 
-For a two-line title, measure the actual visible glyph bounds. Keep a clear gap
-between line 1's visible bottom and line 2's visible top, preferably about
-0.4-0.55 of one title line's visible letter height. Treat this as optical
-guidance, not fixed pixels. Reject touching, tangent, or compressed lines, or
-lines that lose clear separation in the `288 x 384` thumbnail.
+- it is not native portrait 3:4
+- the final merged information safe rectangle contains a card edge, strong
+  shadow, texture change, or detailed geometry
+- a product, product-shaped element, product shadow, floor, table, display
+  stand, generated Logo, or generated text appears
+- the background geometry or MD3 presentation contradicts
+  `references/image-gen-prompt.txt`
+- an SKU changes the master background composition or fails to adapt its colors
+  to the current SKU
 
-Use at most two lines; never split a word or turn a line into a subtitle. If it
-cannot fit strongly, regenerate more space rather than shrink or distort it.
+The final merged information safe rectangle is the only mandatory empty zone.
+At the background-only stage, do not reject a simple, low-detail MD3 card merely
+because it lies beneath the future local product or shadow, and never invent or
+expand a second empty product or shadow zone. Judge an actual product conflict
+only from the complete local preview. Do not accept the attempt or create a
+candidate yet.
 
-Place exact version text directly on the uninterrupted background inside
-`VERSION_TEXT_RECT`, using the same typography measured in preflight. Prefer
-visible height 2.75%-3.25% of canvas height and about 55%-65% of title height,
-bold weight. Measure the title-to-version gap from the final title line's visible
-bottom to the version text's visible top. Use about 1.0-1.4 version-letter
-heights for a one-line title and a tighter 0.75-1.0 for a two-line title. Reject
-crowding or a version line that appears detached from the title block at full
-size or in the `288 x 384` thumbnail. Use one solid text color with sufficient
-contrast. Hierarchy must come from lower emphasis, not miniature type. Never abbreviate, outline, glow, shadow, or add any backing.
+On background failure, do not save or reuse the failed raster. Record every failed
+check/correction pair before any next build, then rebuild the same target prompt:
 
-Mandatory order: product, title, Logo, version. After approval, lock content,
-scale, position, spacing, and line breaks per the lock list; only SKU
-version-text lightness may adapt.
+```text
+python scripts/scene_prompt.py record-failure --log <scene-failures.json> --mode <MASTER|SKU> [--target <candidate-id>] --failed-check <check> --correction <correction>
+```
 
-## Validate and deliver
+Use `--target` only for `MASTER`; `SKU` reads its automatic name from the active
+run.
 
-Run `scripts/validate_final.py` on the final file; it rejects any canvas that is
-not an exact portrait 3:4 and can write the `288 x 384` thumbnail. Then validate
-the full-size file and that thumbnail shown at 100% without zoom. Reject when
-exact hierarchy, source Logo, exact text,
-marketplace readability, planned content rectangles and stepped clear zones,
-title mode, line breaking and spacing, title-to-version gap, shared axis,
-boundary clearance, direct
-version-text contrast, absence of information backings, product
-fidelity/separation, allowed content, master binding, or SKU adaptation fails.
+The active run stops after three inspectable complete-background attempts. Delivery
+failures do not count. Changing the target cannot reset the count. Failure
+records accumulate by complete product name and are appended to every later
+Image Gen prompt for that product, including new candidates and SKUs. Each new
+failure adds to the existing block; different product names never share it.
+Never record a correction requiring a product or shadow coordinate region to be
+empty or unobstructed. After a complete preview, a background-caused product
+conflict must identify the specific dominant high-contrast edge or dense detail
+that competes with the product.
 
-If only Logo or typography fails, preserve the accepted scene and rebuild the
-complete information group from original assets. If protected content-zone or
-connector geometry, placement, or clearance fails, regenerate the complete
-scene. Never repair an individual glyph or Logo fragment. Deliver only after every applicable
-check passes.
+### 4. Preview, then create one master candidate
+
+After the scene-only check passes, run:
+
+```text
+python scripts/artifact_flow.py preview --generated-background <background> --product <authoritative-transparent-product.png> --product-dir <PRODUCT_DIRECTORY> --candidate-id <id> [--text-color <RRGGBB>] [--version-color <RRGGBB>]
+```
+
+This verifies the master product hash, removes low-alpha legacy shadow from the
+transparent PNG, fixes the product at the local placement, and generates one
+2D shadow at `50°`. It then composes the cached information group, validates
+3:4, and writes the background, placed product layer, shadow mask, scene,
+preview, thumbnail, and manifest in `PRODUCT_DIRECTORY`. It leaves
+the scene attempt `PENDING` and leaves `output` unchanged. If colors are omitted,
+the script chooses readable colors automatically. Before compositing, it also
+requires at least `1.5:1` contrast between the visible Logo outer edge and the
+scene background beneath it.
+
+Use the visible product bounds to select local geometry. Keep visible height at
+`54%` and right margin at `12%`. For aspect ratio `>= 1.35`, use maximum width
+`68%` and bottom margin `18%`. For aspect ratio `< 0.90`, use maximum width
+`52%` and bottom margin `12%`. Otherwise use maximum width `52%` and bottom
+margin `18%`. Use shadow angle `50°`, offset `16%` of the product height, blur
+radius `0.7%` of the canvas height, and opacity `28%`.
+
+If preview fails with `LOGO_BACKGROUND_CONTRAST_TOO_LOW`, no preview is kept.
+Record it as a background failure and regenerate the background; do not run
+`discard-preview`, recolor the Logo, or add a backing.
+
+Inspect the full preview and thumbnail. Reject it if the product is cropped or
+altered, the fixed 2D shadow does not visibly follow its silhouette at `50°`,
+or Logo, text, product, shadow, or a dominant background boundary visibly
+conflicts. A simple card beneath the product or cast shadow is not itself a
+conflict. For a background-caused failure, run:
+
+```text
+python scripts/artifact_flow.py discard-preview --product-dir <PRODUCT_DIRECTORY> --candidate-id <id>
+python scripts/scene_prompt.py record-failure --log <scene-failures.json> --mode MASTER --target <id> --failed-check <check> --correction <correction>
+```
+
+Never edit `scene-attempts.json`, delete a candidate manifest manually, or reuse
+a failed preview. Rebuild the same target background after recording the
+failure. If the transparent product itself fails, stop and request a corrected
+PNG instead of regenerating the background.
+
+If the preview passes, run:
+
+```text
+python scripts/artifact_flow.py candidate --product-dir <PRODUCT_DIRECTORY> --candidate-id <id>
+```
+
+This verifies and promotes the exact inspected preview without recompositing,
+then marks the attempt `ACCEPTED` and removes the preview artifacts. Show the
+candidate and canonical product-directory path, then stop. Never copy it into a
+sibling `outputs` directory, infer approval, or bind automatically.
+
+### 5. Bind only explicit user selection
+
+After explicit approval, run:
+
+```text
+python scripts/artifact_flow.py bind --product-dir <PRODUCT_DIRECTORY> --candidate-id <id>
+```
+
+This verifies candidate hashes, creates immutable-by-workflow
+`ORIGINAL_MASTER_BACKGROUND.png`, `ORIGINAL_MASTER_PRODUCT.png`,
+`ORIGINAL_MASTER_SHADOW.png`, `ORIGINAL_MASTER_SCENE.png`,
+`output/ORIGINAL_MASTER_FINAL.png`, and `master.json`, and consolidates the
+selected candidate files. `master.json`
+binds the one `layout.json` by hash and locks title/version colors. Binding also
+closes the accepted master run by clearing `active_run_id`, so the first SKU can
+start a new run normally. Never create or copy a second layout file, edit bound
+files, overwrite a master, or relabel an SKU as master.
+
+### 6. Create an SKU final
+
+After the SKU background passes visual review, run:
+
+```text
+python scripts/artifact_flow.py sku --generated-background <background> --product <current-transparent-SKU.png> --product-dir <PRODUCT_DIRECTORY>
+```
+
+Never ask for or infer an SKU label from user text or upload paths. The script
+reads the automatically assigned name from the active SKU run, verifies the
+master before and after, reuses the bound layout and fixed 2D shadow parameters,
+locally composes the current transparent product and cached Logo/text, and
+writes only the final SKU to `output`; its background, product layer, shadow
+mask, scene, and thumbnail stay in `PRODUCT_DIRECTORY`. It adapts both title and version
+colors to the current SKU scene background. Version text must have lower visual
+contrast than the title while remaining readable against its background. Never
+overwrite an existing SKU. If Logo/background contrast is below `1.5:1`, record
+the SKU background failure and regenerate the SKU background.
+
+## Preserve the information group
+
+Add only the exact source Logo, title, and optional version in that vertical
+order on one uninterrupted background. The mandatory attention order is:
+product, title, Logo, version.
+
+- Preserve Logo artwork, alpha, color, letterforms, spacing, proportions, and
+  edges. Allow only proportional scaling and positioning; use visible alpha
+  bounds, not transparent canvas bounds. Never redraw, retype, recolor, deform,
+  relight, texture, or add a backing/effect. Require at least `1.5:1` contrast
+  between its visible outer edge and the background beneath it.
+- Preserve every text character, case, punctuation mark, space, language, and
+  word order. Use only Roboto Bold and the manually selected line count.
+- For two lines with `GRAPHIC`, use brand on line 1 and remaining name on line
+  2. For two lines with `TEXT`, split only the remaining name at a natural word
+  boundary and never repeat the brand.
+- Keep the Logo and text on the visible Logo left edge. Keep clear line gaps at
+  full size and `288 x 384`. Keep the gap from the last title line to the version
+  text at `2.5%` of the canvas height for both one-line and two-line titles.
+- Render version text in its measured size. Its solid color must have lower
+  visual contrast than the title while remaining clearly readable. Do not force
+  an absolute brightness gap that makes the version more prominent. Never use
+  outline, glow, shadow, or backing.
+
+If only local information rendering fails, reuse the accepted background,
+placed product, shadow, and cached assets; never remeasure. If a protected zone
+or background boundary fails, regenerate only the background. Do not inpaint,
+erase, extend, or repair a failed background.
+
+Deliver only after deterministic script checks and the visual checks above pass.
