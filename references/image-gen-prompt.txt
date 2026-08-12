@@ -4,7 +4,7 @@ Generate only the empty background plate. Use the supplied product reference onl
 
 Background: Create a refined neumorphic soft-UI composition with smooth rounded forms, softly raised and recessed surfaces, subtle ambient occlusion, diffused highlights, and gentle same-material shadows. Avoid flat papercraft styling, hard graphic borders, sharp outlines, high-contrast edges, and realistic physical environments.
 
-Adaptive palette: Translate the dominant colors of the supplied product into a classic macaron palette. Preserve the product’s hue relationships while increasing lightness and reducing saturation. Use soft pastel colors such as powder blue, baby blue, mint, pale lavender, blush pink, soft peach, buttercream, and light slate pastel. Do not use literal near-black, deep navy, burgundy, saturated red, or strong orange as background colors.
+Adaptive palette: Translate the dominant colors of the supplied product into a classic macaron palette. Preserve the product’s hue relationships while increasing lightness and reducing saturation. Do not use literal near-black, deep navy, burgundy, saturated red, or strong orange as background colors.
 
 Layout & Composition: Use clean layered neumorphic panels, rounded capsules, soft discs, and gently recessed or elevated shapes. Keep the composition minimal and balanced. There is no physical floor, table, display stand, or studio set; the scene relies entirely on soft neumorphic surfaces.
 
