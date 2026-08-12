@@ -1,4 +1,4 @@
 interface:
   display_name: "MD3 Product Image"
   short_description: "生成 3:4 MD3 电商产品母版与 SKU 变体"
-  default_prompt: "使用 $md3-product-image 根据上传的透明产品图和 Logo 创建一个 3:4 MD3 母版候选"
+  default_prompt: "使用 $md3-product-image 根据上传的透明产品图和 Logo 生成一张 3:4 MD3 母版预览并等待我决定"
