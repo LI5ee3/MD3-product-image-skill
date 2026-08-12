@@ -6,38 +6,50 @@
 
 ## 使用
 
-上传透明产品 PNG 和透明 Logo PNG：
-
 ```text
 使用 md3-product-image
-
 完整产品名称：[完整名称]
 品牌：[品牌]
 品牌以外的产品名称或型号：[其余名称]
 产品名称显示行数：[一行/两行]
 品牌 Logo 类型：[图形/文字]
-版本文字：[可选；无则删除本行]
-
-创建一个母版候选
+版本文字：[可选] 
+生成母版
 ```
 
 确认候选：
 
 ```text
-将[候选 ID]设为母版
+锁定母版
+```
+
+重做母版：
+
+```text
+重做母版：[可选追加提示词]
 ```
 
 生成 SKU：
 
 ```text
-使用当前上传的透明产品 PNG 生成 SKU 变体
+使用当前产品图生成 SKU
 ```
 
-`产品名称显示行数`和`品牌 Logo 类型`必须手动填写<br>SKU 自动命名为 `SKU_VARIANT-A`、`SKU_VARIANT-B`……
+确认或重做 SKU：
+
+```text
+确认当前 SKU
+```
+
+```text
+重做当前 SKU：[可选追加提示词]
+```
+
+`产品名称显示行数`和`品牌 Logo 类型`必须手动填写<br>每次只生成一张完整预览，母版和 SKU 均由用户确认<br>SKU 自动命名为 `SKU_VARIANT-A`、`SKU_VARIANT-B`……
 
 ## 输出
 
-每个产品使用独立文件夹<br>`output` 只保存 `ORIGINAL_MASTER_FINAL.png` 和最终 `SKU_VARIANT-*.png`<br>其他工作文件保存在产品文件夹根目录
+每个产品使用独立文件夹<br>`reusable` 保存布局、累计提示词和可复用合成资产<br>`output` 只保存 `ORIGINAL_MASTER_FINAL.png` 和已确认的 `SKU_VARIANT-*.png`<br>其他工作文件保存在产品文件夹根目录
 
 ## Roboto Bold 字体许可证
 
