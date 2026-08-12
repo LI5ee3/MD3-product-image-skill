@@ -292,42 +292,12 @@ def accept_scene_attempt(
     state, info = scene_attempt(product_dir, mode, target)
     run = info["run"]
     attempt = info["attempt"]
+    result = attempt_record(info)
     attempt["status"] = "ACCEPTED"
     run["status"] = "ACCEPTED"
-    if mode == "SKU":
-        state["active_run_id"] = None
-    write_json_replace(scene_attempt_path(product_dir), state)
-    return {
-        "run_id": run["run_id"],
-        "attempt": int(attempt["attempt"]),
-        "prompt_path": str(attempt.get("prompt_path", "")),
-        "prompt_sha256": str(attempt.get("prompt_sha256", "")),
-    }
-
-
-def close_accepted_master_run(product_dir: Path, candidate_id: str) -> None:
-    path = scene_attempt_path(product_dir)
-    state = read_json(path)
-    run_id = state.get("active_run_id")
-    runs = state.get("runs")
-    if not run_id or not isinstance(runs, list):
-        raise ValueError("ATTEMPT_STATE_INVALID")
-    run = next((item for item in runs if item.get("run_id") == run_id), None)
-    if (
-        not isinstance(run, dict)
-        or run.get("mode") != "MASTER"
-        or run.get("target") != candidate_id
-        or run.get("status") != "ACCEPTED"
-    ):
-        raise ValueError("ACCEPTED_MASTER_RUN_MISMATCH")
-    attempts = run.get("attempts")
-    if not isinstance(attempts, list) or not attempts:
-        raise ValueError("SCENE_ATTEMPT_MISSING")
-    if attempts[-1].get("status") != "ACCEPTED":
-        raise ValueError("MASTER_ATTEMPT_NOT_ACCEPTED")
     state["active_run_id"] = None
-    write_json_replace(path, state)
-
+    write_json_replace(scene_attempt_path(product_dir), state)
+    return result
 
 def validate_information_colors(layout: dict, information: dict) -> None:
     elements = layout.get("elements")
@@ -346,23 +316,9 @@ def cleanup(paths: list[Path]) -> None:
             path.unlink()
 
 
-def candidate_paths(product_dir: Path, candidate_id: str) -> dict[str, Path]:
+def preview_paths(product_dir: Path, candidate_id: str) -> dict[str, Path]:
     if candidate_id.endswith(("-scene", "-preview")):
         raise ValueError("CANDIDATE_ID_RESERVED")
-    prefix = f"master-candidate-{candidate_id}"
-    reusable_dir = product_dir / "reusable"
-    return {
-        "background": product_dir / f"{prefix}-background.png",
-        "product": reusable_dir / f"{prefix}-product.png",
-        "shadow": reusable_dir / f"{prefix}-shadow.png",
-        "scene": product_dir / f"{prefix}-scene.png",
-        "final": product_dir / f"{prefix}.png",
-        "manifest": product_dir / f"{prefix}.json",
-    }
-
-
-def preview_paths(product_dir: Path, candidate_id: str) -> dict[str, Path]:
-    candidate_paths(product_dir, candidate_id)
     prefix = f"master-candidate-{candidate_id}-preview"
     reusable_dir = product_dir / "reusable"
     return {
@@ -375,10 +331,8 @@ def preview_paths(product_dir: Path, candidate_id: str) -> dict[str, Path]:
     }
 
 
-def current_attempt_info(product_dir: Path, candidate_id: str) -> dict:
-    _, pending_info = scene_attempt(product_dir, "MASTER", candidate_id)
-    run = pending_info["run"]
-    attempt = pending_info["attempt"]
+def attempt_record(info: dict) -> dict[str, str | int]:
+    run, attempt = info["run"], info["attempt"]
     return {
         "run_id": run["run_id"],
         "attempt": int(attempt["attempt"]),
@@ -387,16 +341,14 @@ def current_attempt_info(product_dir: Path, candidate_id: str) -> dict:
     }
 
 
+def current_attempt_info(product_dir: Path, candidate_id: str) -> dict:
+    return attempt_record(scene_attempt(product_dir, "MASTER", candidate_id)[1])
+
+
 def create_preview(args: argparse.Namespace) -> None:
     product_dir, layout_path, layout = load_product(args.product_dir)
     candidate_id = safe_component(args.candidate_id, "CANDIDATE_ID")
     attempt_info = current_attempt_info(product_dir, candidate_id)
-    if any(
-        path.exists()
-        for label, path in candidate_paths(product_dir, candidate_id).items()
-        if label not in {"product", "shadow"}
-    ):
-        raise ValueError("CANDIDATE_ALREADY_EXISTS")
     paths = preview_paths(product_dir, candidate_id)
     if any(
         path.exists()
@@ -507,96 +459,16 @@ def discard_preview(args: argparse.Namespace) -> None:
     print()
 
 
-def create_candidate(args: argparse.Namespace) -> None:
-    product_dir, layout_path, layout = load_product(args.product_dir)
-    candidate_id = safe_component(args.candidate_id, "CANDIDATE_ID")
-    preview, sources = load_preview(product_dir, candidate_id)
-    attempt_info = current_attempt_info(product_dir, candidate_id)
-    if preview.get("scene_attempt") != attempt_info:
-        raise ValueError("PREVIEW_ATTEMPT_MISMATCH")
-    information = preview.get("information")
-    if not isinstance(information, dict):
-        raise ValueError("PREVIEW_INFORMATION_INVALID")
-    validate_information_colors(layout, information)
-    paths = candidate_paths(product_dir, candidate_id)
-    if any(
-        path.exists()
-        for label, path in paths.items()
-        if label not in {"product", "shadow"}
-    ):
-        raise ValueError("CANDIDATE_ALREADY_EXISTS")
-    output_before = ensure_output_allowed(product_dir)
-    created = [
-        path for label, path in paths.items()
-        if label not in {"product", "shadow"}
-    ]
-    try:
-        for label in ("background", "scene", "final"):
-            copy_new(sources[label], paths[label])
-            if sha256_file(sources[label]) != sha256_file(paths[label]):
-                raise ValueError(f"PREVIEW_COPY_HASH_MISMATCH: {label}")
-        manifest = {
-            "schema": 1,
-            "kind": "MASTER_CANDIDATE",
-            "candidate_id": candidate_id,
-            "files": {
-                "layout": relative_entry(layout_path, product_dir),
-                "background": relative_entry(paths["background"], product_dir),
-                "product": relative_entry(paths["product"], product_dir),
-                "shadow": relative_entry(paths["shadow"], product_dir),
-                "scene": relative_entry(paths["scene"], product_dir),
-                "final": relative_entry(paths["final"], product_dir),
-            },
-            "information": information,
-            "scene_composite": preview.get("scene_composite"),
-            "scene_attempt": attempt_info,
-        }
-        write_json_new(paths["manifest"], manifest)
-        if ensure_output_allowed(product_dir) != output_before:
-            raise ValueError("CANDIDATE_MODIFIED_OUTPUT_DIRECTORY")
-        cleanup([
-            path for label, path in sources.items()
-            if label not in {"product", "shadow"}
-        ])
-        accept_scene_attempt(product_dir, "MASTER", candidate_id)
-    except Exception:
-        cleanup(created)
-        raise
-    json.dump(manifest, sys.stdout, ensure_ascii=False, indent=2)
-    print()
-
-
-def load_candidate(product_dir: Path, candidate_id: str) -> tuple[dict, dict[str, Path]]:
-    paths = candidate_paths(product_dir, candidate_id)
-    manifest = read_json(paths["manifest"])
-    if (
-        manifest.get("kind") != "MASTER_CANDIDATE"
-        or manifest.get("candidate_id") != candidate_id
-    ):
-        raise ValueError("CANDIDATE_MANIFEST_INVALID")
-    files = manifest.get("files")
-    if not isinstance(files, dict):
-        raise ValueError("CANDIDATE_MANIFEST_INVALID")
-    expected = {
-        "layout": product_dir / "reusable" / "layout.json",
-        "background": paths["background"],
-        "product": paths["product"],
-        "shadow": paths["shadow"],
-        "scene": paths["scene"],
-        "final": paths["final"],
-    }
-    for label, path in expected.items():
-        resolve_entry(files.get(label), product_dir, path, label)
-    return manifest, paths
-
-
 def bind_candidate(args: argparse.Namespace) -> None:
     product_dir, layout_path, layout = load_product(args.product_dir)
     reusable_dir = product_dir / "reusable"
     candidate_id = safe_component(args.candidate_id, "CANDIDATE_ID")
     if ensure_output_allowed(product_dir):
         raise ValueError("BIND_REQUIRES_EMPTY_OUTPUT_DIRECTORY")
-    candidate, candidate_files = load_candidate(product_dir, candidate_id)
+    preview, preview_files = load_preview(product_dir, candidate_id)
+    attempt_info = current_attempt_info(product_dir, candidate_id)
+    if preview.get("scene_attempt") != attempt_info:
+        raise ValueError("PREVIEW_ATTEMPT_MISMATCH")
     targets = {
         "background": reusable_dir / "ORIGINAL_MASTER_BACKGROUND.png",
         "product": reusable_dir / "ORIGINAL_MASTER_PRODUCT.png",
@@ -611,10 +483,10 @@ def bind_candidate(args: argparse.Namespace) -> None:
     created = list(targets.values())
     try:
         for label in ("background", "product", "shadow", "scene", "final"):
-            copy_new(candidate_files[label], targets[label])
-            if sha256_file(candidate_files[label]) != sha256_file(targets[label]):
+            copy_new(preview_files[label], targets[label])
+            if sha256_file(preview_files[label]) != sha256_file(targets[label]):
                 raise ValueError(f"MASTER_COPY_HASH_MISMATCH: {label}")
-        information = candidate.get("information")
+        information = preview.get("information")
         if not isinstance(information, dict):
             raise ValueError("CANDIDATE_INFORMATION_INVALID")
         validate_information_colors(layout, information)
@@ -636,16 +508,16 @@ def bind_candidate(args: argparse.Namespace) -> None:
                 "logo_type": layout.get("logo_type"),
                 "title_line_count": layout.get("title_line_count"),
             },
-            "scene_composite": candidate.get("scene_composite"),
+            "scene_composite": preview.get("scene_composite"),
         }
         write_json_new(targets["manifest"], master)
         ensure_output_allowed(product_dir)
-        close_accepted_master_run(product_dir, candidate_id)
+        accept_scene_attempt(product_dir, "MASTER", candidate_id)
     except Exception:
         cleanup(created)
         raise
 
-    cleanup(list(candidate_files.values()))
+    cleanup(list(preview_files.values()))
     json.dump(master, sys.stdout, ensure_ascii=False, indent=2)
     print()
 
@@ -711,14 +583,7 @@ def create_sku_preview(args: argparse.Namespace) -> None:
     verify_master(product_dir)
     master_manifest_hash = sha256_file(product_dir / "reusable" / "master.json")
     sku_label, pending_info = pending_sku(product_dir)
-    pending_run = pending_info["run"]
-    pending_attempt = pending_info["attempt"]
-    attempt_info = {
-        "run_id": pending_run["run_id"],
-        "attempt": int(pending_attempt["attempt"]),
-        "prompt_path": str(pending_attempt.get("prompt_path", "")),
-        "prompt_sha256": str(pending_attempt.get("prompt_sha256", "")),
-    }
+    attempt_info = attempt_record(pending_info)
 
     paths = sku_preview_paths(product_dir, sku_label)
     if any(
@@ -827,11 +692,6 @@ def main() -> None:
     discard.add_argument("--product-dir", required=True)
     discard.add_argument("--candidate-id", required=True)
     discard.set_defaults(handler=discard_preview)
-
-    candidate = subparsers.add_parser("candidate")
-    candidate.add_argument("--product-dir", required=True)
-    candidate.add_argument("--candidate-id", required=True)
-    candidate.set_defaults(handler=create_candidate)
 
     bind = subparsers.add_parser("bind")
     bind.add_argument("--product-dir", required=True)

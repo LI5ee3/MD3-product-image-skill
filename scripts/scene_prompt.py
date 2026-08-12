@@ -222,14 +222,8 @@ def start_run(state: dict, mode: str, target: str) -> dict:
     return run
 
 
-def prepare_run(
-    state: dict, mode: str, target: str, new_candidate: bool
-) -> dict:
+def prepare_run(state: dict, mode: str, target: str) -> dict:
     run = active_run(state)
-    if new_candidate:
-        if run and run.get("status") == "ACTIVE":
-            run["status"] = "ABANDONED"
-        return start_run(state, mode, target)
     if run is None:
         return start_run(state, mode, target)
     if run.get("mode") != mode or run.get("target") != target:
@@ -356,7 +350,7 @@ def build_prompt(args: argparse.Namespace) -> None:
     elif args.master:
         raise ValueError("MASTER_MANIFEST_NOT_ALLOWED_FOR_MASTER_PROMPT")
 
-    run = prepare_run(state, args.mode, target, args.new_candidate)
+    run = prepare_run(state, args.mode, target)
     attempts = run["attempts"]
     attempt_number = len(attempts) + 1
     parts = [image_prompt()]
@@ -504,11 +498,6 @@ def main() -> None:
     build.add_argument("--layout", required=True)
     build.add_argument("--target")
     build.add_argument("--master")
-    build.add_argument(
-        "--new-candidate",
-        action="store_true",
-        help="start an explicitly requested independent candidate run",
-    )
     build.set_defaults(handler=build_prompt)
 
     record = subparsers.add_parser("reject")

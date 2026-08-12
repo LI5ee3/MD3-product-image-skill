@@ -37,6 +37,20 @@ def must_fail(script: str, *args: str) -> str:
     return completed.stderr or completed.stdout
 
 
+def scene_prompt(
+    action: str, layout: Path, mode: str, *, target: str = "", master: Path | None = None,
+    addition: str = "", fail: bool = False,
+) -> str:
+    args = [action, "--layout", str(layout), "--mode", mode]
+    if target:
+        args += ["--target", target]
+    if master:
+        args += ["--master", str(master)]
+    if addition:
+        args += ["--additional-prompt", addition]
+    return (must_fail if fail else run)("scene_prompt.py", *args)
+
+
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -83,14 +97,10 @@ def main() -> None:
         layout = reusable / "layout.json"
         assert layout.is_file() and (reusable / "logo.png").is_file()
 
-        prompt = run(
-            "scene_prompt.py", "build", "--mode", "MASTER",
-            "--layout", str(layout), "--target", "01",
-        )
+        prompt = scene_prompt("build", layout, "MASTER", target="01")
         assert "FINAL_INFORMATION_SAFE_ZONE" in prompt
-        assert "USER_DECISION_REQUIRED" in must_fail(
-            "scene_prompt.py", "build", "--mode", "MASTER",
-            "--layout", str(layout), "--target", "01",
+        assert "USER_DECISION_REQUIRED" in scene_prompt(
+            "build", layout, "MASTER", target="01", fail=True
         )
         preview = json.loads(run(
             "artifact_flow.py", "preview",
@@ -110,23 +120,16 @@ def main() -> None:
             "artifact_flow.py", "discard-preview",
             "--product-dir", str(product_dir), "--candidate-id", "01",
         )
-        run(
-            "scene_prompt.py", "reject", "--layout", str(layout),
-            "--mode", "MASTER", "--target", "01",
-            "--additional-prompt", "Keep the left side quieter",
+        scene_prompt(
+            "reject", layout, "MASTER", target="01",
+            addition="Keep the left side quieter",
         )
 
         for index in range(4):
-            retry_prompt = run(
-                "scene_prompt.py", "build", "--mode", "MASTER",
-                "--layout", str(layout), "--target", "01",
-            )
+            retry_prompt = scene_prompt("build", layout, "MASTER", target="01")
             assert retry_prompt.count("Keep the left side quieter") == 1
             if index < 3:
-                run(
-                    "scene_prompt.py", "reject", "--layout", str(layout),
-                    "--mode", "MASTER", "--target", "01",
-                )
+                scene_prompt("reject", layout, "MASTER", target="01")
 
         run(
             "artifact_flow.py", "preview",
@@ -137,10 +140,6 @@ def main() -> None:
         )
         assert cached_hashes == (sha256(cached_product), sha256(cached_shadow))
         run(
-            "artifact_flow.py", "candidate",
-            "--product-dir", str(product_dir), "--candidate-id", "01",
-        )
-        run(
             "artifact_flow.py", "bind",
             "--product-dir", str(product_dir), "--candidate-id", "01",
         )
@@ -150,10 +149,7 @@ def main() -> None:
             "ORIGINAL_MASTER_FINAL.png"
         }
 
-        sku_prompt = run(
-            "scene_prompt.py", "build", "--mode", "SKU",
-            "--layout", str(layout), "--master", str(master),
-        )
+        sku_prompt = scene_prompt("build", layout, "SKU", master=master)
         assert "Keep the left side quieter" in sku_prompt
         sku_preview_report = json.loads(run(
             "artifact_flow.py", "sku-preview",
@@ -172,14 +168,10 @@ def main() -> None:
         sku_layer_hashes = tuple(sha256(path) for path in sku_layers)
         assert not (product_dir / "output" / "SKU_VARIANT-A.png").exists()
         run("artifact_flow.py", "discard-sku-preview", "--product-dir", str(product_dir))
-        run(
-            "scene_prompt.py", "reject", "--layout", str(layout),
-            "--mode", "SKU", "--additional-prompt", "Use warmer accent cards",
+        scene_prompt(
+            "reject", layout, "SKU", addition="Use warmer accent cards",
         )
-        sku_retry_prompt = run(
-            "scene_prompt.py", "build", "--mode", "SKU",
-            "--layout", str(layout), "--master", str(master),
-        )
+        sku_retry_prompt = scene_prompt("build", layout, "SKU", master=master)
         assert "Keep the left side quieter" in sku_retry_prompt
         assert "Use warmer accent cards" in sku_retry_prompt
         run(

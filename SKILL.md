@@ -81,14 +81,13 @@ python scripts/artifact_flow.py preview --generated-background <background> --pr
 
 The command immediately creates one full-size composite containing the exact cached or newly prepared product layer, its fixed shadow, cached Logo, and cached text. Reuse an existing product layer and shadow for the same candidate; a redo changes only the background, scene, and final preview. Show the full-size preview and stop.
 
-Do not use contrast or other visual heuristics to accept, reject, or regenerate. Surface computed contrast as information only. The user owns the visual decision.
+Do not use visual heuristics to accept, reject, or regenerate. The user owns the visual decision.
 
 ### 4. Lock or redo the master
 
 Only after the explicit instruction `锁定母版`, run:
 
 ```text
-python scripts/artifact_flow.py candidate --product-dir <PRODUCT_DIRECTORY> --candidate-id <id>
 python scripts/artifact_flow.py bind --product-dir <PRODUCT_DIRECTORY> --candidate-id <id>
 ```
 

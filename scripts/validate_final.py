@@ -1,17 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a candidate, SKU preview, or final image for md3-product-image.
-
-This script performs the deterministic checks only:
-- the file exists and decodes as an image
-- the canvas is an exact 3:4 portrait (any other ratio is a rejection)
-Visual checks remain the user's decision after the full-size composite is shown.
-
-Usage:
-  python scripts/validate_final.py --image-kind FINAL --image PRODUCT/output/final.png
-
-Exit codes: 0 = ratio exact, 1 = any rejection.
-Outputs one JSON document on stdout.
-"""
+"""Validate an MD3 candidate, SKU preview, or final image."""
 
 import argparse
 import json
@@ -19,39 +7,6 @@ import sys
 from pathlib import Path
 
 from PIL import Image
-
-REJECT_RATIO = "CANVAS_NOT_3_4"
-
-
-def resolve_product_dir(image_path: Path, image_kind: str) -> Path:
-    if image_kind == "FINAL":
-        if image_path.parent.name != "output":
-            raise ValueError("FINAL_OUTSIDE_PRODUCT_OUTPUT_DIRECTORY")
-        allowed = image_path.name == "ORIGINAL_MASTER_FINAL.png" or (
-            image_path.name.startswith("SKU_VARIANT-")
-            and image_path.name != "SKU_VARIANT-.png"
-            and image_path.suffix.lower() == ".png"
-        )
-        if not allowed:
-            raise ValueError("FINAL_FILENAME_INVALID")
-        return image_path.parent.parent
-
-    if image_kind == "SKU_PREVIEW":
-        if (
-            not image_path.name.startswith("SKU_VARIANT-")
-            or not image_path.name.endswith("-preview.png")
-        ):
-            raise ValueError("SKU_PREVIEW_FILENAME_INVALID")
-        return image_path.parent
-
-    if (
-        not image_path.name.startswith("master-candidate-")
-        or image_path.name == "master-candidate-.png"
-        or image_path.suffix.lower() != ".png"
-        or image_path.name.endswith("-scene.png")
-    ):
-        raise ValueError("CANDIDATE_FILENAME_INVALID")
-    return image_path.parent
 
 
 def main() -> None:
@@ -61,33 +16,42 @@ def main() -> None:
     )
     parser.add_argument("--image", required=True)
     args = parser.parse_args()
+    path = Path(args.image).expanduser().resolve()
 
-    image_path = Path(args.image).expanduser().resolve()
+    valid_name = {
+        "CANDIDATE": path.name.startswith("master-candidate-")
+        and not path.name.endswith("-scene.png"),
+        "SKU_PREVIEW": path.name.startswith("SKU_VARIANT-")
+        and path.name.endswith("-preview.png"),
+        "FINAL": path.name == "ORIGINAL_MASTER_FINAL.png"
+        or path.name.startswith("SKU_VARIANT-") and path.suffix.lower() == ".png",
+    }[args.image_kind]
+    if path.suffix.lower() != ".png" or not valid_name:
+        sys.exit(f"{args.image_kind}_FILENAME_INVALID")
+    if args.image_kind == "FINAL" and path.parent.name != "output":
+        sys.exit("FINAL_OUTSIDE_PRODUCT_OUTPUT_DIRECTORY")
+
     try:
-        product_dir = resolve_product_dir(image_path, args.image_kind)
-    except ValueError as exc:
-        sys.exit(str(exc))
-    try:
-        img = Image.open(image_path)
-        img.load()
+        with Image.open(path) as image:
+            image.load()
+            width, height = image.size
     except OSError as exc:
         sys.exit(f"IMAGE_UNREADABLE: {exc}")
+    if width * 4 != height * 3:
+        sys.exit("CANVAS_NOT_3_4")
 
-    w, h = img.size
-    ratio_exact = w * 4 == h * 3
-
-    report = {
-        "image": str(image_path),
-        "image_kind": args.image_kind,
-        "size": {"width": w, "height": h},
-        "ratio_exact_3_4": ratio_exact,
-    }
-
-    json.dump(report, sys.stdout, ensure_ascii=False, indent=2)
+    json.dump(
+        {
+            "image": str(path),
+            "image_kind": args.image_kind,
+            "size": {"width": width, "height": height},
+            "ratio_exact_3_4": True,
+        },
+        sys.stdout,
+        ensure_ascii=False,
+        indent=2,
+    )
     print()
-
-    if not ratio_exact:
-        sys.exit(REJECT_RATIO)
 
 
 if __name__ == "__main__":
