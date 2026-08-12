@@ -328,12 +328,14 @@ def prepare_layout(args: argparse.Namespace) -> dict:
     product_reference = Path(args.product_reference).expanduser().resolve()
     logo_path = Path(args.logo).expanduser().resolve()
     product_metadata = image_metadata(product_reference)
-    output_dir = resolve_product_directory(Path(args.output_root), args.complete_name)
-    layout_path = output_dir / "layout.json"
+    product_dir = resolve_product_directory(Path(args.output_root), args.complete_name)
+    reusable_dir = product_dir / "reusable"
+    reusable_dir.mkdir(exist_ok=True)
+    layout_path = reusable_dir / "layout.json"
     if layout_path.exists():
         raise ValueError(f"REFUSE_REMEASURE: reuse existing {layout_path}")
     logo_art, logo_metadata = visible_logo(logo_path)
-    logo_art.save(output_dir / "logo.png")
+    logo_art.save(reusable_dir / "logo.png")
 
     x0 = opts.left_margin_frac * width
     logo_height = opts.logo_height_frac * height
@@ -353,7 +355,7 @@ def prepare_layout(args: argparse.Namespace) -> dict:
     title_top = max(opts.title_top_frac * height, logo_rect[3] + 0.02 * height)
     title_rects = []
     for index, (line, mask) in enumerate(zip(title_lines, title_masks), start=1):
-        mask_path = output_dir / f"title-{index}-mask.png"
+        mask_path = reusable_dir / f"title-{index}-mask.png"
         mask.save(mask_path)
         rect = (x0, title_top, x0 + mask.width, title_top + mask.height)
         title_rects.append((line, rect, mask_path.name))
@@ -370,7 +372,7 @@ def prepare_layout(args: argparse.Namespace) -> dict:
         )
         version_mask = render_text_mask(version_font, args.version)
         version_asset = "version-mask.png"
-        version_mask.save(output_dir / version_asset)
+        version_mask.save(reusable_dir / version_asset)
         gap = opts.title_version_gap_frac * height
         top = title_rects[-1][1][3] + gap
         version_rect = (x0, top, x0 + version_mask.width, top + version_mask.height)
@@ -407,22 +409,22 @@ def prepare_layout(args: argparse.Namespace) -> dict:
     information_assets = {
         "logo": {
             "path": "logo.png",
-            "sha256": sha256_file(output_dir / "logo.png"),
+            "sha256": sha256_file(reusable_dir / "logo.png"),
         }
     }
     for index, (_, _, asset) in enumerate(title_rects, start=1):
         information_assets[f"title_{index}"] = {
             "path": asset,
-            "sha256": sha256_file(output_dir / asset),
+            "sha256": sha256_file(reusable_dir / asset),
         }
     if version_asset:
         information_assets["version"] = {
             "path": version_asset,
-            "sha256": sha256_file(output_dir / version_asset),
+            "sha256": sha256_file(reusable_dir / version_asset),
         }
 
     report = {
-        "product_directory": str(output_dir),
+        "product_directory": str(product_dir),
         "canvas": {
             "width": width,
             "height": height,
@@ -444,7 +446,7 @@ def prepare_layout(args: argparse.Namespace) -> dict:
         "information_assets": information_assets,
         "clear_zones": clear_zones(labeled_rects, width, height, opts),
     }
-    temporary = output_dir / ".layout.json.tmp"
+    temporary = reusable_dir / ".layout.json.tmp"
     temporary_created = False
     try:
         with temporary.open("x", encoding="utf-8") as handle:
@@ -456,8 +458,8 @@ def prepare_layout(args: argparse.Namespace) -> dict:
         if temporary_created and temporary.exists():
             temporary.unlink()
         raise
-    attempt_state_path = output_dir / "scene-attempts.json"
-    attempt_state_temporary = output_dir / ".scene-attempts.json.tmp"
+    attempt_state_path = product_dir / "scene-attempts.json"
+    attempt_state_temporary = product_dir / ".scene-attempts.json.tmp"
     attempt_state_created = False
     try:
         with attempt_state_temporary.open("x", encoding="utf-8") as handle:
